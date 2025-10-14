@@ -7,3 +7,4 @@ export { default as Review } from "./review.model.js";
 export { default as Bookmark } from "./bookmark.model.js";
 export { default as SOSAlert } from "./sosAlert.model.js";
 export { default as WorkerLocation } from "./workerLocation.model.js";
+export { default as Category } from "./category.model.js";
