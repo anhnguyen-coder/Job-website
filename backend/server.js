@@ -5,8 +5,7 @@ import cookieParser  from "cookie-parser";
 
 
 import connectDB from "./config/mongodb.js";
-import authRouter from "./routes/authRoutes.js";
-import userRouter from "./routes/userRoutes.js";
+import initAppRouter from "./routes/index.routes.js";
 
 
 const app = express();
@@ -19,9 +18,7 @@ app.use(cookieParser());
 app.use(cors({credentials: true}));
 
 //API Endpoints
-app.get('/', (req, res)=> res.send("API working"));
-app.use('/api/auth',authRouter);
-app.use('/api/user', userRouter);
+initAppRouter(app);
 
 app.listen(port, ()=>{ console.log(`Server started on PORT: ${port}`)});
 
