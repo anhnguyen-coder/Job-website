@@ -1,5 +1,5 @@
 import { Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
 export const deleteJob = async (req, res, next) => {
@@ -8,13 +8,14 @@ export const deleteJob = async (req, res, next) => {
     const customerId = req.user?.id;
 
     if (!customerId) {
-      throw new AppError(401, "Không xác thực được người dùng.");
+      throw AppError(res, 401, "Không xác thực được người dùng.");
     }
 
     const job = await Job.findOneAndDelete({ _id: jobId, customerId });
 
     if (!job) {
-      throw new AppError(
+      throw AppError(
+        res,
         404,
         "Công việc không tồn tại hoặc không thuộc về bạn."
       );

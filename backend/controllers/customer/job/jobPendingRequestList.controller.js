@@ -1,11 +1,14 @@
 import { Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { getPagination, getPagingData } from "../../../pkg/helper/pagy.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
 export const jobPendingRequestList = async (req, res, next) => {
   try {
-    const customerId = req.user.id;
+    const customerId = req.user?.id;
+    if (!customerId) {
+      throw AppError(res, 401, "Không xác thực được người dùng.");
+    }
 
     const { page, limit, skip } = getPagination(req.query);
     const [jobs, total] = await Promise.all([

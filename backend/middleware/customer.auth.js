@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/index.js";
 
 const customerAuth = async (req, res, next) => {
-  const { token } = req.cookies;
+  const { customerToken } = req.cookies;
 
-  if (!token) {
+  if (!customerToken) {
     return res.json({
       success: false,
       message: "Not authorized. Please try again",
@@ -12,7 +12,7 @@ const customerAuth = async (req, res, next) => {
   }
 
   try {
-    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+    const tokenDecode = jwt.verify(customerToken, process.env.JWT_SECRET);
 
     if (tokenDecode.id) {
       const user = await User.findById(tokenDecode.id);

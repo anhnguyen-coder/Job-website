@@ -23,6 +23,7 @@ const jobSchema = new mongoose.Schema(
         "available",
         "pending_request", // waiting for customer approval
         "job_accepted",
+        "job_rejected",
         "in_Progress",
         "completed",
         "cancelled",

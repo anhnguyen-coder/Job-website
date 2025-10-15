@@ -1,5 +1,5 @@
 import { Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
 export const jobDetails = async (req, res) => {
@@ -8,13 +8,10 @@ export const jobDetails = async (req, res) => {
 
     const customerId = req.user?.id;
     if (!customerId) {
-      return res.status(401).json({
-        success: false,
-        message: "Không xác thực được người dùng.",
-      });
+      return AppError(res, 401, "Không xác thực được người dùng.");
     }
 
-    const job = Job.findOne({ id: jobId, customerId: customerId });
+    const job = await Job.findOne({ id: jobId, customerId: customerId });
 
     if (!job) {
       return res.status(404).json({
@@ -25,6 +22,6 @@ export const jobDetails = async (req, res) => {
 
     return successRes(res, { status: 200, data: { job } });
   } catch (error) {
-    AppError(500, "Đã xảy ra lỗi khi lấy thông tin công việc.", error.message);
+    AppError(res, 500, error.message);
   }
 };

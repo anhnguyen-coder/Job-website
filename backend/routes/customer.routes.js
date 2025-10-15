@@ -2,23 +2,25 @@ import express from "express";
 import customerAuth from "../middleware/customer.auth.js";
 import customerController from "../controllers/customer/index.js";
 
-const customerRouter = express.Router();
+const router = express.Router();
 
-// job routes
+// Auth routes
+router.post("/signin", customerController.signIn);
+router.post("/signup", customerController.signUp);
+router.post("/reset-password", customerController.resetPassword);
+router.get("/find-by-email", customerController.findByEmail);
+router.post("/signout", customerAuth, customerController.signOut);
 
-// GET
-customerRouter.get("/jobs", customerAuth, customerController.jobList)
-customerRouter.get("/job/pending-requests", customerAuth, customerController.jobPendingList)
-customerRouter.get("/job/:jobId", customerAuth, customerController.jobDetail)
+// Job routes (private)
+router.use(customerAuth);
 
-// POST
-customerRouter.post("/job", customerAuth, customerController.jobCreate)
+// Job routes
+router.get("/jobs", customerController.jobList);
+router.get("/job/pending-requests", customerController.jobPendingList);
+router.get("/job/:jobId", customerController.jobDetail);
+router.post("/job", customerController.jobCreate);
+router.put("/job/:jobId", customerController.jobUpdate);
+router.put("/job/approve/:jobId", customerController.jobApproval);
+router.delete("/job/:jobId", customerController.jobDelete);
 
-// PUT
-customerRouter.put("/job/:jobId", customerAuth, customerController.jobUpdate),
-customerRouter.put("/job/approve/:jobId", customerController.jobApproval)
-
-// DELETE
-customerRouter.delete("/job/:jobId", customerAuth, customerController.jobDelete)
-
-export default customerRouter;
+export default router;
