@@ -1,7 +1,7 @@
 import transporter from "../../../config/nodemailer.js";
 import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
 import { User } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import {
   isEmailValid,
@@ -13,14 +13,11 @@ export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    const validationError = validateRegisterInput(name, email, password);
-    if (validationError) {
-      return validationError;
-    }
+    validateRegisterInput(res, name, email, password);
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return AppError(400, "User already exists");
+      return new AppError(400, "User already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,23 +43,25 @@ export const register = async (req, res) => {
 
     return successRes(res);
   } catch (error) {
-    return AppError(500, error.message);
+    return AppError(res, 500, error.message);
   }
 };
 
-const validateRegisterInput = (name, email, password) => {
-  if (!name || !email || !password) throw AppError(400, "Missing details");
+const validateRegisterInput = (res, name, email, password) => {
+  if (!name || !email || !password)
+    return AppError(res, 400, "Missing details");
 
   if (name.trim().length < 2)
-    throw AppError(400, "Name must be at least 2 characters long");
+    return AppError(res, 400, "Name must be at least 2 characters long");
 
-  if (!isEmailValid(email)) throw AppError(400, "Invalid email format");
+  if (!isEmailValid(email)) return AppError(res, 400, "Invalid email format");
 
   if (password.trim().length < 8)
-    throw AppError(400, "Password must be at least 8 characters long");
+    return AppError(res, 400, "Password must be at least 8 characters long");
 
   if (!isValidPassword(password))
-    throw AppError(
+    return AppError(
+      res,
       400,
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     );

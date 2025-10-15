@@ -1,5 +1,5 @@
 import { Bookmark, Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
 export const bookmarkJob = async (req, res, next) => {

@@ -1,5 +1,6 @@
 import { Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
+import successRes from "../../../pkg/helper/successRes.js";
 
 export const updateJob = async (req, res, next) => {
   try {

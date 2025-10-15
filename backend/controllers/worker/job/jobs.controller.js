@@ -1,5 +1,5 @@
 import { Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { getPagination, getPagingData } from "../../../pkg/helper/pagy.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
@@ -57,7 +57,7 @@ export const listJobs = async (req, res, next) => {
       status: 200,
       data: jobs,
       pagy: pagination,
-    })
+    });
   } catch (error) {
     AppError(500, "Server Error");
   }

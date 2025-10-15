@@ -1,5 +1,5 @@
 import { Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { getPagination, getPagingData } from "../../../pkg/helper/pagy.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
@@ -7,7 +7,7 @@ export const jobs = async (req, res, next) => {
   try {
     const customerId = req.user?.id;
     if (!customerId) {
-      throw new AppError(401, "Không xác thực được người dùng.");
+      throw AppError(res, 401, "Không xác thực được người dùng.");
     }
 
     const { page, limit, skip } = getPagination(req.query);
@@ -27,6 +27,6 @@ export const jobs = async (req, res, next) => {
       status: 200,
     });
   } catch (error) {
-    next(error);
+    AppError(res, 500, error.message);
   }
 };

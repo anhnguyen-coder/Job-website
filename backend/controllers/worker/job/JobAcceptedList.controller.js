@@ -1,5 +1,5 @@
 import { Job } from "../../../models/index.js";
-import AppError from "../../../pkg/helper/errorHandler.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
 export const jobListaccepted = async (req, res, next) => {
