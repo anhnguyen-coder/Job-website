@@ -18,16 +18,14 @@ export const signIn = async (req, res) => {
       expiresIn: "7d",
     });
 
-    res.cookie("token", token, {
+    res.cookie("customerToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return successRes(res, {
-      data: token,
-    });
+    return successRes(res);
   } catch (error) {
     console.log(error);
     AppError(500, error.message);

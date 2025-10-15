@@ -8,13 +8,14 @@ export const deleteJob = async (req, res, next) => {
     const customerId = req.user?.id;
 
     if (!customerId) {
-      throw new AppError(401, "Không xác thực được người dùng.");
+      throw AppError(res, 401, "Không xác thực được người dùng.");
     }
 
     const job = await Job.findOneAndDelete({ _id: jobId, customerId });
 
     if (!job) {
-      throw new AppError(
+      throw AppError(
+        res,
         404,
         "Công việc không tồn tại hoặc không thuộc về bạn."
       );

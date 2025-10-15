@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/index.js";
 
 const workerAuth = async (req, res, next) => {
-  const { token } = req.cookies;
+  const { workerToken } = req.cookies;
 
-  if (!token) {
+  if (!workerToken) {
     return res.json({
       success: false,
       message: "Not authorized. Please try again",
@@ -12,7 +12,7 @@ const workerAuth = async (req, res, next) => {
   }
 
   try {
-    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+    const tokenDecode = jwt.verify(workerToken, process.env.JWT_SECRET);
 
     if (tokenDecode.id) {
       const user = await User.findById(tokenDecode.id);

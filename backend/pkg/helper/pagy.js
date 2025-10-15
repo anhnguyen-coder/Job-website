@@ -7,10 +7,14 @@ export function getPagination(query) {
 
 export function getPagingData(total, page, limit) {
   const totalPages = Math.ceil(total / limit);
+  const nextPage = page < totalPages ? page + 1 : null;
+  const prevPage = page > 1 ? page - 1 : null;
   return {
     totalItems: total,
     totalPages,
     currentPage: page,
     pageSize: limit,
+    nextPage,
+    prevPage,
   };
 }

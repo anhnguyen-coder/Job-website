@@ -1,49 +1,33 @@
-import transporter from "../../../config/nodemailer.js";
-import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
+import bcrypt from "bcryptjs";
 import { User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
+import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
 import successRes from "../../../pkg/helper/successRes.js";
-import {
-  isEmailValid,
-  isValidPassword,
-} from "../../../pkg/helper/validation.js";
-import bcrypt from "bcryptjs";
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
-
   try {
     validateRegisterInput(res, name, email, password);
 
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
-      return AppError(res, 400, "User already exists");
+    const existingWorker = await User.findOne({ email: email });
+    if (existingWorker) {
+      return AppError(res, 400, "Worker already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new User({
+    const worker = new User({
       name: name,
       email: email,
       password: hashedPassword,
-      role: USER_ROLE_ENUM.CUSTOMER,
+      role: USER_ROLE_ENUM.WORKER,
     });
 
-    await user.save();
-
-    //Sending welcome email
-    const mailOption = {
-      from: process.env.SENDER_EMAIL,
-      to: email,
-      subject: "Welcome to our job application",
-      text: `Welcome to our website. Your account has been created with email id: ${email}`,
-    };
-
-    await transporter.sendMail(mailOption);
+    await worker.save();
 
     return successRes(res);
   } catch (error) {
-    return AppError(res, 500, error.message);
+    AppError(res, 500, error.message);
   }
 };
 

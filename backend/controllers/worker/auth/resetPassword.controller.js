@@ -13,7 +13,7 @@ export const resetPassword = async (req, res) => {
 
     const user = await User.findOne({
       email: email,
-      role: USER_ROLE_ENUM.CUSTOMER,
+      role: USER_ROLE_ENUM.WORKER,
     });
     if (!user) return AppError(res, 404, "User not found");
 
