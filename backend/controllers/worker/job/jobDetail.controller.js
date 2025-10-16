@@ -4,9 +4,9 @@ import successRes from "../../../pkg/helper/successRes.js";
 
 export const jobDetails = async (req, res, next) => {
   try {
-    const jobId = req.params.id;
+    const jobId = req.params.jobId;
     if (!jobId) {
-      throw new AppError(400, "Job ID is required.");
+      throw AppError(400, "Job ID is required.");
     }
 
     const job = await Job.findById(jobId)
@@ -15,7 +15,7 @@ export const jobDetails = async (req, res, next) => {
       .populate("assignedWorkerId", "name email");
 
     if (!job) {
-      throw new AppError(404, "Job not found.");
+      throw AppError(404, "Job not found.");
     }
 
     return successRes(res, {
@@ -24,5 +24,6 @@ export const jobDetails = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+    AppError(res, 500, error.message || "Server Error");
   }
 };

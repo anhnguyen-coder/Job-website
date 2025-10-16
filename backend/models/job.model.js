@@ -21,10 +21,9 @@ const jobSchema = new mongoose.Schema(
       type: String,
       enum: [
         "available",
-        "pending_request", // waiting for customer approval
-        "job_accepted",
-        "job_rejected",
-        "in_Progress",
+        "taken",
+        "in_progress",
+        "check_complete",
         "completed",
         "cancelled",
       ],

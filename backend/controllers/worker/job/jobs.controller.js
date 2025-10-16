@@ -1,64 +1,52 @@
+import { JOB_STATUS } from "../../../enums/job.enum.js";
 import { Job } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { getPagination, getPagingData } from "../../../pkg/helper/pagy.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
-export const listJobs = async (req, res, next) => {
+export const listJobs = async (req, res) => {
   try {
-    // queries for filtering
-    const title = req.query.title;
-    const customerid = req.query.customerid;
-    const categories = req.query.categories;
-    const location = req.query.location;
-    const status = req.query.status;
-    const minBudget = req.query.minBudget;
-    const maxBudget = req.query.maxBudget;
+    const {
+      title,
+      customerid,
+      categories,
+      location,
+      minBudget,
+      maxBudget,
+    } = req.query;
 
-    let filter = {};
+    const filter = {};
 
-    if (title) {
-      filter.title = { $regex: title, $options: "i" }; // case-insensitive regex search
-    }
-    if (customerid) {
-      filter.customerId = customerid;
-    }
-    if (categories) {
-      filter.categories = { $in: categories.split(",") };
-    }
-    if (location) {
-      filter.location = { $regex: location, $options: "i" }; // case-insensitive regex search
-    }
-    if (status) {
-      filter.status = status;
-    }
+    if (title) filter.title = { $regex: title, $options: "i" };
+    if (customerid) filter.customerId = customerid;
+    if (categories) filter.categories = { $in: categories.split(",") };
+    if (location) filter.location = { $regex: location, $options: "i" };
+
+    filter.status = JOB_STATUS.AVAILABLE;
+
+    // budget range
     if (minBudget || maxBudget) {
       filter.budget = {};
-      if (minBudget) {
-        filter.budget.$gte = Number(minBudget);
-      }
-      if (maxBudget) {
-        filter.budget.$lte = Number(maxBudget);
-      }
+      if (minBudget) filter.budget.$gte = Number(minBudget);
+      if (maxBudget) filter.budget.$lte = Number(maxBudget);
     }
 
-    filter.status = "available";
-
     // pagination
-
     const { page, limit, skip } = getPagination(req.query);
+
     const [jobs, total] = await Promise.all([
-      Job.find(filter).skip(skip).limit(limit),
-      Job.countDocuments(),
+      Job.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      Job.countDocuments(filter),
     ]);
 
-    const pagination = getPagingData(total, page, limit);
+    const pagy = getPagingData(total, page, limit);
 
     return successRes(res, {
       status: 200,
       data: jobs,
-      pagy: pagination,
+      pagy,
     });
   } catch (error) {
-    AppError(500, "Server Error");
+    return AppError(res, 500, error.message || "Server Error");
   }
 };

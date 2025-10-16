@@ -11,7 +11,7 @@ export const deleteJob = async (req, res, next) => {
       throw AppError(res, 401, "Không xác thực được người dùng.");
     }
 
-    const job = await Job.findOneAndDelete({ _id: jobId, customerId });
+    const job = await Job.findOne({ _id: jobId, customerId });
 
     if (!job) {
       throw AppError(
@@ -20,6 +20,12 @@ export const deleteJob = async (req, res, next) => {
         "Công việc không tồn tại hoặc không thuộc về bạn."
       );
     }
+
+    if (job && job.status === "in_progress") {
+      return AppError(res, 400, "Không thể xóa công việc đang tiến hành.");
+    }
+
+    await Job.deleteOne({ _id: jobId, customerId });
 
     return successRes(res, { status: 200, data: null });
   } catch (error) {

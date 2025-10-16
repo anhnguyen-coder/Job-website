@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   resetOtp: { type: String, default: "" },
   resetOtpExpireAt: { type: Number, default: 0 },
   role: { type: String, enum: ["customer", "worker"], required: true },
-  
+
   // profile details
   profileImage: { type: String, default: "" },
   coverImage: { type: String, default: "" },
@@ -35,6 +35,4 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const userModel = mongoose.models.user || mongoose.model("user", userSchema);
-
-export default userModel;
+export default mongoose.model("User", userSchema);

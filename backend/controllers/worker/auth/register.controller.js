@@ -3,6 +3,7 @@ import { User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
 import successRes from "../../../pkg/helper/successRes.js";
+import { isEmailValid, isValidPassword } from "../../../pkg/helper/validation.js";
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;

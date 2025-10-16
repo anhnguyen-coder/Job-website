@@ -3,6 +3,7 @@ import { User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import jwt from "jsonwebtoken";
 import successRes from "../../../pkg/helper/successRes.js";
+import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
 
 export const signIn = async (req, res) => {
   const { email, password } = req.body;

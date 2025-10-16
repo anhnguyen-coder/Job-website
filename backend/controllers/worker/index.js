@@ -7,6 +7,7 @@ import { bookmarkJob } from "./job/bookmarkJob.controller.js";
 import { bookmarkList } from "./job/bookmarkList.controller.js";
 import { jobListaccepted } from "./job/JobAcceptedList.controller.js";
 import { jobDetails } from "./job/jobDetail.controller.js";
+import { myCurrentJobs } from "./job/myCurrentJobs.controller.js";
 import { listJobs } from "./job/jobs.controller.js";
 import { requestJob } from "./job/requestJob.controller.js";
 import { updateJob } from "./job/updateJob.controller.js";
@@ -23,7 +24,7 @@ const workerController = {
   jobList: listJobs,
   jobDetail: jobDetails,
   bookmarJobList: bookmarkList,
-  jobAcceptedList: jobListaccepted,
+  myCurrentJobs: myCurrentJobs,
 
   makeBookmarkJob: bookmarkJob,
   makeRequestJob: requestJob,

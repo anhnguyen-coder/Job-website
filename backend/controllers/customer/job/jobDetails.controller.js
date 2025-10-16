@@ -11,7 +11,10 @@ export const jobDetails = async (req, res) => {
       return AppError(res, 401, "Không xác thực được người dùng.");
     }
 
-    const job = await Job.findOne({ id: jobId, customerId: customerId });
+    const job = await Job.findOne({
+      _id: jobId,
+      customerId: customerId,
+    }).populate("assignedWorkerId", "name email role");
 
     if (!job) {
       return res.status(404).json({

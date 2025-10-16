@@ -16,11 +16,12 @@ router.use(customerAuth);
 
 // Job routes
 router.get("/jobs", customerController.jobList);
-router.get("/job/pending-requests", customerController.jobPendingList);
+router.get("/job/requests", customerController.jobRequestList);
 router.get("/job/:jobId", customerController.jobDetail);
 router.post("/job", customerController.jobCreate);
 router.put("/job/:jobId", customerController.jobUpdate);
 router.put("/job/approve/:jobId", customerController.jobApproval);
+router.put("/job/complete/:jobId", customerController.makeJobComplete);
 router.delete("/job/:jobId", customerController.jobDelete);
 
 export default router;

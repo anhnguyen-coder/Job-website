@@ -1,3 +1,4 @@
+import { JOB_STATUS } from "../../../enums/job.enum.js";
 import { Job } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
@@ -19,6 +20,10 @@ export const updateJob = async (req, res, next) => {
         404,
         "Công việc không tồn tại hoặc không thuộc về bạn."
       );
+    }
+
+    if (job && job.status === JOB_STATUS.IN_PROGRESS) {
+      return AppError(res, 400, "Không thể cập nhật công việc đang tiến hành.");
     }
 
     if (categoryIds && Array.isArray(categoryIds) && categoryIds.length > 0) {

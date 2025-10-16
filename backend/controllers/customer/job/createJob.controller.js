@@ -51,10 +51,10 @@ const validateCategories = async (categoryIds, res) => {
         throw AppError(res, 400, `ID danh mục không hợp lệ: ${id}`);
       }
 
-      const isValid = await Category.findById(id);
-      if (!isValid) {
-        throw AppError(res, 400, `Không tìm thấy danh mục với ID: ${id}`);
-      }
+      // const isValid = await Category.findById(id);
+      // if (!isValid) {
+      //   throw AppError(res, 400, `Không tìm thấy danh mục với ID: ${id}`);
+      // }
     }
 
     return ids.map((id) => new mongoose.Types.ObjectId(id));
