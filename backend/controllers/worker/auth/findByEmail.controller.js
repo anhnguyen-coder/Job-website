@@ -9,10 +9,10 @@ export const findByEmail = async (req, res) => {
 
     const user = await User.find({
       email: email,
-      role: USER_ROLE_ENUM.WORKER,
     }).select("-password");
 
-    if (!user) return AppError(res, 404, "User not found");
+    if (!user || user.role != USER_ROLE_ENUM.WORKER)
+      return AppError(res, 404, "User not found");
 
     return successRes(res, { data: user });
   } catch (error) {
