@@ -50,13 +50,23 @@ export const jobApproval = async (req, res) => {
 
         // reject all other pending job requests for the same job
         await bulkRejectJobRequests(jobRequest.jobId, workerId, session);
-        // TODO: handle notification to worker about job acceptance
+        await notifyWorker(
+          workerId,
+          job.title,
+          session,
+          JOB_REQUEST_STATUS.ACCEPTED
+        );
       }
       if (status === JOB_REQUEST_STATUS.REJECTED) {
         jobRequest.status = JOB_REQUEST_STATUS.REJECTED;
         job.status = JOB_STATUS.AVAILABLE;
 
-        // TODO: handle notification to worker about job rejection
+        await notifyWorker(
+          workerId,
+          job.title,
+          session,
+          JOB_REQUEST_STATUS.REJECTED
+        );
       }
 
       await jobRequest.save();
@@ -69,8 +79,6 @@ export const jobApproval = async (req, res) => {
   }
 };
 
-// TODO: create notification for worker when job request is accepted or rejected
-
 const bulkRejectJobRequests = async (jobId, workerId, session) => {
   await JobRequest.updateMany(
     {
@@ -80,4 +88,23 @@ const bulkRejectJobRequests = async (jobId, workerId, session) => {
     },
     { $set: { status: JOB_REQUEST_STATUS.REJECTED } }
   ).session(session);
+};
+
+const notifyWorker = async (workerId, jobtitle, session, status) => {
+  const titleAccept = "Job Application Accepted";
+  const titleReject = "Job Application Declined";
+  await Notification.create(
+    {
+      userId: workerId,
+      type:
+        status === JOB_REQUEST_STATUS.ACCEPTED ? "job_accept" : "job_reject",
+      title: status === JOB_REQUEST_STATUS.ACCEPTED ? titleAccept : titleReject,
+      content: `Your job application about job: ${jobtitle} has been ${
+        status === JOB_REQUEST_STATUS.ACCEPTED ? "accepted" : "rejected"
+      }.`,
+    },
+    {
+      session: session,
+    }
+  );
 };
