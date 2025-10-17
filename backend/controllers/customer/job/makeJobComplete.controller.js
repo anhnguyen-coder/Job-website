@@ -1,5 +1,5 @@
 import { JOB_STATUS } from "../../../enums/job.enum.js";
-import { Job, User } from "../../../models/index.js";
+import { Job, Notification, User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { withTransaction } from "../../../pkg/transaction/transaction.js";
 
@@ -29,7 +29,8 @@ export const makeJobComplete = async (req, res) => {
       job.status = JOB_STATUS.COMPLETED;
       await job.save({ session });
 
-      updateWorkerEarnings(workerId, job.budget || 0, session);
+      await updateWorkerEarnings(workerId, job.budget || 0, session);
+      await notifyWorker(workerId, job.title, session);
     });
 
     return successRes(res);
@@ -45,5 +46,29 @@ const updateWorkerEarnings = async (workerId, amount, session) => {
   worker.totalEarnings = (worker.totalEarnings || 0) + amount;
   await worker.save({ session });
 
-  //TODO: Send notification to worker about earnings update
+  await notifyWorkerPaymentReceived(workerId, jobTitle, session);
+};
+
+const notifyWorker = async (workerId, jobTitle, session) => {
+  await Notification.create(
+    {
+      userId: workerId,
+      type: "job_status_changed",
+      title: `Job marked complete`,
+      content: `Your job: ${jobTitle} has been marked complete by the customer. You will soon receive the payment for your work.`,
+    },
+    { session: session }
+  );
+};
+
+const notifyWorkerPaymentReceived = async (workerId, jobTitle, session) => {
+  await Notification.create(
+    {
+      userId: workerId,
+      type: "payment_received",
+      title: `Payment received for job: ${jobTitle}`,
+      content: `You have received payment for the job: ${jobTitle}. Thank you for your work.`,
+    },
+    { session: session }
+  );
 };

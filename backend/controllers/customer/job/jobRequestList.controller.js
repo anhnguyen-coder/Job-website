@@ -1,43 +1,94 @@
+import mongoose from "mongoose";
 import { JOB_REQUEST_STATUS } from "../../../enums/job.enum.js";
 import { JobRequest } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { getPagination, getPagingData } from "../../../pkg/helper/pagy.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
+const STATUS_ORDER = {
+  [JOB_REQUEST_STATUS.PENDING]: 1,
+  [JOB_REQUEST_STATUS.ACCEPTED]: 2,
+  [JOB_REQUEST_STATUS.REJECTED]: 3,
+  [JOB_REQUEST_STATUS.CANCELLED]: 4,
+};
+
 export const jobRequestList = async (req, res, next) => {
   try {
-    const customerId = req.user?.id;
+    const customerIdStr = req.user?.id;
     const { status } = req.query;
-
-    if (!customerId) {
-      throw AppError(res, 401, "Không xác thực được người dùng.");
-    }
 
     if (status && !Object.values(JOB_REQUEST_STATUS).includes(status)) {
       return AppError(res, 400, "Invalid status value");
     }
 
-    const filter = { customerId: customerId };
-    if (status) {
-      filter.status = status;
-    }
+    const customerObjectId = new mongoose.Types.ObjectId(customerIdStr);
+
+    const match = { customerId: customerObjectId };
+    if (status) match.status = status;
 
     const { page, limit, skip } = getPagination(req.query);
-    const [jobs, total] = await Promise.all([
-      JobRequest.find(filter)
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 })
-        .populate("workerId", "name email phone")
-        .populate("jobId"),
-      JobRequest.countDocuments(filter),
+
+    const pipeline = [
+      { $match: match },
+      {
+        $addFields: {
+          sortOrder: {
+            $switch: {
+              branches: Object.entries(STATUS_ORDER).map(([key, val]) => ({
+                case: { $eq: ["$status", key] },
+                then: val,
+              })),
+              default: 99,
+            },
+          },
+        },
+      },
+      { $sort: { sortOrder: 1, createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "users",
+          localField: "workerId",
+          foreignField: "_id",
+          as: "worker",
+        },
+      },
+      { $unwind: { path: "$worker", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "jobs",
+          localField: "jobId",
+          foreignField: "_id",
+          as: "job",
+        },
+      },
+      { $unwind: { path: "$job", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          workerId: "$worker",
+          jobId: "$job",
+          status: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+    ];
+
+    const [rows, total] = await Promise.all([
+      JobRequest.aggregate(pipeline),
+      JobRequest.countDocuments(match),
     ]);
 
     const pagination = getPagingData(total, page, limit);
 
-    return successRes(res, { data: jobs, status: 200, pagy: pagination });
+    return successRes(res, {
+      data: rows,
+      pagy: pagination,
+      status: 200,
+    });
   } catch (error) {
-    next(error);
-    AppError(500, "Server Error");
+    console.log(error);
+    return AppError(res, 500, "Server Error");
   }
 };
