@@ -5,7 +5,7 @@ const customerAuth = async (req, res, next) => {
   const { customerToken } = req.cookies;
 
   if (!customerToken) {
-    return res.json({
+    return res.status(401).json({
       success: false,
       message: "Not authorized. Please try again",
     });
@@ -17,21 +17,21 @@ const customerAuth = async (req, res, next) => {
     if (tokenDecode.id) {
       const user = await User.findById(tokenDecode.id);
       if (!user) {
-        return res.json({
+        return res.status(400).json({
           success: false,
           message: "Invalid token. Please try again",
         });
       }
 
       if (user.role !== "customer")
-        return res.json({
+        return res.status(403).json({
           success: false,
           message: "Access denied. Customers only",
         });
 
       req.user = { id: tokenDecode.id };
     } else {
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: "Not authorized. Please try again",
       });
@@ -39,7 +39,7 @@ const customerAuth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

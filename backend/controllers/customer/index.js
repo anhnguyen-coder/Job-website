@@ -11,6 +11,10 @@ import { jobRequestList } from "./job/jobRequestList.controller.js";
 import { jobs } from "./job/jobs.controller.js";
 import { makeJobComplete } from "./job/makeJobComplete.controller.js";
 import { updateJob } from "./job/updateJob.controller.js";
+import { deleteMessage } from "./messages/deleteMessage.controller.js";
+import { fetchMessageJob } from "./messages/fetchMessageJob.controller.js";
+import { sendMessage } from "./messages/sendMessage.controller.js";
+import { updateMessage } from "./messages/updateMessage.controller.js";
 
 const customerController = {
   // auth
@@ -29,6 +33,12 @@ const customerController = {
   jobRequestList: jobRequestList,
   jobApproval: jobApproval,
   makeJobComplete: makeJobComplete,
+
+  // message controllers
+  fetchMessagesWithWorkerByJob: fetchMessageJob,
+  sendMessage: sendMessage,
+  updateMessage: updateMessage,
+  deleteMessage: deleteMessage,
 };
 
 export default customerController;

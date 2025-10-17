@@ -24,4 +24,10 @@ router.put("/job/approve/:jobId", customerController.jobApproval);
 router.put("/job/complete/:jobId", customerController.makeJobComplete);
 router.delete("/job/:jobId", customerController.jobDelete);
 
+// message routes
+router.get("/message/:jobId", customerController.fetchMessagesWithWorkerByJob);
+router.post("/message", customerController.sendMessage);
+router.put("/message/:messageId", customerController.updateMessage);
+router.delete("/message/:messageId", customerController.deleteMessage);
+
 export default router;

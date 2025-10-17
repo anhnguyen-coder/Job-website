@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   resetOtp: { type: String, default: "" },
   resetOtpExpireAt: { type: Number, default: 0 },
   role: { type: String, enum: ["customer", "worker"], required: true },
+  active: { type: Boolean, default: true },
 
   // profile details
   profileImage: { type: String, default: "" },
