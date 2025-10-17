@@ -30,4 +30,8 @@ router.post("/message", customerController.sendMessage);
 router.put("/message/:messageId", customerController.updateMessage);
 router.delete("/message/:messageId", customerController.deleteMessage);
 
+// rating routes
+router.post("/rating", customerController.makeRatingWorker);
+router.put("/rating/:ratingId", customerController.updateRatingWorker);
+router.get("/rating/:workerId", customerController.viewWorkerRatings);
 export default router;

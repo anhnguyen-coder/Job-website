@@ -15,6 +15,9 @@ import { deleteMessage } from "./messages/deleteMessage.controller.js";
 import { fetchMessageJob } from "./messages/fetchMessageJob.controller.js";
 import { sendMessage } from "./messages/sendMessage.controller.js";
 import { updateMessage } from "./messages/updateMessage.controller.js";
+import { makeRatingWorker } from "./rating/makeRatingWorker.controller.js";
+import { updateRatingWorker } from "./rating/updateRatingWorker.controller.js";
+import { viewWorkerRates } from "./rating/viewWorkerRates.controller.js";
 
 const customerController = {
   // auth
@@ -39,6 +42,11 @@ const customerController = {
   sendMessage: sendMessage,
   updateMessage: updateMessage,
   deleteMessage: deleteMessage,
+
+  // rating
+  makeRatingWorker: makeRatingWorker,
+  updateRatingWorker: updateRatingWorker,
+  viewWorkerRatings: viewWorkerRates,
 };
 
 export default customerController;

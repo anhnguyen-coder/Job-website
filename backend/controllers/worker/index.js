@@ -14,6 +14,7 @@ import { fetchMessagesJob } from "./messages/fetchMessageJob.controller.js";
 import { sendMessage } from "./messages/sendMessage.controller.js";
 import { updateMessage } from "./messages/updateMessage.controller.js";
 import { deleteMessage } from "./messages/deleteMessage.controller.js";
+import { viewProfileRating } from "./rating/viewProfileRating.controller.js";
 
 const workerController = {
   // Auth
@@ -38,6 +39,9 @@ const workerController = {
   sendMessage: sendMessage,
   updateMessage: updateMessage,
   deleteMessage: deleteMessage,
+
+  // rating
+  viewProfileRating: viewProfileRating,
 };
 
 export default workerController;

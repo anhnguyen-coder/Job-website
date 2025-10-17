@@ -29,6 +29,13 @@ const customerAuth = async (req, res, next) => {
           message: "Access denied. Customers only",
         });
 
+      if (!user.active) {
+        return res.status(403).json({
+          success: false,
+          message: "Account not active. Please contact support",
+        });
+      }
+
       req.user = { id: tokenDecode.id };
     } else {
       return res.status(400).json({
