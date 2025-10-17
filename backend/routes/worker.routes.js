@@ -2,26 +2,44 @@ import express from "express";
 import workerAuth from "../middleware/worker.auth.js";
 import workerController from "../controllers/worker/index.js";
 
-const workerRouter = express.Router();
+const router = express.Router();
 
-// auth routes
-workerRouter.get("/find-by-email", workerController.findByEmail);
+// ==============================
+// 🔐 PUBLIC AUTH ROUTES
+// ==============================
+router.get("/find-by-email", workerController.findByEmail);
+router.post("/signup", workerController.register);
+router.post("/signin", workerController.signIn);
+router.put("/reset-password", workerController.resetPassword);
 
-workerRouter.post("/signup", workerController.register);
-workerRouter.post("/signin", workerController.signIn);
-workerRouter.put("/reset-password", workerController.resetPassword);
+// ==============================
+// 🔒 PROTECTED ROUTES (require authentication)
+// ==============================
 
-workerRouter.post("/signout", workerAuth, workerController.signOut);
+// Apply auth middleware to everything below this line
+router.use(workerAuth);
 
-// job routes
+// 🔐 Sign out
+router.post("/signout", workerController.signOut);
 
-workerRouter.get("/jobs", workerAuth, workerController.jobList);
-workerRouter.get("/jobs/bookmark", workerAuth, workerController.bookmarJobList);
-workerRouter.get("/jobs/current-job", workerAuth, workerController.myCurrentJobs);
-workerRouter.get("/job/:jobId", workerAuth, workerController.jobDetail);
+// 💼 Job routes
+router.get("/jobs", workerController.jobList);
+router.get("/jobs/bookmark", workerController.bookmarJobList);
+router.get("/jobs/current-job", workerController.myCurrentJobs);
+router.get("/job/:jobId", workerController.jobDetail);
+router.put("/job/:jobId", workerController.updateJobStatus);
+router.post("/job/:jobId/bookmark", workerController.makeBookmarkJob);
+router.post("/job/:jobId/request", workerController.makeRequestJob);
 
-workerRouter.post("/job/:jobId/bookmark", workerAuth, workerController.makeBookmarkJob);
-workerRouter.post("/job/:jobId/request", workerAuth, workerController.makeRequestJob);
-workerRouter.put("/job/:jobId", workerAuth, workerController.updateJobStatus);
+// 💬 Message routes
+router
+  .route("/messages/:jobId")
+  .get(workerController.fetchMessagesJob)
+  .post(workerController.sendMessage);
 
-export default workerRouter;
+router
+  .route("/messages/:messageId")
+  .put(workerController.updateMessage)
+  .delete(workerController.deleteMessage);
+
+export default router;

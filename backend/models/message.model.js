@@ -13,7 +13,7 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     jobId: { type: mongoose.Schema.Types.ObjectId, ref: "Job", required: true },
-    content: { type: String, required: true },
+    message: { type: String, required: true },
     isRead: { type: Boolean, default: false },
   },
   { timestamps: true }
