@@ -42,4 +42,7 @@ router
   .put(workerController.updateMessage)
   .delete(workerController.deleteMessage);
 
+// 🌟 Rating routes
+router.get("/ratings", workerController.viewProfileRating);
+
 export default router;

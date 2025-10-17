@@ -10,3 +10,4 @@ export { default as WorkerLocation } from "./workerLocation.model.js";
 export { default as Category } from "./category.model.js";
 export { default as JobRequest } from "./jobRequest.model.js";
 export { default as JobTicket } from "./jobTicket.model.js";
+export { default as Rating } from "./rating.model.js";
