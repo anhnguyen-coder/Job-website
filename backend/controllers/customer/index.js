@@ -1,4 +1,5 @@
 import { findByEmail } from "./auth/findByEmail.controller.js";
+import { profile } from "./auth/profile.js";
 import { register } from "./auth/register.controller.js";
 import { resetPassword } from "./auth/resetPassword.controller.js";
 import { signIn } from "./auth/signin.controller.js";
@@ -26,6 +27,7 @@ const customerController = {
   signOut: signOut,
   findByEmail: findByEmail,
   resetPassword: resetPassword,
+  profile: profile,
 
   // job controllers
   jobList: jobs,
