@@ -6,6 +6,7 @@ export const Input = ({
   onChange,
   className,
   iconClassName,
+  required,
 }: {
   id?: string;
   type?: string;
@@ -14,6 +15,7 @@ export const Input = ({
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
   iconClassName?: string;
+  required?: boolean;
 }) => {
   return (
     <div className="flex items-center border border-slate-200 px-2 py-1 rounded-lg">
@@ -24,6 +26,7 @@ export const Input = ({
         placeholder={placeholder}
         value={value || ""}
         onChange={onChange}
+        required={required}
         className={
           className
             ? className

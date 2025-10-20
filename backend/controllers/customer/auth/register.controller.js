@@ -10,10 +10,10 @@ import {
 import bcrypt from "bcryptjs";
 
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
 
   try {
-    validateRegisterInput(res, name, email, password);
+    validateRegisterInput(res, name, email, password, confirmPassword);
 
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
@@ -47,7 +47,7 @@ export const register = async (req, res) => {
   }
 };
 
-const validateRegisterInput = (res, name, email, password) => {
+const validateRegisterInput = (res, name, email, password, confirmPassword) => {
   if (!name || !email || !password)
     return AppError(res, 400, "Missing details");
 
@@ -58,6 +58,9 @@ const validateRegisterInput = (res, name, email, password) => {
 
   if (password.trim().length < 8)
     return AppError(res, 400, "Password must be at least 8 characters long");
+
+  if (password !== confirmPassword)
+    return AppError(res, 400, "Passwords do not match");
 
   if (!isValidPassword(password))
     return AppError(
