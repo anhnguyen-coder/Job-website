@@ -2,27 +2,27 @@ import type React from "react";
 import { Input } from "@/components/base/input";
 import { useState } from "react";
 import { Button } from "@/components/base/button";
-import type { customerSigninInput } from "@/contexts/customer";
+import type { customerSignupInput } from "@/contexts/customer";
 
-interface signnFormProps {
-  input: customerSigninInput;
-  setInput: (input: customerSigninInput) => void;
-  handleSignIn: () => Promise<void>;
+interface signUpFormProps {
+  input: customerSignupInput;
+  setInput: (input: customerSignupInput) => void;
+  handleSignUp: () => Promise<void>;
   err: string;
 }
 
-export function SignInForm({
+export function SignUpForm({
   input,
   setInput,
-  handleSignIn,
+  handleSignUp,
   err,
-}: signnFormProps) {
+}: signUpFormProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSignIn();
-    console.log(input);
+    handleSignUp();
   };
 
   return (
@@ -30,6 +30,27 @@ export function SignInForm({
       <div className="bg-white rounded-2xl">
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5 mt-10">
+          {/* Name Field */}
+          <div className="space-y-4">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-slate-500 flex items-start"
+            >
+              User name
+            </label>
+            <div className="relative">
+              <Input
+                id="name"
+                type="text"
+                placeholder="Joshua Smith"
+                required
+                value={input.name}
+                onChange={(e) => setInput({ ...input, name: e.target.value })}
+                iconClassName="bx bx-envelope text-slate-400"
+              />
+            </div>
+          </div>
+
           {/* Email Field */}
           <div className="space-y-4">
             <label
@@ -85,31 +106,42 @@ export function SignInForm({
             </div>
           </div>
 
+          {/* Confirm Password Field */}
+          <div className="space-y-4">
+            <label
+              htmlFor="ConfirmPassword"
+              className="block text-sm font-medium text-slate-500 flex items-start"
+            >
+              Confirm Password
+            </label>
+            <div className="relative">
+              <Input
+                id="ConfirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                value={input.confirmPassword}
+                required
+                onChange={(e) =>
+                  setInput({ ...input, confirmPassword: e.target.value })
+                }
+                iconClassName="bx bx-lock-alt text-slate-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
+              >
+                {showConfirmPassword ? (
+                  <i className="bx bx-show-alt w-5 h-5"></i>
+                ) : (
+                  <i className="bx bx-hide w-5 h-5"></i>
+                )}
+              </button>
+            </div>
+          </div>
+
           {/* Error Message */}
           {err && <p className="text-red-500 text-sm font-medium">{err}</p>}
-
-          {/* Remember & Forgot */}
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center space-x-2">
-              {/* <Checkbox
-                id="remember"
-                checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-              /> */}
-              <label
-                htmlFor="remember"
-                className="text-sm text-slate-600 cursor-pointer"
-              >
-                Remember me
-              </label>
-            </div>
-            <a
-              href="/customer/reset-password"
-              className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-            >
-              Forgot password?
-            </a>
-          </div>
 
           {/* Login Button */}
           <div className="flex justify-center mb-4">
@@ -117,19 +149,19 @@ export function SignInForm({
               type="submit"
               className="w-[50%] h-11 bg-emerald-600 hover:bg-emerald-700 font-semibold rounded-lg text-green-800 mt-6"
             >
-              Log In
+              Sign Up
             </Button>
           </div>
         </form>
 
         {/* Sign Up Link */}
         <p className="text-center text-slate-600 text-sm">
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <a
-            href="/customer/signup"
+            href="/customer/signin"
             className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
-            Sign Up
+            Sign In Now!
           </a>
         </p>
       </div>

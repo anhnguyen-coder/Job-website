@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomerAuthContext } from "./context";
 import type {
   CustomerAuthContextType,
   customerSigninInput,
+  customerSignupInput,
+  resetPasswordInput,
   User,
 } from "./types";
 import axiosInstance from "../../services/axios";
@@ -15,8 +17,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [err, setErr] = useState("");
-
-  useEffect(() => {}, []);
 
   const navigate = useNavigate();
 
@@ -59,7 +59,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       setIsAuthenticated(false);
       setUser(null);
-      console.log(error);
+      // console.log(error);
     } finally {
       setLoading(false);
     }
@@ -77,6 +77,48 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const resetPassword = async (input: resetPasswordInput) => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.post(POST.RESET_PASSWORD, input);
+      if (response.data.success) {
+        navigate("/customer/signin");
+      }
+      setLoading(false);
+    } catch (errorny) {
+      let message = "An unknown error occurred";
+
+      if (errorny && (errorny as AxiosError).isAxiosError) {
+        const axiosError = errorny as AxiosError<{ message: string }>;
+        message = axiosError.response?.data?.message || axiosError.message;
+      }
+
+      setErr(message);
+      setLoading(false);
+    }
+  };
+
+  const signUp = async (input: customerSignupInput) => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.post(POST.SIGNUP, input);
+      if (response.data.success) {
+        navigate("/customer/signin");
+      }
+      setLoading(false);
+    } catch (errorny) {
+      let message = "An unknown error occurred";
+
+      if (errorny && (errorny as AxiosError).isAxiosError) {
+        const axiosError = errorny as AxiosError<{ message: string }>;
+        message = axiosError.response?.data?.message || axiosError.message;
+      }
+
+      setErr(message);
+      setLoading(false);
+    }
+  };
+
   const value: CustomerAuthContextType = {
     user,
     loading,
@@ -89,6 +131,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     signin: signin,
     profile: profile,
     signOut: signOut,
+    signUp: signUp,
+    resetPassword: resetPassword,
   };
 
   return (

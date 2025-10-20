@@ -17,9 +17,23 @@ export interface CustomerAuthContextType {
   signin: (input: customerSigninInput) => Promise<void>;
   profile: () => Promise<void>;
   signOut: () => Promise<void>;
+  signUp: (input: customerSignupInput) => Promise<void>;
+  resetPassword: (input: resetPasswordInput) => Promise<void>;
 }
 
 export interface customerSigninInput {
+  email: string;
+  password: string;
+}
+
+export interface customerSignupInput {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface resetPasswordInput {
   email: string;
   password: string;
 }
