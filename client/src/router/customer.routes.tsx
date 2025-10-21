@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import CustomerLayout from "@/layouts/customer.layout";
-import Page from "@/pages/customer/jobs/page";
+// import Page from "@/pages/customer/jobs/page";
 import { useCustomerAuth } from "@/contexts/customer";
 import SignIn from "@/pages/customer/auth/signin/signIn";
 import AuthLayout from "@/layouts/auth.layout";
 import { SignUp } from "@/pages/customer/auth/signup/page";
 import ForgotPasswordPage from "@/pages/customer/auth/forgotPassword/page";
+import DashBoard from "@/pages/customer/dashboard/page";
 
 const NotFound: React.FC = () => {
   return <div>404 Not Found</div>;
@@ -39,7 +40,7 @@ const CustomerAppRouters: React.FC = () => {
 
             {/* private routes */}
             {isAuthenticated && !loading && (
-              <Route path="dashboard" element={<Page />}></Route>
+              <Route path="dashboard" element={<DashBoard />}></Route>
             )}
           </Route>
           <Route path="*" element={<NotFound />} />

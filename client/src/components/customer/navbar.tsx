@@ -1,6 +1,7 @@
 import appLogo from "@/assets/images/logo.png";
 import { CUSTOMER_APP_THEME } from "@/constant/constant";
 import { NavItem } from "./navItem";
+import { useCustomerAuth } from "@/contexts/customer";
 
 interface navItem {
   id: number;
@@ -31,7 +32,7 @@ const navItemData: navItem[] = [
   {
     id: 4,
     title: "Reviews",
-    icon: "mdi mdi-account-star-outline",
+    icon: "mdi mdi-star-outline",
     path: "/customer/reviews",
   },
   {
@@ -42,6 +43,7 @@ const navItemData: navItem[] = [
   },
 ];
 export function Navbar() {
+  const customerAuth = useCustomerAuth();
   return (
     <div
       className="h-screen w-full p-4 flex flex-col justify-between"
@@ -78,7 +80,10 @@ export function Navbar() {
 
       {/* signout */}
       <div className="p-4 border-t border-emerald-500/30">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-500/20 transition-colors text-emerald-50">
+        <button
+          onClick={customerAuth.signOut}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-500/20 transition-colors text-emerald-50"
+        >
           <NavItem icon="mdi mdi-logout" label="Sign Out" />
         </button>
       </div>

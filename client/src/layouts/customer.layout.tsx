@@ -12,8 +12,8 @@ const CustomerLayout: React.FC = () => {
           <Navbar />
         </div>
         {/* Main content */}
-        <main className="">
-          <Outlet /> {/* nơi các page con được render */}
+        <main className="bg-gray-100">
+          <Outlet />
         </main>
       </div>
 
