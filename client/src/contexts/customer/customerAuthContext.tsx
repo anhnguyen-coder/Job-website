@@ -9,8 +9,9 @@ import type {
   User,
 } from "./types";
 import axiosInstance from "../../services/axios";
-import { GET, POST } from "../../services/customer/auth/apis";
+import { GET, POST, PUT } from "../../services/customer/auth/apis";
 import type { AxiosError } from "axios";
+import { errhandler } from "@/pkg/helpers/errorHandler";
 
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -29,15 +30,9 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         navigate("/customer/dashboard");
       }
       setLoading(false);
-    } catch (errorny) {
-      let message = "An unknown error occurred";
-
-      if (errorny && (errorny as AxiosError).isAxiosError) {
-        const axiosError = errorny as AxiosError<{ message: string }>;
-        message = axiosError.response?.data?.message || axiosError.message;
-      }
-
-      setErr(message);
+    } catch (error) {
+      errhandler(error as AxiosError, setErr);
+    } finally {
       setLoading(false);
     }
   };
@@ -59,7 +54,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       setIsAuthenticated(false);
       setUser(null);
-      // console.log(error);
+      errhandler(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -73,14 +68,14 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("currenCustomer");
       navigate("/customer/signin");
     } catch (error) {
-      console.log(error);
+      errhandler(error as AxiosError, setErr);
     }
   };
 
   const resetPassword = async (input: resetPasswordInput) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.post(POST.RESET_PASSWORD, input);
+      const response = await axiosInstance.post(PUT.RESET_PASSWORD, input);
       if (response.data.success) {
         navigate("/customer/signin");
       }
@@ -106,16 +101,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         navigate("/customer/signin");
       }
       setLoading(false);
-    } catch (errorny) {
-      let message = "An unknown error occurred";
-
-      if (errorny && (errorny as AxiosError).isAxiosError) {
-        const axiosError = errorny as AxiosError<{ message: string }>;
-        message = axiosError.response?.data?.message || axiosError.message;
-      }
-
-      setErr(message);
-      setLoading(false);
+    } catch (error) {
+      errhandler(error as AxiosError, setErr);
     }
   };
 
