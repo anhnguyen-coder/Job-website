@@ -35,4 +35,8 @@ router.delete("/message/:messageId", customerController.deleteMessage);
 router.post("/rating", customerController.makeRatingWorker);
 router.put("/rating/:ratingId", customerController.updateRatingWorker);
 router.get("/rating/:workerId", customerController.viewWorkerRatings);
+
+
+// customer dashboard
+router.get("/dashboard/stats", customerController.customerStats)
 export default router;

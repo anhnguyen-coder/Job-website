@@ -3,12 +3,22 @@ import mongoose from "mongoose";
 const reviewSchema = new mongoose.Schema(
   {
     jobId: { type: mongoose.Schema.Types.ObjectId, ref: "Job", required: true },
-    customerId: {
+    authorType: {
+      type: String,
+      enum: ["customer", "worker"],
+      required: true,
+    },
+    authorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    workerId: {
+    targetType: {
+      type: String,
+      enum: ["customer", "worker"],
+      required: true,
+    },
+    targetId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,

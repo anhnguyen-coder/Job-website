@@ -8,10 +8,11 @@ import type {
   resetPasswordInput,
   User,
 } from "./types";
-import axiosInstance from "../../services/axios";
-import { GET, POST, PUT } from "../../services/customer/auth/apis";
+
 import type { AxiosError } from "axios";
 import { errhandler } from "@/pkg/helpers/errorHandler";
+import axiosInstance from "@/pkg/axios/axiosInstance";
+import { GET, POST, PUT } from "@/apis/customer/auth/apis";
 
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

@@ -11,3 +11,4 @@ export { default as Category } from "./category.model.js";
 export { default as JobRequest } from "./jobRequest.model.js";
 export { default as JobTicket } from "./jobTicket.model.js";
 export { default as Rating } from "./rating.model.js";
+export { default as Payment } from "./payment.model.js";

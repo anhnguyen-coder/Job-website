@@ -80,12 +80,12 @@ export function Navbar() {
 
       {/* signout */}
       <div className="p-4 border-t border-emerald-500/30">
-        <button
-          onClick={customerAuth.signOut}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-500/20 transition-colors text-emerald-50"
-        >
-          <NavItem icon="mdi mdi-logout" label="Sign Out" />
-        </button>
+        <NavItem
+          icon="mdi mdi-logout"
+          label="Sign Out"
+          isSignout
+          onClickSignOut={customerAuth.signOut}
+        />
       </div>
     </div>
   );

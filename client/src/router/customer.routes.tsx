@@ -25,7 +25,7 @@ const CustomerAppRouters: React.FC = () => {
     <>
       {!loading && (
         <Routes>
-          <Route path="customer" element={<CustomerLayout />}>
+          <Route path="customer">
             {/* public routes */}
             {!isAuthenticated && !loading && (
               <Route element={<AuthLayout />}>
@@ -40,7 +40,9 @@ const CustomerAppRouters: React.FC = () => {
 
             {/* private routes */}
             {isAuthenticated && !loading && (
-              <Route path="dashboard" element={<DashBoard />}></Route>
+              <Route element={<CustomerLayout />}>
+                <Route path="dashboard" element={<DashBoard />}></Route>
+              </Route>
             )}
           </Route>
           <Route path="*" element={<NotFound />} />

@@ -4,6 +4,7 @@ import { register } from "./auth/register.controller.js";
 import { resetPassword } from "./auth/resetPassword.controller.js";
 import { signIn } from "./auth/signin.controller.js";
 import { signOut } from "./auth/signout.controller.js";
+import { dashboardStats } from "./dashboard/stats.controller.js";
 import { createJob } from "./job/createJob.controller.js";
 import { deleteJob } from "./job/deleteJob.controller.js";
 import { jobApproval } from "./job/jobApproval.controller.js";
@@ -49,6 +50,10 @@ const customerController = {
   makeRatingWorker: makeRatingWorker,
   updateRatingWorker: updateRatingWorker,
   viewWorkerRatings: viewWorkerRates,
+
+
+  // dashboard
+  customerStats: dashboardStats
 };
 
 export default customerController;

@@ -1,7 +1,6 @@
 import { Navbar } from "@/components/customer/navbar";
 import React from "react";
 import { Outlet } from "react-router-dom";
-// import Navbar from "../components/Navbar";
 
 const CustomerLayout: React.FC = () => {
   return (
@@ -16,11 +15,6 @@ const CustomerLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
-
-      {/* Footer */}
-      <footer className="p-4 text-center text-gray-500 border-t border-gray-200">
-        © {new Date().getFullYear()} My App
-      </footer>
     </div>
   );
 };

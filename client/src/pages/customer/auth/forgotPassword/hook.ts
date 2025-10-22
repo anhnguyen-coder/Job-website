@@ -1,6 +1,7 @@
+import { GET, PUT } from "@/apis/customer/auth/apis";
+import axiosInstance from "@/pkg/axios/axiosInstance";
 import { errhandler } from "@/pkg/helpers/errorHandler";
-import axiosInstance from "@/services/axios";
-import { GET, PUT } from "@/services/customer/auth/apis";
+
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
