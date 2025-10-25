@@ -1,24 +1,30 @@
-interface statItem {
+import { applyOpacity } from "@/pkg/helpers/style";
+
+interface StatItemProps {
   label: string;
-  value: string;
+  value: string | number;
   icon: string;
   color: string;
 }
 
-export function StatItem({ label, value, icon, color }: statItem) {
-
-  const bgOpacity = `${color}/30`
+export function StatItem({ label, value, icon, color }: StatItemProps) {
   return (
-    <div className={`flex items-center justify-between px-4 py-2 rounded-lg ${color} bg-opacity-30`}>
-      {/* label & value */}
+    <div
+      className="flex items-center justify-between px-5 py-4 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 cursor-pointer"
+      style={{ backgroundColor: applyOpacity(color, 0.12) }}
+    >
+      {/* Label & Value */}
       <div>
-        <p className="text-xl font-semibold text-white mb-4">{label}</p>
-        <p className="text-2xl font-600 text-white">{value}</p>
+        <p className="text-sm font-medium text-gray-500 mb-2">{label}</p>
+        <p className="text-3xl font-semibold text-gray-900 leading-none">
+          {value}
+        </p>
       </div>
 
-      {/* icon */}
+      {/* Icon */}
       <div
-        className={`w-12 h-12 flex items-center justify-center rounded-lg ${color}`}
+        className="w-14 h-14 flex items-center justify-center rounded-xl transition-transform duration-300 hover:scale-110"
+        style={{ backgroundColor: color }}
       >
         <i className={`mdi ${icon} text-2xl text-white`}></i>
       </div>

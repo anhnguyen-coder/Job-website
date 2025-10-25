@@ -15,11 +15,11 @@ const NotFound: React.FC = () => {
 
 const CustomerAppRouters: React.FC = () => {
   const customerContext = useCustomerAuth();
-  const { profile, loading, isAuthenticated } = customerContext;
+  const { validateToken, loading, isAuthenticated } = customerContext;
 
   useEffect(() => {
-    profile();
-  }, [profile]);
+    validateToken();
+  }, [validateToken]);
 
   return (
     <>

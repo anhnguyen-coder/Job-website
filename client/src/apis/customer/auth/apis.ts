@@ -3,6 +3,7 @@ const BASE_URL_CUSTOMER = `/customer`;
 const GET = {
   FIND_BY_EMAIL: `${BASE_URL_CUSTOMER}/find-by-email`,
   PROFILE: `${BASE_URL_CUSTOMER}/profile`,
+  VALIDATE_TOKEN: `${BASE_URL_CUSTOMER}/validate-token`,
 };
 
 const POST = {
