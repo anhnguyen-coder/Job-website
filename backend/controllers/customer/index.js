@@ -4,6 +4,7 @@ import { register } from "./auth/register.controller.js";
 import { resetPassword } from "./auth/resetPassword.controller.js";
 import { signIn } from "./auth/signin.controller.js";
 import { signOut } from "./auth/signout.controller.js";
+import { validateToken } from "./auth/validateToken.controller.js";
 import { dashboardStats } from "./dashboard/stats.controller.js";
 import { createJob } from "./job/createJob.controller.js";
 import { deleteJob } from "./job/deleteJob.controller.js";
@@ -29,6 +30,7 @@ const customerController = {
   findByEmail: findByEmail,
   resetPassword: resetPassword,
   profile: profile,
+  validateToken: validateToken,
 
   // job controllers
   jobList: jobs,
@@ -51,9 +53,8 @@ const customerController = {
   updateRatingWorker: updateRatingWorker,
   viewWorkerRatings: viewWorkerRates,
 
-
   // dashboard
-  customerStats: dashboardStats
+  customerStats: dashboardStats,
 };
 
 export default customerController;

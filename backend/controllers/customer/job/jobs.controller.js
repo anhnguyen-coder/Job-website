@@ -15,8 +15,11 @@ export const jobs = async (req, res, next) => {
       Job.find({ customerId: customerId })
         .skip(skip)
         .limit(limit)
-        .sort({ createdAt: -1 }),
-      Job.countDocuments(),
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "jobTasks",
+        }),
+      Job.countDocuments({ customerId }),
     ]);
 
     const pagination = getPagingData(total, page, limit);

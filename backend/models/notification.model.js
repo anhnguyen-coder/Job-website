@@ -9,9 +9,10 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["job_accepted", "job_status_changed", "new_message"],
+      enum: ["info", "success", "error", "warning"],
       required: true,
     },
+    title: { type: String, required: true },
     content: { type: String, required: true },
     isRead: { type: Boolean, default: false },
   },

@@ -50,6 +50,12 @@ const jobSchema = new mongoose.Schema(
       min: 0,
       default: 0,
     },
+    jobTasks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "JobTask",
+      },
+    ],
     assignedWorkerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

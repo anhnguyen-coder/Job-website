@@ -11,6 +11,7 @@ router.put("/reset-password", customerController.resetPassword);
 router.get("/find-by-email", customerController.findByEmail);
 router.post("/signout", customerAuth, customerController.signOut);
 router.get("/profile", customerAuth, customerController.profile);
+router.get("/validate-token", customerAuth, customerController.validateToken);
 
 // Job routes (private)
 router.use(customerAuth);
@@ -36,7 +37,6 @@ router.post("/rating", customerController.makeRatingWorker);
 router.put("/rating/:ratingId", customerController.updateRatingWorker);
 router.get("/rating/:workerId", customerController.viewWorkerRatings);
 
-
 // customer dashboard
-router.get("/dashboard/stats", customerController.customerStats)
+router.get("/dashboard/stats", customerController.customerStats);
 export default router;

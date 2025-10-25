@@ -18,10 +18,12 @@ export const signIn = async (req, res) => {
       expiresIn: "7d",
     });
 
+    const isProd = process.env.APP_ENV === "production"
+
     res.cookie("customerToken", token, {
       httpOnly: true,
-      secure: process.env.APP_ENV === "production",
-      sameSite: process.env.APP_ENV === "production" ? "none" : "lax",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
