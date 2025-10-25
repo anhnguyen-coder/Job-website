@@ -11,3 +11,15 @@ export function parseQueryArrayToString(values: string[]): string {
 
   return cleaned.map(encodeURIComponent).join(",").toString();
 }
+
+export function buildQueryParams(query: Record<string, any>): string {
+  const params = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.append(key, String(value));
+    }
+  });
+
+  const queryString = params.toString();
+  return queryString ? `?${queryString}` : "";
+}

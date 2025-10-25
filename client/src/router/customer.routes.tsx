@@ -8,6 +8,7 @@ import AuthLayout from "@/layouts/auth.layout";
 import { SignUp } from "@/pages/customer/auth/signup/page";
 import ForgotPasswordPage from "@/pages/customer/auth/forgotPassword/page";
 import DashBoard from "@/pages/customer/dashboard/page";
+import JobsPage from "@/pages/customer/jobs/page";
 
 const NotFound: React.FC = () => {
   return <div>404 Not Found</div>;
@@ -42,6 +43,7 @@ const CustomerAppRouters: React.FC = () => {
             {isAuthenticated && !loading && (
               <Route element={<CustomerLayout />}>
                 <Route path="dashboard" element={<DashBoard />}></Route>
+                <Route path="jobs" element={<JobsPage />}></Route>
               </Route>
             )}
           </Route>

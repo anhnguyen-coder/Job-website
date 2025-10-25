@@ -3,7 +3,7 @@ import type React from "react";
 import useHook, { type stat } from "./hook";
 import { useEffect } from "react";
 import { StatItem } from "@/components/customer/statItem";
-import { JobList } from "@/components/customer/job/jobList";
+import { JobList } from "@/components/customer/dashboard/jobList";
 import { Notification } from "@/components/customer/dashboard/notification";
 import type { NotificationInterface } from "@/pkg/types/interfaces/notification";
 import { NOTI_TYPE } from "@/pkg/types/enums/noti";

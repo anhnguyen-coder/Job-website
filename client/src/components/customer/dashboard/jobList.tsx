@@ -1,5 +1,5 @@
+import JobItem from "@/components/base/jobItem";
 import type { JobInterface } from "@/pkg/types/interfaces/job.type";
-import JobItem from "./jobItem";
 
 interface JobListProps {
   jobs: JobInterface[];
