@@ -38,11 +38,32 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const validateToken = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await axiosInstance.get(GET.VALIDATE_TOKEN);
+
+      if (res.data.success) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      setIsAuthenticated(false);
+      setUser(null);
+      errhandler(error as AxiosError, setErr);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const profile = useCallback(async () => {
     setLoading(true);
     try {
-      if (localStorage.getItem("currenCustomer")) {
-        setIsAuthenticated(true);
+      const storedUser = localStorage.getItem("currenCustomer");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
         return;
       }
 
@@ -50,7 +71,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       if (res.data.success) {
         setUser(res.data.data);
         localStorage.setItem("currenCustomer", JSON.stringify(res.data.data));
-        setIsAuthenticated(true);
       }
     } catch (error) {
       setIsAuthenticated(false);
@@ -121,6 +141,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     signOut: signOut,
     signUp: signUp,
     resetPassword: resetPassword,
+    validateToken: validateToken,
   };
 
   return (

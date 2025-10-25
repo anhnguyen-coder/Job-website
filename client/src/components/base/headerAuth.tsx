@@ -2,23 +2,26 @@ import appLogo from "@/assets/images/logo.png";
 
 export function HeaderAuth() {
   return (
-    <>
-      {/* header */}
-      <header>
-        <div className="flex items-center justify-center mb-4">
-          <img
-            src={appLogo}
-            alt="logo"
-            className="w-[100px] h-[100px] rounded-lg"
-            style={{ objectFit: "cover" }}
-          />
-        </div>
+    <header className="flex flex-col items-center text-center mb-8">
+      {/* Logo */}
+      <div className="flex items-center justify-center mb-5">
+        <img
+          src={appLogo}
+          alt="Job Ting Ting logo"
+          className="w-20 h-20 rounded-xl shadow-md transition-transform duration-300 hover:scale-105"
+          style={{ objectFit: "cover" }}
+        />
+      </div>
 
-        <div>
-          <h3 className="text-4xl font-semibold mb-2">Job Ting Ting</h3>
-          <p className="text-sm text-gray-500">Sign in to your account</p>
-        </div>
-      </header>
-    </>
+      {/* Title & Subtitle */}
+      <div>
+        <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 tracking-tight">
+          Job Ting Ting
+        </h3>
+        <p className="text-sm md:text-base text-gray-500">
+          Sign in to your account
+        </p>
+      </div>
+    </header>
   );
 }

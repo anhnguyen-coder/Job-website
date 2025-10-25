@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
 }
@@ -19,6 +19,7 @@ export interface CustomerAuthContextType {
   signOut: () => Promise<void>;
   signUp: (input: customerSignupInput) => Promise<void>;
   resetPassword: (input: resetPasswordInput) => Promise<void>;
+  validateToken: () => void;
 }
 
 export interface customerSigninInput {

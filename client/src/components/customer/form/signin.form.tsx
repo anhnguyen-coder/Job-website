@@ -22,7 +22,6 @@ export function SignInForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSignIn();
-    console.log(input);
   };
 
   return (
