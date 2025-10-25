@@ -2,17 +2,20 @@ import type { FilterFieldInterface } from "@/pkg/types/interfaces/filterField";
 import React from "react";
 import { Search, SlidersHorizontal } from "lucide-react"; // icon đẹp
 import { flushSync } from "react-dom";
+import type { PagyInput } from "@/pkg/types/interfaces/pagy";
 
 type FilterBaseProps<T extends object> = {
   fields: FilterFieldInterface<T>[];
+  page: number;
   values: T;
   onChange: (values: T) => void;
-  onSubmit: (queries: T) => void;
+  onSubmit: (queries: T, pagyInput: PagyInput) => void;
 };
 
 export function FilterBase<T extends object>({
   fields,
   values,
+  page,
   onChange,
   onSubmit,
 }: FilterBaseProps<T>) {
@@ -25,7 +28,11 @@ export function FilterBase<T extends object>({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(values);
+    const pagyInput = {
+      page: page,
+      limit: 10,
+    };
+    onSubmit(values, pagyInput);
   };
 
   const handleReset = () => {
@@ -37,7 +44,11 @@ export function FilterBase<T extends object>({
     }, {} as T);
 
     flushSync(() => onChange(resetValues));
-    onSubmit(resetValues);
+    const pagyInput = {
+      page: 1,
+      limit: 10,
+    };
+    onSubmit(resetValues, pagyInput);
   };
 
   return (

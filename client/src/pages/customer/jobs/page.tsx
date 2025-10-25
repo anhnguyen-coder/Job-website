@@ -6,8 +6,19 @@ import type { FilterFieldInterface } from "@/pkg/types/interfaces/filterField";
 import type { JobsQueryInputForm } from "./type";
 import { JOB_STATUS } from "@/pkg/types/enums/job";
 import { JobList } from "@/components/customer/job/jobList";
+import { Pagination } from "@/components/base/pagy";
 
 const Page: React.FC = () => {
+  const {
+    jobs,
+    queryInput,
+    pagy,
+    page,
+    setPage,
+    setQueryInput,
+    handleGetJobs,
+  } = useHook();
+
   const statusOptions = [
     { label: "Available", value: JOB_STATUS.AVAILABLE },
     { label: "Taken", value: JOB_STATUS.TAKEN },
@@ -16,8 +27,6 @@ const Page: React.FC = () => {
     { label: "Completed", value: JOB_STATUS.COMPLETED },
     { label: "Cancelled", value: JOB_STATUS.CANCELLED },
   ];
-  const { jobs, queryInput, setQueryInput, handleGetJobs } = useHook();
-
   const fields: FilterFieldInterface<JobsQueryInputForm>[] = [
     { name: "title", label: "Title", type: "text" },
     {
@@ -32,8 +41,12 @@ const Page: React.FC = () => {
   ] as const;
 
   useEffect(() => {
-    handleGetJobs(queryInput);
-  }, []);
+    const pagyInput = {
+      page: page,
+      limit: 10,
+    };
+    handleGetJobs(queryInput, pagyInput);
+  }, [page]);
 
   return (
     <div>
@@ -43,13 +56,18 @@ const Page: React.FC = () => {
         <FilterBase
           fields={fields}
           values={queryInput}
+          page={page}
           onChange={setQueryInput}
           onSubmit={handleGetJobs}
         />
       </div>
 
       {/* job list */}
-      {jobs && <JobList jobs={jobs} />}
+      <div className="py-4 px-6 rounded-2xl shadow-lg bg-white mt-6">
+        {jobs && <JobList jobs={jobs} />}
+      </div>
+
+      <div>{pagy && <Pagination pagy={pagy} onPageChange={setPage} />}</div>
     </div>
   );
 };

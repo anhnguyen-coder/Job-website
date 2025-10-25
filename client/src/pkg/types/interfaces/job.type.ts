@@ -16,7 +16,7 @@ export interface JobInterface {
   location: string;
   status: string;
   budget: number;
-  jobTasks: JobTaskInterface[] | string[];
+  jobTasks?: JobTaskInterface[];
   assignedWorkerId?: UserInterface | null;
   createdAt: string;
   updatedAt: string;

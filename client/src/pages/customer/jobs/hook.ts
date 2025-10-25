@@ -5,7 +5,7 @@ import { errhandler } from "@/pkg/helpers/errorHandler";
 import type { AxiosError } from "axios";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { GET } from "@/apis/customer/job";
-import type { PagyInterface } from "@/pkg/types/interfaces/pagy";
+import type { PagyInput, PagyInterface } from "@/pkg/types/interfaces/pagy";
 import { buildQueryParams } from "@/pkg/helpers/query";
 
 const useHook = () => {
@@ -14,12 +14,15 @@ const useHook = () => {
   const [err, setErr] = useState("");
   const [pagy, setPagy] = useState<PagyInterface>();
   const [queryInput, setQueryInput] = useState<JobsQueryInputForm>({});
+  const [page, setPage] = useState(1);
 
-  const handleGetJobs = async (queries: JobsQueryInputForm) => {
+  const handleGetJobs = async (
+    queries: JobsQueryInputForm,
+    pagyInput: PagyInput
+  ) => {
     setLoading(true);
     try {
-      const queryString = buildQueryParams(queries);
-
+      const queryString = buildQueryParams(queries, pagyInput);
       const res = await axiosInstance.get(`${GET.GET_JOBS}${queryString}`);
       if (res.data.success) {
         setJobs(res.data.data);
@@ -38,8 +41,10 @@ const useHook = () => {
     err,
     pagy,
     queryInput,
+    page,
     setQueryInput,
     handleGetJobs,
+    setPage,
   };
 };
 

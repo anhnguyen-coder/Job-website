@@ -7,6 +7,9 @@ import type {
 import { ProgressBar } from "@/components/base/progressBar";
 import { formatUSD } from "@/pkg/helpers/formatter";
 import { MapPin, DollarSign, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CUSTOMER_APP_THEME } from "@/constant/constant";
+import { applyOpacity } from "@/pkg/helpers/style";
 
 interface JobItemProps {
   job: JobInterface;
@@ -14,6 +17,7 @@ interface JobItemProps {
 
 const JobItem = ({ job }: JobItemProps) => {
   const [progress, setProgress] = useState<number>(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (job.jobTasks && job.jobTasks.length > 0) {
@@ -30,13 +34,33 @@ const JobItem = ({ job }: JobItemProps) => {
     [job.status]
   );
 
+  const handleViewJobDetails = (jobId: string) => {
+    navigate(`/customer/jobs/${jobId}`);
+  };
+
   return (
     <div className="p-5 border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h4 className="text-lg font-semibold text-gray-800 truncate">
-          {job.title}
-        </h4>
+        <div className="flex items-center">
+          <h4 className="text-lg font-semibold mr-3 text-gray-800 truncate">
+            {job.title}
+          </h4>
+          <div
+            onClick={() => handleViewJobDetails(job._id)}
+            className={`border px-2 rounded-lg text-sm text-green-500 hover:cursor-pointer hover:text-green-700`}
+            style={{
+              borderColor: CUSTOMER_APP_THEME.COLOR.SECONDARY,
+              backgroundColor: applyOpacity(
+                CUSTOMER_APP_THEME.COLOR.SECONDARY,
+                0.2
+              ),
+            }}
+          >
+            <p>View</p>
+          </div>
+        </div>
+
         <span
           className={`text-xs px-3 py-1 rounded-full font-semibold ${bg} ${text}`}
         >
