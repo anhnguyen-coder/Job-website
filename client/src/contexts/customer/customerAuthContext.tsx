@@ -47,6 +47,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
+        navigate("/customer/signin");
       }
     } catch (error) {
       setIsAuthenticated(false);
