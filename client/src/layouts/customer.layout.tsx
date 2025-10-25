@@ -5,9 +5,9 @@ import { Outlet } from "react-router-dom";
 const CustomerLayout: React.FC = () => {
   return (
     <div className="flex flex-col h-screen">
-      <div className="grid grid-cols-[minmax(350px,1fr)_5fr] h-full w-full overflow-hidden">
+      <div className="grid grid-cols-[1fr_5fr] h-full w-full overflow-hidden">
         {/* Sidebar / Navbar */}
-        <div className="h-full">
+        <div className="h-full ">
           <Navbar />
         </div>
 

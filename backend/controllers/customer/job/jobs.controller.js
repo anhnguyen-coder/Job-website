@@ -5,31 +5,43 @@ import successRes from "../../../pkg/helper/successRes.js";
 
 export const jobs = async (req, res, next) => {
   try {
-    const customerId = req.user?.id;
-    if (!customerId) {
-      throw AppError(res, 401, "Không xác thực được người dùng.");
+    const customerId = req.user.id;
+
+    const filter = { customerId };
+
+    if (req.query.status) {
+      const statuses = req.query.status
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      if (statuses.length > 0) {
+        filter.status = { $in: statuses };
+      }
     }
 
+    // ===== Pagination =====
     const { page, limit, skip } = getPagination(req.query);
+
+    // ===== Query =====
     const [jobs, total] = await Promise.all([
-      Job.find({ customerId: customerId })
+      Job.find(filter)
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 })
-        .populate({
-          path: "jobTasks",
-        }),
-      Job.countDocuments({ customerId }),
+        .populate("jobTasks"),
+      Job.countDocuments(filter),
     ]);
 
     const pagination = getPagingData(total, page, limit);
 
+    // ===== Response =====
     return successRes(res, {
       data: jobs,
       pagy: pagination,
       status: 200,
     });
   } catch (error) {
-    AppError(res, 500, error.message);
+    return AppError(res, 500, error.message);
   }
 };
