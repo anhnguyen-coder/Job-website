@@ -3,14 +3,14 @@ import { CUSTOMER_APP_THEME } from "@/constant/constant";
 import { NavItem } from "./navItem";
 import { useCustomerAuth } from "@/contexts/customer";
 
-interface NavItemData {
+interface navItem {
   id: number;
   title: string;
   icon: string;
   path: string;
 }
 
-const navItemData: NavItemData[] = [
+const navItemData: navItem[] = [
   {
     id: 1,
     title: "Dashboard",
@@ -42,33 +42,33 @@ const navItemData: NavItemData[] = [
     path: "/customer/history",
   },
 ];
-
 export function Navbar() {
-  const { signOut } = useCustomerAuth();
-
+  const customerAuth = useCustomerAuth();
   return (
-    <aside
-      className="h-screen w-full flex flex-col justify-between py-6 px-4 shadow-xl"
+    <div
+      className="h-screen w-full p-4 flex flex-col justify-between"
       style={{ backgroundColor: CUSTOMER_APP_THEME.PRIMARI_COLOR }}
     >
-      {/* Logo & Title */}
-      <div className="flex items-center gap-3 px-2">
-        <img
-          src={appLogo}
-          alt="Job Ting Ting logo"
-          className="w-14 h-14 rounded-xl shadow-md transition-transform duration-300 hover:scale-105"
-        />
-        <div>
-          <h3 className="text-2xl font-bold text-white leading-tight">
-            Job Ting Ting
-          </h3>
-          <p className="text-xs text-emerald-100">Job management</p>
+      {/* logo & title */}
+      <div className="mt-4">
+        <div className="flex items-center border-emerald-500">
+          <div className="w-14 h-14">
+            <img
+              src={appLogo}
+              alt="logo"
+              className="w-full h-full object-contain rounded-xl"
+            />
+          </div>
+          <div className="text-gray-200 ml-3">
+            <h3 className="text-2xl mb-2 font-bold">Job Ting Ting</h3>
+            <p className="text-sm text-gray-300">Job management</p>
+          </div>
         </div>
       </div>
 
-      {/* Navigation Items */}
-      <nav className="flex-1 mt-10 border-t border-b border-emerald-400/20 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-500/40">
-        {navItemData.map((item) => (
+      {/* items */}
+      <div className="border-t-1 border-b-1 border-emerald-500/30 h-[100%] mt-10 py-4">
+        {navItemData.map((item: navItem) => (
           <NavItem
             key={item.id}
             icon={item.icon}
@@ -76,17 +76,17 @@ export function Navbar() {
             href={item.path}
           />
         ))}
-      </nav>
+      </div>
 
-      {/* Sign out */}
-      <div className="pt-4 border-t border-emerald-400/20">
+      {/* signout */}
+      <div className="p-4 border-t border-emerald-500/30">
         <NavItem
           icon="mdi mdi-logout"
           label="Sign Out"
           isSignout
-          onClickSignOut={signOut}
+          onClickSignOut={customerAuth.signOut}
         />
       </div>
-    </aside>
+    </div>
   );
 }

@@ -2,6 +2,8 @@ import { GET } from "@/apis/customer/dashboard/apis";
 import { GET as GET_JOB } from "@/apis/customer/job";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { errhandler } from "@/pkg/helpers/errorHandler";
+import { parseQueryArrayToString } from "@/pkg/helpers/query";
+import { JOB_STATUS } from "@/pkg/types/enums/job";
 import type { JobInterface } from "@/pkg/types/interfaces/job.type";
 import type { AxiosError } from "axios";
 import { useState } from "react";
@@ -25,7 +27,6 @@ const useHook = () => {
 
       if (res.data.success) {
         setStats(res.data.data);
-        // console.log(res.data.data)
       }
     } catch (error) {
       errhandler(error as AxiosError, setErr);
@@ -36,10 +37,20 @@ const useHook = () => {
 
   const handleGetJobList = async () => {
     try {
-      const res = await axiosInstance.get(`${GET_JOB.GET_JOBS}?limit=5`);
+      const status = [
+        JOB_STATUS.IN_PROGRESS,
+        JOB_STATUS.TAKEN,
+        JOB_STATUS.CHECK_COMPLETE,
+        JOB_STATUS.COMPLETED,
+      ];
+
+      const statusParse = parseQueryArrayToString(status);
+
+      const res = await axiosInstance.get(
+        `${GET_JOB.GET_JOBS}?limit=5&status=${statusParse}`
+      );
       if (res.data.success) {
         setJobs(res.data.data);
-        console.log(res.data.data);
       }
     } catch (error) {
       errhandler(error as AxiosError, setErr);

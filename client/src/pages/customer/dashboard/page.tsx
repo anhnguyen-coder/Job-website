@@ -47,11 +47,11 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="p-4">
       <PageHeading title="Dashboard" />
 
-      {/* stats */}
-      <div className="grid xl:grid-cols-4 sm:grid-cols-2 xs:grid-col-1 p-4 gap-4">
+      {/* ===== Stats Section ===== */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         {stats &&
           stats.map((stat) => (
             <StatItem
@@ -64,12 +64,15 @@ const Page: React.FC = () => {
           ))}
       </div>
 
-      {/* dashboard & notify*/}
-      <div className="grid grid-cols-[4fr_3fr] xs:grid-cols-1 p-4 gap-6">
-        <div className="bg-white px-6 py-4 rounded-xl border border-gray-200 h-fit">
+      {/* ===== Dashboard & Notifications ===== */}
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mt-6">
+        {/* Job List */}
+        <div className="bg-white px-6 py-4 rounded-xl border border-gray-200 shadow-sm h-fit">
           {jobs && <JobList jobs={jobs} />}
         </div>
-        <div className="bg-white px-6 py-4 rounded-xl border border-gray-200">
+
+        {/* Notifications */}
+        <div className="bg-white px-6 py-4 rounded-xl border border-gray-200 shadow-sm h-fit">
           <Notification notifications={mockNotifications} />
         </div>
       </div>
