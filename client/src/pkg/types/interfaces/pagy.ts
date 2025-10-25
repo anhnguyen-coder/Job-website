@@ -6,3 +6,8 @@ export interface PagyInterface {
   nextPage?: number;
   prevPage?: number;
 }
+
+export interface PagyInput {
+  page: number;
+  limit: number;
+}

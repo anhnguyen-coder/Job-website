@@ -23,7 +23,7 @@ export const jobDetails = async (req, res) => {
       });
     }
 
-    return successRes(res, { status: 200, data: { job } });
+    return successRes(res, { data: job });
   } catch (error) {
     AppError(res, 500, error.message);
   }

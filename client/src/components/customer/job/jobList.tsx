@@ -10,10 +10,8 @@ export function JobList({ jobs }: JobListProps) {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Job List</h3>
-        <button className="text-green-500 hover:text-green-700 hover:cursor-pointer font-medium transition-colors">
-          Show more
-        </button>
+        <h3 className="text-lg font-semibold">Job List: <span>{jobs.length} jobs</span></h3>
+
       </div>
 
       {/* Job items */}
