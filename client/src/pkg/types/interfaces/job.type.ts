@@ -1,9 +1,10 @@
+import type { CategoryInterface } from "./category";
 import type { UserInterface } from "./user.type";
 
 export interface JobTaskInterface {
   _id: string;
   title: string;
-  description?: string;
+  description: string;
   isCompleted: boolean;
 }
 
@@ -12,7 +13,7 @@ export interface JobInterface {
   customerId: string;
   title: string;
   description: string;
-  categories: string[];
+  categories: CategoryInterface[];
   location: string;
   status: string;
   budget: number;

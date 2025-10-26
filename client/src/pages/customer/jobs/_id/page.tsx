@@ -6,7 +6,8 @@ import { JOB_STATUS } from "@/pkg/types/enums/job";
 import type { JobTaskInterface } from "@/pkg/types/interfaces/job.type";
 import { ProgressBar } from "@/components/base/progressBar";
 import { PageHeading } from "@/components/customer/pageheading";
-import { Button } from "@/components/base/button";
+import type { CategoryInterface } from "@/pkg/types/interfaces/category";
+import { InfoItem } from "@/components/base/item";
 
 const JobIdPage = () => {
   const { jobId } = useParams();
@@ -95,12 +96,12 @@ const JobIdPage = () => {
           {job.categories && job.categories.length > 0 && (
             <Section title="Categories">
               <div className="flex flex-wrap gap-2">
-                {job.categories.map((cat) => (
+                {job.categories.map((cat: CategoryInterface) => (
                   <span
-                    key={cat}
+                    key={cat._id}
                     className="px-4 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-200 to-blue-300 text-blue-900 shadow-sm hover:shadow-md transition-all"
                   >
-                    {cat}
+                    {cat.name}
                   </span>
                 ))}
               </div>
@@ -155,13 +156,6 @@ const statusStyleMap: Record<string, { bg: string; text: string }> = {
 
 const getStatusStyle = (status: string) =>
   statusStyleMap[status] || statusStyleMap[JOB_STATUS.AVAILABLE];
-
-const InfoItem = ({ label, value }: { label: string; value: string }) => (
-  <div className="p-4 bg-gray-50 rounded-lg shadow-sm">
-    <p className="text-gray-500 text-sm">{label}</p>
-    <p className="text-gray-900 font-medium mt-1">{value}</p>
-  </div>
-);
 
 const Section = ({
   title,

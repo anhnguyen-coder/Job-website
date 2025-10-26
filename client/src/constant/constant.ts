@@ -15,6 +15,7 @@ const CUSTOMER_APP_THEME = {
 const USER_ENDPOINT = {
   CUSTOMER_ENDPOINT: "/customer",
   WORKER_ENPOINT: "/worker",
+  SHARED_ENDPOINT: "/shared"
 };
 
 const ROLE = {

@@ -14,7 +14,10 @@ export const jobDetails = async (req, res) => {
     const job = await Job.findOne({
       _id: jobId,
       customerId: customerId,
-    }).populate("assignedWorkerId", "name email role");
+    })
+      .populate("assignedWorkerId", "name email role")
+      .populate("categories")
+      .populate("jobTasks");
 
     if (!job) {
       return res.status(404).json({

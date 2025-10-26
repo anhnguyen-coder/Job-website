@@ -5,4 +5,8 @@ const GET = {
   GET_JOB_ID: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/job`, // jobid after
 };
 
-export { GET };
+const POST = {
+  CREATE_JOB: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/job`,
+};
+
+export { GET, POST };
