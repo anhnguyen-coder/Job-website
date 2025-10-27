@@ -11,15 +11,15 @@ export const jobApproval = async (req, res) => {
     const customerId = req.user.id;
 
     if (!status || !Object.values(JOB_REQUEST_STATUS).includes(status)) {
-      return AppError(res, 400, "Invalid status");
+      throw new AppError(400, "Invalid status");
     }
 
     if (!workerId) {
-      return AppError(res, 400, "Worker ID is required");
+      throw new AppError(400, "Worker ID is required");
     }
 
     if (!customerId) {
-      return AppError(res, 401, "Unauthorized");
+      throw new AppError(401, "Unauthorized");
     }
 
     await withTransaction(async (session) => {
@@ -31,7 +31,7 @@ export const jobApproval = async (req, res) => {
       }).session(session);
 
       if (!jobRequest) {
-        return AppError(res, 404, "Job request not found");
+        throw new AppError(404, "Job request not found");
       }
 
       const job = await Job.findOne({
@@ -40,7 +40,7 @@ export const jobApproval = async (req, res) => {
       }).session(session);
 
       if (!job) {
-        return AppError(res, 404, "Job not found");
+        throw new AppError(404, "Job not found");
       }
 
       if (status === JOB_REQUEST_STATUS.ACCEPTED) {
@@ -65,7 +65,7 @@ export const jobApproval = async (req, res) => {
 
     return successRes(res, { data: null, status: 200 });
   } catch (error) {
-    return AppError(res, 500, error.message);
+    throw new AppError(500, error.message);
   }
 };
 

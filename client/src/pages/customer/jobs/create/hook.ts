@@ -10,7 +10,7 @@ import type { Option } from "@/pkg/types/interfaces/option";
 
 const useHook = () => {
   const [categories, setCategories] = useState<CategoryInterface[]>();
-  const [loading, setLoading] = useState<Boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [err, setErr] = useState("");
   const [formInput, setFormInput] = useState<JobCreateForm>({
     title: "",
@@ -19,6 +19,8 @@ const useHook = () => {
     location: "",
     budget: 0,
     tasks: [],
+    dateEnd: "",
+    dateStart: "",
   });
   const [categoriesOptions, setCategoriesOption] = useState<Option[]>();
 
@@ -61,6 +63,7 @@ const useHook = () => {
 
   return {
     categories,
+    err,
     loading,
     formInput,
     categoriesOptions,

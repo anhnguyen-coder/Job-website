@@ -2,13 +2,13 @@ import { Job } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
-export const jobDetails = async (req, res) => {
+export const jobDetails = async (req, res, next) => {
   try {
     const { jobId } = req.params;
 
     const customerId = req.user?.id;
     if (!customerId) {
-      return AppError(res, 401, "Không xác thực được người dùng.");
+      throw new AppError(res, 401, "Không xác thực được người dùng.");
     }
 
     const job = await Job.findOne({
@@ -28,6 +28,6 @@ export const jobDetails = async (req, res) => {
 
     return successRes(res, { data: job });
   } catch (error) {
-    AppError(res, 500, error.message);
+    next(error);
   }
 };

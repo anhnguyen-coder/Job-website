@@ -9,12 +9,8 @@ export const jobRequestList = async (req, res, next) => {
     const customerId = req.user?.id;
     const { status } = req.query;
 
-    if (!customerId) {
-      throw AppError(res, 401, "Không xác thực được người dùng.");
-    }
-
     if (status && !Object.values(JOB_REQUEST_STATUS).includes(status)) {
-      return AppError(res, 400, "Invalid status value");
+      throw new AppError(400, "Invalid status value");
     }
 
     const filter = { customerId: customerId };
@@ -38,6 +34,5 @@ export const jobRequestList = async (req, res, next) => {
     return successRes(res, { data: jobs, status: 200, pagy: pagination });
   } catch (error) {
     next(error);
-    AppError(500, "Server Error");
   }
 };

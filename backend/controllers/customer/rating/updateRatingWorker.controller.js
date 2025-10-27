@@ -2,22 +2,22 @@ import { Rating } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
-export const updateRatingWorker = async (req, res) => {
+export const updateRatingWorker = async (req, res, next) => {
   const { ratingId } = req.params;
   const { rating, comment } = req.body;
 
   const customerId = req.user.id;
   try {
-    validateUpdateRatingInput(res, rating, comment);
+    validateUpdateRatingInput(rating, comment);
 
     const rate = await Rating.findById(ratingId);
-    if (!rate) return AppError(res, 400, "Invalid rating ID");
+    if (!rate) throw new AppError(400, "Invalid rating ID");
 
     if (rate.authorType !== "customer")
-      return AppError(res, 400, "Only customer can update rating");
+      throw new AppError(400, "Only customer can update rating");
 
     if (rate.authorId.toString() !== customerId)
-      return AppError(res, 403, "You can only update your own rating");
+      throw new AppError(403, "You can only update your own rating");
 
     rate.rating = rating;
     rate.comment = comment;
@@ -25,13 +25,13 @@ export const updateRatingWorker = async (req, res) => {
 
     return successRes(res);
   } catch (error) {
-    AppError(res, 500, error.message);
+    next(error);
   }
 };
 
-const validateUpdateRatingInput = (res, rating, comment) => {
+const validateUpdateRatingInput = (rating, comment) => {
   if (!rating || !comment)
-    return AppError(res, 400, "Rating and comment are required");
+    throw new AppError(400, "Rating and comment are required");
   if (rating < 1 || rating > 5)
-    return AppError(res, 400, "Rating must be between 1 and 5");
+    throw new AppError(400, "Rating must be between 1 and 5");
 };

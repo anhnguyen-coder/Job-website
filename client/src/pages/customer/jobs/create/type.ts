@@ -5,10 +5,11 @@ export interface JobCreateForm {
   location: string;
   budget: number;
   tasks: TaskInputForm[];
+  dateStart: string;
+  dateEnd: string;
 }
 
 export interface TaskInputForm {
   title: string;
   description: string;
 }
-

@@ -6,6 +6,7 @@ import type { TaskInputForm } from "./type";
 import { TaskItem } from "@/components/base/taskItem";
 import { JobTaskModal } from "@/components/customer/job/ jobTaskModal";
 import { BaseDropdownMulti } from "@/components/base/baseDropdownMultiple";
+import { DateTimeInputFieldBase } from "@/components/base/dateTimeInputFieldBase";
 
 const Page = () => {
   const {
@@ -135,6 +136,36 @@ const Page = () => {
               className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               placeholder="Enter budget"
               required
+            />
+          </div>
+
+          {/* Date Start */}
+          <div>
+            <DateTimeInputFieldBase
+              field={{
+                name: "dateStart",
+                label: "Start Date & Time",
+                type: "datetime",
+              }}
+              values={formInput}
+              onChange={(name, value) =>
+                setFormInput((prev) => ({ ...prev, [name]: value }))
+              }
+            />
+          </div>
+
+          {/* Date End */}
+          <div>
+            <DateTimeInputFieldBase
+              field={{
+                name: "dateEnd",
+                label: "End Date & Time",
+                type: "datetime",
+              }}
+              values={formInput}
+              onChange={(name, value) =>
+                setFormInput((prev) => ({ ...prev, [name]: value }))
+              }
             />
           </div>
 

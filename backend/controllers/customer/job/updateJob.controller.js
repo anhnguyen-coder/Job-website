@@ -1,5 +1,5 @@
 import { JOB_STATUS } from "../../../enums/job.enum.js";
-import { Job } from "../../../models/index.js";
+import { Job, Category } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
@@ -10,24 +10,22 @@ export const updateJob = async (req, res, next) => {
     const customerId = req.user?.id;
 
     if (!customerId) {
-      throw new AppError(401, "Không xác thực được người dùng.");
+      throw new AppError(401, "User authentication failed.");
     }
 
     const job = await Job.findOne({ _id: jobId, customerId });
 
     if (!job) {
-      throw new AppError(
-        404,
-        "Công việc không tồn tại hoặc không thuộc về bạn."
-      );
+      throw new AppError(404, "Job not found or does not belong to you.");
     }
 
-    if (job && job.status === JOB_STATUS.IN_PROGRESS) {
-      return AppError(res, 400, "Không thể cập nhật công việc đang tiến hành.");
+    if (job.status === JOB_STATUS.IN_PROGRESS) {
+      throw new AppError(400, "Cannot update a job that is in progress.");
     }
 
-    if (categoryIds && Array.isArray(categoryIds) && categoryIds.length > 0) {
+    if (Array.isArray(categoryIds) && categoryIds.length > 0) {
       await validateCategories(categoryIds);
+      job.categories = categoryIds;
     }
 
     if (title) job.title = title;
@@ -44,14 +42,12 @@ export const updateJob = async (req, res, next) => {
 };
 
 const validateCategories = async (categoryIds) => {
-  try {
-    categoryIds.forEach(async (element) => {
-      const isValid = await Category.findById(element);
-      if (!isValid) {
-        throw new AppError(400, "Danh mục không hợp lệ.");
-      }
-    });
-  } catch (error) {
-    throw error;
+  const results = await Promise.all(
+    categoryIds.map((id) => Category.findById(id))
+  );
+
+  const invalid = results.some((cat) => !cat);
+  if (invalid) {
+    throw new AppError(400, "One or more category IDs are invalid.");
   }
 };

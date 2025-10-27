@@ -7,19 +7,15 @@ export const updateMessage = async (req, res) => {
     const { messageId, message } = req.body;
     const customerId = req.user?.id;
 
-    validation(messageId, message, res);
+    validation(messageId, message);
 
     const messageToUpdate = await Message.findById(messageId);
 
     if (!messageToUpdate) {
-      return AppError(res, 404, "Message not found");
+      throw new AppError(404, "Message not found");
     }
     if (messageToUpdate.senderId !== customerId) {
-      return AppError(
-        res,
-        403,
-        "You are not authorized to update this message"
-      );
+      throw new AppError(403, "You are not authorized to update this message");
     }
 
     messageToUpdate.message = message;
@@ -31,11 +27,11 @@ export const updateMessage = async (req, res) => {
   }
 };
 
-const validation = (messageId, message, res) => {
+const validation = (messageId, message) => {
   if (!messageId) {
-    return AppError(res, 400, "Message ID is required");
+    throw new AppError(400, "Message ID is required");
   }
   if (!message) {
-    return AppError(res, 400, "Message is required");
+    throw new AppError(400, "Message is required");
   }
 };

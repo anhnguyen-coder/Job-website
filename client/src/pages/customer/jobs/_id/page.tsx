@@ -44,8 +44,8 @@ const JobIdPage = () => {
   return (
     <div>
       <PageHeading title="Job details" />
-      <div className="container mx-auto px-6 lg:px-12 py-10">
-        <div className="max-w-6xl mx-auto bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-xl p-8 transition-transform hover:-translate-y-1 hover:shadow-2xl">
+      <div className="mx-auto px-4 lg:px-0 py-6">
+        <div className="mx-auto bg-white border border-gray-200 rounded-xl shadow-lg p-6 transition-transform hover:-translate-y-0.5 hover:shadow-xl">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
             <h2 className="text-3xl font-extrabold text-gray-900">

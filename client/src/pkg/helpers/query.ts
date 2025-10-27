@@ -14,20 +14,21 @@ export function parseQueryArrayToString(values: string[]): string {
   return cleaned.map(encodeURIComponent).join(",").toString();
 }
 
-export function buildQueryParams(
-  query: Record<string, any>,
+export function buildQueryParams<T extends object>(
+  query: T,
   pagyInput: PagyInput
 ): string {
   const params = new URLSearchParams();
-  Object.entries(query).forEach(([key, value]) => {
+
+  (Object.entries(query) as [keyof T, T[keyof T]][]).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
-      params.append(key, String(value));
+      params.append(String(key), String(value));
     }
   });
 
-  params.append("page", String(pagyInput.page) || "1");
-  params.append("limit", String(pagyInput.limit) || "10");
-  
+  params.append("page", String(pagyInput.page ?? 1));
+  params.append("limit", String(pagyInput.limit ?? 10));
+
   const queryString = params.toString();
   return queryString ? `?${queryString}` : "";
 }

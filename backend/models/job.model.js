@@ -56,6 +56,14 @@ const jobSchema = new mongoose.Schema(
         ref: "JobTask",
       },
     ],
+    dateStart: {
+      type: Date,
+      default: null,
+    },
+    dateEnd: {
+      type: Date,
+      default: null,
+    },
     assignedWorkerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

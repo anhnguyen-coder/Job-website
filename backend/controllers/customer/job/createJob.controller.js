@@ -1,31 +1,49 @@
 import mongoose from "mongoose";
 import { Category, Job, JobTask } from "../../../models/index.js";
-import { AppError } from "../../../pkg/helper/errorHandler.js";
+
 import successRes from "../../../pkg/helper/successRes.js";
 import { withTransaction } from "../../../pkg/transaction/transaction.js";
+import { AppError } from "../../../pkg/helper/errorHandler.js";
 
 export const createJob = async (req, res, next) => {
   try {
-    const { title, description, categoryIds, location, budget, tasks } =
-      req.body;
+    const {
+      title,
+      description,
+      categoryIds,
+      location,
+      budget,
+      tasks,
+      dateStart,
+      dateEnd,
+    } = req.body;
+
     const customerId = req.user?.id;
 
-    if (!title || !description || !location || !budget) {
-      return AppError(res, 400, "Please provide all required fields.");
+    if (
+      !title ||
+      !description ||
+      !location ||
+      !budget ||
+      !dateStart ||
+      !dateEnd
+    ) {
+      throw new AppError("Please provide all required fields.", 400);
     }
 
-    if (!customerId) {
-      return AppError(res, 401, "User authentication failed.");
-    }
+    const categoriesArr = await validateCategories(categoryIds);
+    if (!categoriesArr) throw new AppError("Invalid categories provided.", 400);
 
-    const categoriesArr = await validateCategories(categoryIds, res);
-    if (!categoriesArr) return;
+    if (!validateTasks(tasks))
+      throw new AppError("Invalid tasks provided.", 400);
 
-    const isValidTasks = validateTasks(tasks);
-    if (!isValidTasks) return AppError(res, 400, "Invalid tasks");
+    const parsedDates = validateDateTimeAndParse(dateStart, dateEnd);
+    if (!parsedDates)
+      throw new AppError("Invalid or inconsistent date range.", 400);
+
+    const { startDateObj, endDateObj } = parsedDates;
 
     let job;
-
     await withTransaction(async (session) => {
       const jobTasks = await JobTask.insertMany(
         tasks.map((t) => ({
@@ -35,7 +53,7 @@ export const createJob = async (req, res, next) => {
         { session }
       );
 
-      job = await Job.create(
+      const createdJobs = await Job.create(
         [
           {
             title,
@@ -46,54 +64,51 @@ export const createJob = async (req, res, next) => {
             customerId,
             budget,
             status: "available",
+            dateStart: startDateObj,
+            dateEnd: endDateObj,
           },
         ],
         { session }
       );
+
+      job = createdJobs[0];
     });
 
-    return successRes(res, {
-      data: { job: job[0] },
-      status: 200,
-    });
+    return successRes(res, { data: { job }, status: 200 });
   } catch (error) {
     next(error);
   }
 };
 
-// --- Validate category IDs ---
-const validateCategories = async (categoryIds, res) => {
-  if (!Array.isArray(categoryIds)) {
-    return AppError(res, 400, "Invalid categories format.");
-  }
-
-  
-
+//
+// --- Helpers ---
+//
+const validateCategories = async (categoryIds) => {
+  if (!Array.isArray(categoryIds) || categoryIds.length === 0) return null;
   for (const id of categoryIds) {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return AppError(res, 400, `Invalid category ID: ${id}`);
-    }
-
+    if (!mongoose.Types.ObjectId.isValid(id)) return null;
     const exists = await Category.findById(id);
-    if (!exists) {
-      return AppError(res, 400, `Category not found with ID: ${id}`);
-    }
+    if (!exists) return null;
   }
-
-  return categoryIds
+  return categoryIds;
 };
 
-// --- Validate tasks ---
 const validateTasks = (tasks) => {
-  if (!Array.isArray(tasks)) {
-    return false;
-  }
+  if (!Array.isArray(tasks) || tasks.length === 0) return false;
+  return tasks.every((t) => t.title && t.description);
+};
 
-  for (const task of tasks) {
-    if (!task.title || !task.description) {
-      return false;
-    }
-  }
+const validateDateTimeAndParse = (startDate, endDate) => {
+  const startDateObj = new Date(startDate);
+  const endDateObj = new Date(endDate);
+  if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) return null;
 
-  return true;
+  const now = new Date();
+  if (startDateObj < now.setHours(0, 0, 0, 0)) return null;
+  if (endDateObj < startDateObj) return null;
+
+  startDateObj.setHours(0, 0, 0, 0);
+  endDateObj.setHours(23, 59, 59, 999);
+
+  return { startDateObj, endDateObj };
 };

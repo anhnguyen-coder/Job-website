@@ -14,9 +14,11 @@ const Page: React.FC = () => {
     queryInput,
     pagy,
     page,
+    categoriesOptions,
     setPage,
     setQueryInput,
     handleGetJobs,
+    handleGetCategories,
   } = useHook();
 
   const statusOptions = [
@@ -35,9 +37,14 @@ const Page: React.FC = () => {
       type: "select",
       options: Object.values(statusOptions),
     },
-    { name: "budget", label: "Budget", type: "number" },
+    { name: "budget", label: "Budget", type: "inputRange" },
     { name: "location", label: "Location", type: "text" },
-    { name: "category", label: "Category", type: "select", options: [] },
+    {
+      name: "category",
+      label: "Category",
+      type: "select",
+      options: categoriesOptions,
+    },
   ] as const;
 
   useEffect(() => {
@@ -47,6 +54,11 @@ const Page: React.FC = () => {
     };
     handleGetJobs(queryInput, pagyInput);
   }, [page]);
+
+  useEffect(() => {
+    if (categoriesOptions && categoriesOptions.length > 0) return;
+    handleGetCategories();
+  }, [categoriesOptions, handleGetCategories]);
 
   return (
     <div>

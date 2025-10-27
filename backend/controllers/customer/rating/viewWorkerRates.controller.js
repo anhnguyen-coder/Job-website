@@ -3,7 +3,7 @@ import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { getPagination, getPagingData } from "../../../pkg/helper/pagy.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
-export const viewWorkerRates = async (req, res) => {
+export const viewWorkerRates = async (req, res, next) => {
   const workerId = req.params.workerId;
   try {
     const { page, limit, skip } = getPagination(req.query);
@@ -26,6 +26,6 @@ export const viewWorkerRates = async (req, res) => {
     const pagination = getPagingData(total, page, limit);
     return successRes(res, { data: ratings, pagy: pagination });
   } catch (error) {
-    AppError(res, 500, error.message);
+    next(error);
   }
 };

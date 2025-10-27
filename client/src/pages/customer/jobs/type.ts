@@ -3,5 +3,10 @@ export interface JobsQueryInputForm {
   title?: string;
   category?: string;
   location?: string;
-  budget?: number;
+  budget?: rageNumberInput;
+}
+
+export interface rageNumberInput {
+  min?: number;
+  max?: number;
 }
