@@ -17,7 +17,7 @@ export const Notification = ({ notifications }: props) => {
       </div>
 
       {notifications.map((noti: NotificationInterface) => (
-        <NotiItem noti={noti} />
+        <NotiItem noti={noti} key={noti._id} />
       ))}
     </div>
   );
