@@ -1,0 +1,19 @@
+import { ENDPOINT } from "@/constant/constant";
+
+const JOB_GET_API = {
+  JOB_LIST: `${ENDPOINT.WORKER_ENPOINT}/jobs`,
+  JOB_BOOKMARK_LIST: `${ENDPOINT.WORKER_ENPOINT}/jobs/bookmark`,
+  JOB_CURRENT_LIST: `${ENDPOINT.WORKER_ENPOINT}/jobs/current-job`,
+  JOB_DETAIL: `${ENDPOINT.WORKER_ENPOINT}/job`,
+};
+
+const JOB_PUT_API = {
+  UPDATE_JOB_STATUS: `${ENDPOINT.WORKER_ENPOINT}/job`,
+};
+
+const JOB_POST_API = {
+  MAKE_BOOKMARK_JOB: `${ENDPOINT.WORKER_ENPOINT}/job/bookmark`,
+  MAKE_REQUEST_JOB: `${ENDPOINT.WORKER_ENPOINT}/job/request`,
+};
+
+export { JOB_GET_API, JOB_POST_API, JOB_PUT_API };
