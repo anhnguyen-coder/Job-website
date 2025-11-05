@@ -68,4 +68,23 @@ const jobSchema = new mongoose.Schema(
 
 jobSchema.index({ customerId: 1, status: 1 });
 
+jobSchema.pre("findOneAndDelete", async function (next) {
+  const job = await this.model.findOne(this.getFilter());
+
+  if (job) {
+    await JobTask.deleteMany({ _id: { $in: job.jobTasks } });
+  }
+
+  next();
+});
+
+jobSchema.pre(
+  "deleteOne",
+  { document: true, query: false },
+  async function (next) {
+    await JobTask.deleteMany({ _id: { $in: this.jobTasks } });
+    next();
+  }
+);
+
 export default mongoose.model("Job", jobSchema);

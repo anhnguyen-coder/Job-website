@@ -3,12 +3,15 @@ import { User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
 import successRes from "../../../pkg/helper/successRes.js";
-import { isEmailValid, isValidPassword } from "../../../pkg/helper/validation.js";
+import {
+  isEmailValid,
+  isValidPassword,
+} from "../../../pkg/helper/validation.js";
 
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
   try {
-    validateRegisterInput(res, name, email, password);
+    validateRegisterInput(res, name, email, password, confirmPassword);
 
     const existingWorker = await User.findOne({ email: email });
     if (existingWorker) {
@@ -32,7 +35,7 @@ export const register = async (req, res) => {
   }
 };
 
-const validateRegisterInput = (res, name, email, password) => {
+const validateRegisterInput = (res, name, email, password, confirmPassword) => {
   if (!name || !email || !password)
     return AppError(res, 400, "Missing details");
 
@@ -43,6 +46,9 @@ const validateRegisterInput = (res, name, email, password) => {
 
   if (password.trim().length < 8)
     return AppError(res, 400, "Password must be at least 8 characters long");
+
+  if (password !== confirmPassword)
+    return AppError(res, 400, "Passwords do not match");
 
   if (!isValidPassword(password))
     return AppError(

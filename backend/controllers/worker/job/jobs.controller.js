@@ -6,20 +6,18 @@ import successRes from "../../../pkg/helper/successRes.js";
 
 export const listJobs = async (req, res) => {
   try {
-    const {
-      title,
-      customerid,
-      categories,
-      location,
-      minBudget,
-      maxBudget,
-    } = req.query;
+    const { title, category, location, minBudget, maxBudget } = req.query;
 
     const filter = {};
 
     if (title) filter.title = { $regex: title, $options: "i" };
-    if (customerid) filter.customerId = customerid;
-    if (categories) filter.categories = { $in: categories.split(",") };
+    if (category) {
+      const categories = category
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean);
+      filter.categories = { $in: categories };
+    }
     if (location) filter.location = { $regex: location, $options: "i" };
 
     filter.status = JOB_STATUS.AVAILABLE;
@@ -35,7 +33,7 @@ export const listJobs = async (req, res) => {
     const { page, limit, skip } = getPagination(req.query);
 
     const [jobs, total] = await Promise.all([
-      Job.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      Job.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }).lean(),
       Job.countDocuments(filter),
     ]);
 

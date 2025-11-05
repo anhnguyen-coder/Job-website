@@ -9,10 +9,6 @@ export const useErrorHandler = () => {
     let message = "An unknown error occurred";
 
     if (error && (error as AxiosError).isAxiosError) {
-      if (error.status === 401) {
-        navigate("/signin");
-      }
-
       const axiosError = error as AxiosError<{ message: string }>;
       message = axiosError.response?.data?.message || axiosError.message;
     }

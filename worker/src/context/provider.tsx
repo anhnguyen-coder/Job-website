@@ -27,7 +27,7 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const response = await axiosInstance.post(POST_API.SIGN_IN, input);
-      if (response.status === 200) {
+      if (response.data.success) {
         setIsAuthenticated(true);
         navigate("/dashboard");
       }

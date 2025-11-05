@@ -1,11 +1,12 @@
+import type React from "react";
+import useSignUpHook from "./hook";
 import appLogo from "@/assets/logo.png";
-import SignInForm from "@/components/form/signInForm";
-import useHook from "./hook";
+import { SignUpForm } from "@/components/form/signUpForm";
 
-function Page() {
-  const { input, setInput, handleSignIn, err } = useHook();
+const SignUp: React.FC = () => {
+  const { input, setInput, handleSignUp, err } = useSignUpHook();
   return (
-    <div>
+    <div className="w-full flex flex-col items-center justify-center p-8">
       <header className="flex flex-col items-center text-center mb-8">
         {/* Logo */}
         <div className="flex items-center justify-center mb-5">
@@ -28,15 +29,15 @@ function Page() {
         </div>
       </header>
 
-      {/* sign in form */}
-      <SignInForm
+      {/* form */}
+      <SignUpForm
         input={input}
         setInput={setInput}
-        handleSignIn={handleSignIn}
+        handleSignUp={handleSignUp}
         err={err}
       />
     </div>
   );
-}
+};
 
-export default Page;
+export default SignUp;

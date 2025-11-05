@@ -20,16 +20,17 @@ router.put("/reset-password", workerController.resetPassword);
 router.use(workerAuth);
 
 // 🔐 Sign out
+router.get("/profile", workerController.profile);
 router.post("/signout", workerController.signOut);
-
+router.get("/validate-token", workerController.validateToken);
 // 💼 Job routes
 router.get("/jobs", workerController.jobList);
 router.get("/jobs/bookmark", workerController.bookmarJobList);
 router.get("/jobs/current-job", workerController.myCurrentJobs);
 router.get("/job/:jobId", workerController.jobDetail);
 router.put("/job/:jobId", workerController.updateJobStatus);
-router.post("/job/:jobId/bookmark", workerController.makeBookmarkJob);
-router.post("/job/:jobId/request", workerController.makeRequestJob);
+router.post("/job/bookmark/:jobId", workerController.makeBookmarkJob);
+router.post("/job/request/:jobId", workerController.makeRequestJob);
 
 // 💬 Message routes
 router
