@@ -17,6 +17,7 @@ const Page: React.FC = () => {
     setPage,
     setQueryInput,
     handleGetJobs,
+    categoriesOptions,
   } = useHook();
 
   const statusOptions = [
@@ -37,7 +38,12 @@ const Page: React.FC = () => {
     },
     { name: "budget", label: "Budget", type: "number" },
     { name: "location", label: "Location", type: "text" },
-    { name: "category", label: "Category", type: "select", options: [] },
+    {
+      name: "category",
+      label: "Category",
+      type: "select",
+      options: categoriesOptions,
+    },
   ] as const;
 
   useEffect(() => {

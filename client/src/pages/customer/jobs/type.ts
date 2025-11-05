@@ -5,3 +5,8 @@ export interface JobsQueryInputForm {
   location?: string;
   budget?: number;
 }
+
+
+export interface JobRequestQueryInput {
+  status?: string
+}

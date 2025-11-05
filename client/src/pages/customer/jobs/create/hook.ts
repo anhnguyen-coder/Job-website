@@ -1,12 +1,12 @@
 import { GET } from "@/apis/shared/category";
 import axiosInstance from "@/pkg/axios/axiosInstance";
-import { errhandler } from "@/pkg/helpers/errorHandler";
 import type { CategoryInterface } from "@/pkg/types/interfaces/category";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import type { JobCreateForm } from "./type";
 import { POST } from "@/apis/customer/job";
 import type { Option } from "@/pkg/types/interfaces/option";
+import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 
 const useHook = () => {
   const [categories, setCategories] = useState<CategoryInterface[]>();
@@ -21,6 +21,8 @@ const useHook = () => {
     tasks: [],
   });
   const [categoriesOptions, setCategoriesOption] = useState<Option[]>();
+
+  const handleError = useErrorHandler();
 
   const handleGetCategories = async () => {
     setLoading(true);
@@ -39,7 +41,7 @@ const useHook = () => {
         setCategoriesOption(mappedOptions);
       }
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,7 @@ const useHook = () => {
         console.log(res.data);
       }
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -64,6 +66,7 @@ const useHook = () => {
     loading,
     formInput,
     categoriesOptions,
+    err,
     setFormInput,
     handleGetCategories,
     handleCreateJob,

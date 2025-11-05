@@ -1,7 +1,7 @@
 import { GET } from "@/apis/customer/dashboard/apis";
 import { GET as GET_JOB } from "@/apis/customer/job";
 import axiosInstance from "@/pkg/axios/axiosInstance";
-import { errhandler } from "@/pkg/helpers/errorHandler";
+import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 import { parseQueryArrayToString } from "@/pkg/helpers/query";
 import { JOB_STATUS } from "@/pkg/types/enums/job";
 import type { JobInterface } from "@/pkg/types/interfaces/job.type";
@@ -19,6 +19,7 @@ const useHook = () => {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState<JobInterface[]>();
+  const handleError = useErrorHandler();
 
   const handleGetStats = async () => {
     setLoading(true);
@@ -29,7 +30,7 @@ const useHook = () => {
         setStats(res.data.data);
       }
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,7 @@ const useHook = () => {
         setJobs(res.data.data);
       }
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     }
   };
 

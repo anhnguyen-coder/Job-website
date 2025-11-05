@@ -35,7 +35,7 @@ const JobItem = ({ job }: JobItemProps) => {
   );
 
   const handleViewJobDetails = (jobId: string) => {
-    navigate(`/customer/jobs/${jobId}`);
+    navigate(`/jobs/${jobId}`);
   };
 
   return (

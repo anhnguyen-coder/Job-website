@@ -22,3 +22,13 @@ export interface JobInterface {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface JobRequestInterface {
+  _id: string;
+  jobId: JobInterface;
+  workerId: UserInterface;
+  customerId: UserInterface;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}

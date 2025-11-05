@@ -15,31 +15,37 @@ const navItemData: navItem[] = [
     id: 1,
     title: "Dashboard",
     icon: "mdi mdi-view-dashboard-outline",
-    path: "/customer/dashboard",
+    path: "/dashboard",
   },
   {
     id: 2,
     title: "Jobs",
     icon: "mdi mdi-briefcase-outline",
-    path: "/customer/jobs",
+    path: "/jobs",
+  },
+  {
+    id: 6,
+    title: "Job requests",
+    icon: "mdi mdi-briefcase-outline",
+    path: "/job-request",
   },
   {
     id: 3,
     title: "Post new job",
     icon: "mdi mdi-plus",
-    path: "/customer/create-job",
+    path: "/create-job",
   },
   {
     id: 4,
     title: "Reviews",
     icon: "mdi mdi-star-outline",
-    path: "/customer/reviews",
+    path: "/reviews",
   },
   {
     id: 5,
     title: "Account history & Insights",
     icon: "mdi mdi-chart-bar",
-    path: "/customer/history",
+    path: "/history",
   },
 ];
 export function Navbar() {

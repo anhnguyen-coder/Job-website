@@ -8,10 +8,11 @@ import { Notification } from "@/components/customer/dashboard/notification";
 import type { NotificationInterface } from "@/pkg/types/interfaces/notification";
 import { NOTI_TYPE } from "@/pkg/types/enums/noti";
 import { CUSTOMER_APP_THEME } from "@/constant/constant";
+import { LoadingOverlay } from "@/components/base/loading";
+import { formatUSD } from "@/pkg/helpers/formatter";
 
 const Page: React.FC = () => {
-  const { stats, loading, err, jobs, handleGetStats, handleGetJobList } =
-    useHook();
+  const { stats, loading, jobs, handleGetStats, handleGetJobList } = useHook();
 
   useEffect(() => {
     handleGetStats();
@@ -46,6 +47,8 @@ const Page: React.FC = () => {
     return "";
   };
 
+  if (loading) return <LoadingOverlay />;
+
   return (
     <div className="p-4">
       <PageHeading title="Dashboard" />
@@ -57,7 +60,7 @@ const Page: React.FC = () => {
             <StatItem
               key={stat.id}
               label={stat.label}
-              value={stat.value}
+              value={stat.id === 2 ? formatUSD(Number(stat.value)) : stat.value}
               icon={getIconBasedOnStat(stat)}
               color={getStatColor(stat)}
             />

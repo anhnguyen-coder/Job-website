@@ -10,15 +10,16 @@ import type {
 } from "./types";
 
 import type { AxiosError } from "axios";
-import { errhandler } from "@/pkg/helpers/errorHandler";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { GET, POST, PUT } from "@/apis/customer/auth/apis";
+import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [err, setErr] = useState("");
+  const handleError = useErrorHandler();
 
   const navigate = useNavigate();
 
@@ -28,11 +29,11 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       const response = await axiosInstance.post(POST.SIGNIN, input);
       if (response.status === 200) {
         setIsAuthenticated(true);
-        navigate("/customer/dashboard");
+        navigate("/dashboard");
       }
       setLoading(false);
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -47,12 +48,12 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        navigate("/customer/signin");
+        navigate("/signin");
       }
     } catch (error) {
       setIsAuthenticated(false);
       setUser(null);
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -76,7 +77,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       setIsAuthenticated(false);
       setUser(null);
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -88,9 +89,9 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(false);
       setUser(null);
       localStorage.removeItem("currenCustomer");
-      navigate("/customer/signin");
+      navigate("/signin");
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     }
   };
 
@@ -99,7 +100,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await axiosInstance.post(PUT.RESET_PASSWORD, input);
       if (response.data.success) {
-        navigate("/customer/signin");
+        navigate("/signin");
       }
       setLoading(false);
     } catch (errorny) {
@@ -120,11 +121,11 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await axiosInstance.post(POST.SIGNUP, input);
       if (response.data.success) {
-        navigate("/customer/signin");
+        navigate("/signin");
       }
       setLoading(false);
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     }
   };
 

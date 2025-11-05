@@ -11,6 +11,7 @@ import DashBoard from "@/pages/customer/dashboard/page";
 import JobsPage from "@/pages/customer/jobs/page";
 import JobIdPage from "@/pages/customer/jobs/_id/page";
 import JobCreatePage from "@/pages/customer/jobs/create/page";
+import JobRequestList from "@/pages/customer/jobs/request/page";
 
 const NotFound: React.FC = () => {
   return <div>404 Not Found</div>;
@@ -28,29 +29,28 @@ const CustomerAppRouters: React.FC = () => {
     <>
       {!loading && (
         <Routes>
-          <Route path="customer">
-            {/* public routes */}
-            {!isAuthenticated && !loading && (
-              <Route element={<AuthLayout />}>
-                <Route path="signin" element={<SignIn />}></Route>
-                <Route path="signup" element={<SignUp />}></Route>
-                <Route
-                  path="reset-password"
-                  element={<ForgotPasswordPage />}
-                ></Route>
-              </Route>
-            )}
+          {/* public routes */}
+          {!isAuthenticated && !loading && (
+            <Route element={<AuthLayout />}>
+              <Route path="signin" element={<SignIn />}></Route>
+              <Route path="signup" element={<SignUp />}></Route>
+              <Route
+                path="reset-password"
+                element={<ForgotPasswordPage />}
+              ></Route>
+            </Route>
+          )}
 
-            {/* private routes */}
-            {isAuthenticated && !loading && (
-              <Route element={<CustomerLayout />}>
-                <Route path="dashboard" element={<DashBoard />}></Route>
-                <Route path="jobs" element={<JobsPage />}></Route>
-                <Route path="jobs/:jobId" element={<JobIdPage />}></Route>
-                <Route path="create-job" element={<JobCreatePage />}></Route>
-              </Route>
-            )}
-          </Route>
+          {/* private routes */}
+          {isAuthenticated && !loading && (
+            <Route element={<CustomerLayout />}>
+              <Route path="dashboard" element={<DashBoard />}></Route>
+              <Route path="jobs" element={<JobsPage />}></Route>
+              <Route path="jobs/:jobId" element={<JobIdPage />}></Route>
+              <Route path="create-job" element={<JobCreatePage />}></Route>
+              <Route path="job-request" element={<JobRequestList />}></Route>
+            </Route>
+          )}
           <Route path="*" element={<NotFound />} />
         </Routes>
       )}

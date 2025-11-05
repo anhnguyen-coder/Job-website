@@ -1,6 +1,6 @@
 import { GET, PUT } from "@/apis/customer/auth/apis";
 import axiosInstance from "@/pkg/axios/axiosInstance";
-import { errhandler } from "@/pkg/helpers/errorHandler";
+import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 
 import type { AxiosError } from "axios";
 import { useState } from "react";
@@ -12,6 +12,7 @@ const useHook = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isExist, setIsExist] = useState<boolean>(false);
   const [err, setErr] = useState<string>("");
+  const handleError = useErrorHandler();
 
   const navigate = useNavigate();
 
@@ -28,7 +29,7 @@ const useHook = () => {
       }
     } catch (error) {
       console.log(error);
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }
@@ -47,7 +48,7 @@ const useHook = () => {
         navigate("/customer/signin");
       }
     } catch (error) {
-      errhandler(error as AxiosError, setErr);
+      handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
     }

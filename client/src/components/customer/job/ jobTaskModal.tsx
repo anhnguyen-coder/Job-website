@@ -1,14 +1,26 @@
 import { BaseModal } from "@/components/base/baseModal";
 import type { TaskInputForm } from "@/pages/customer/jobs/create/type";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   setOpen: (val: boolean) => void;
   isOpen: boolean;
-  setInputValue: (value: TaskInputForm) => void;
+  setInputValue: (value: TaskInputForm, index?: number) => void;
+  task?: TaskInputForm;
+  index?: number;
+  setIndex?: (num: number) => void;
+  setTask?: (task: TaskInputForm) => void;
 }
 
-export function JobTaskModal({ setOpen, isOpen, setInputValue }: Props) {
+export function JobTaskModal({
+  setOpen,
+  isOpen,
+  setInputValue,
+  task,
+  index,
+  setIndex,
+  setTask,
+}: Props) {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
 
@@ -19,13 +31,22 @@ export function JobTaskModal({ setOpen, isOpen, setInputValue }: Props) {
       description: desc,
     };
 
-    setInputValue(form);
+    setInputValue(form, index);
+    setIndex?.(-1);
+    setTask?.({ title: "", description: "" });
     setOpen(false);
   };
 
+  useEffect(() => {
+    if (task && index !== undefined && index !== null) {
+      setTitle(task.title);
+      setDesc(task.description);
+    }
+  }, []);
+
   return (
     <BaseModal isOpen={isOpen} onClose={() => setOpen(false)}>
-      <div className="bg-white rounded-2xl w-full max-w-md p-6 relative animate-fade-in">
+      <div className="bg-white rounded-2xl w-[400px] max-w-md p-4 relative animate-fade-in">
         {/* Heading */}
         <h2 className="text-2xl font-semibold text-gray-800 mb-5">
           Create Sub Task

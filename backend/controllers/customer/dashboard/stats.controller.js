@@ -2,11 +2,14 @@ import { JOB_STATUS } from "../../../enums/job.enum.js";
 import { Job, Payment, Review } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
+import mongoose from "mongoose";
 
 const STATUS_JOB = [
   JOB_STATUS.TAKEN,
   JOB_STATUS.IN_PROGRESS,
   JOB_STATUS.CHECK_COMPLETE,
+  JOB_STATUS.COMPLETED,
+  JOB_STATUS.CANCELLED,
 ];
 
 export const dashboardStats = async (req, res) => {
@@ -21,7 +24,13 @@ export const dashboardStats = async (req, res) => {
         }),
 
         Payment.aggregate([
-          { $match: { customerId, status: "paid" } },
+          {
+            $match: {
+              customerId:
+                mongoose.Types.ObjectId.createFromHexString(customerId),
+              status: "paid",
+            },
+          },
           { $group: { _id: null, total: { $sum: "$amount" } } },
         ]),
 

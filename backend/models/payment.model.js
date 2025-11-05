@@ -43,6 +43,7 @@ export const paymentSchema = new mongoose.Schema(
     },
     paidAt: {
       type: Date,
+      default: Date.now(),
     },
   },
   {
@@ -50,7 +51,21 @@ export const paymentSchema = new mongoose.Schema(
   }
 );
 
+// ✅ Indexes
 paymentSchema.index({ customerId: 1, status: 1 });
 paymentSchema.index({ workerId: 1, status: 1 });
+
+// ✅ Auto-generate transactionId for demo purpose
+paymentSchema.pre("save", function (next) {
+  if (!this.transactionId) {
+    const randomPart = Math.random()
+      .toString(36)
+      .substring(2, 10)
+      .toUpperCase();
+    const timestamp = Date.now().toString(36).toUpperCase();
+    this.transactionId = `TXN-${timestamp}-${randomPart}`;
+  }
+  next();
+});
 
 export default mongoose.model("Payment", paymentSchema);

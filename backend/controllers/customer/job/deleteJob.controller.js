@@ -8,21 +8,21 @@ export const deleteJob = async (req, res, next) => {
     const customerId = req.user?.id;
 
     if (!customerId) {
-      throw AppError(res, 401, "Không xác thực được người dùng.");
+      throw AppError(res, 401, "User authentication failed.");
     }
 
     const job = await Job.findOne({ _id: jobId, customerId });
 
     if (!job) {
-      throw AppError(
-        res,
-        404,
-        "Công việc không tồn tại hoặc không thuộc về bạn."
-      );
+      throw AppError(res, 404, "Job not found or does not belong to you.");
     }
 
-    if (job && job.status === "in_progress") {
-      return AppError(res, 400, "Không thể xóa công việc đang tiến hành.");
+    if (job && job.status !== "available") {
+      return AppError(
+        res,
+        400,
+        "Cannot delete a job that has already been taken."
+      );
     }
 
     await Job.deleteOne({ _id: jobId, customerId });

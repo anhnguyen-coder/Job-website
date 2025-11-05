@@ -5,6 +5,7 @@ const useSignUpHook = () => {
   const customerAuth = useCustomerAuth();
 
   const [input, setInput] = useState<customerSignupInput>({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
