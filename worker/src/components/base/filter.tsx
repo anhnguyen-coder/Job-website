@@ -1,15 +1,19 @@
-import type { FilterFieldInterface } from "@/pkg/types/interfaces/filterField";
-import React from "react";
-import { Search, SlidersHorizontal } from "lucide-react"; // icon đẹp
+import type { FilterFieldInterface } from "@/pkg/interfaces/filterField";
+import type { PagyInput } from "@/pkg/interfaces/pagy";
+import { SlidersHorizontal } from "lucide-react";
 import { flushSync } from "react-dom";
-import type { PagyInput } from "@/pkg/types/interfaces/pagy";
+import { TextField } from "./textFieldBase";
+import { NumberField } from "./numberFieldBase";
+import { SelectField } from "./singleSelectFieldBase";
+import { DateField } from "./dateFieldBase";
+import { MultipleSelectField } from "./multipleSelectFieldBase";
 
 type FilterBaseProps<T extends object> = {
   fields: FilterFieldInterface<T>[];
   page: number;
   values: T;
   onChange: (values: T) => void;
-  onSubmit: (queries: T, pagyInput: PagyInput) => void;
+  onSubmit: (queries: T, pagyInput: PagyInput) => Promise<void>;
 };
 
 export function FilterBase<T extends object>({
@@ -19,36 +23,32 @@ export function FilterBase<T extends object>({
   onChange,
   onSubmit,
 }: FilterBaseProps<T>) {
-  const handleFieldChange = (name: keyof T, value: any) => {
+  const handleFieldChange = <K extends keyof T>(name: K, value: T[K]) => {
     onChange({
       ...values,
       [name]: value,
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const pagyInput = {
       page: page,
       limit: 10,
     };
-    onSubmit(values, pagyInput);
+    await onSubmit(values, pagyInput);
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     const resetValues = fields.reduce((acc, field) => {
       const key = field.name as keyof T;
-      if (field.type === "number") acc[key] = "" as unknown as T[keyof T];
-      else acc[key] = "" as unknown as T[keyof T];
+      acc[key] = "" as unknown as T[keyof T];
       return acc;
     }, {} as T);
 
     flushSync(() => onChange(resetValues));
-    const pagyInput = {
-      page: 1,
-      limit: 10,
-    };
-    onSubmit(resetValues, pagyInput);
+
+    await onSubmit(resetValues, { page: 1, limit: 10 }); // <- dùng resetValues trực tiếp
   };
 
   return (
@@ -73,48 +73,53 @@ export function FilterBase<T extends object>({
             </label>
 
             {field.type === "text" && (
-              <div className="relative">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  type="text"
-                  value={(values[field.name] as string) || ""}
-                  onChange={(e) =>
-                    handleFieldChange(field.name, e.target.value)
-                  }
-                  placeholder={`Search ${field.label.toLowerCase()}...`}
-                  className="w-full border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-lg pl-9 pr-3 py-2 text-sm outline-none transition-all duration-200 bg-white shadow-sm"
-                />
-              </div>
+              <TextField
+                label={field.label}
+                value={values[field.name]}
+                onChange={(val) =>
+                  handleFieldChange(field.name as keyof T, val as T[keyof T])
+                }
+              />
             )}
 
             {field.type === "number" && (
-              <input
-                type="number"
-                value={(values[field.name] as number) || ""}
-                onChange={(e) =>
-                  handleFieldChange(field.name, Number(e.target.value))
+              <NumberField
+                label={field.label}
+                value={values[field.name]}
+                onChange={(val) =>
+                  handleFieldChange(field.name as keyof T, val as T[keyof T])
                 }
-                placeholder={`Enter ${field.label.toLowerCase()}...`}
-                className="border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-lg px-3 py-2 text-sm outline-none transition-all duration-200 bg-white shadow-sm"
               />
             )}
 
             {field.type === "select" && field.options && (
-              <select
-                value={(values[field.name] as string) || ""}
-                onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                className="border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-lg px-3 py-2 text-sm outline-none transition-all duration-200 bg-white shadow-sm"
-              >
-                <option value="">-- Select --</option>
-                {field.options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              <SelectField
+                label={field.label}
+                value={values[field.name]}
+                options={field.options}
+                onChange={(val) =>
+                  handleFieldChange(field.name as keyof T, val as T[keyof T])
+                }
+              />
+            )}
+
+            {field.type === "date" && (
+              <DateField
+                value={values[field.name] as unknown as string | undefined}
+                onChange={(val) =>
+                  handleFieldChange(field.name as keyof T, val as T[keyof T])
+                }
+              />
+            )}
+
+            {field.type === "multiSelect" && field.options && (
+              <MultipleSelectField
+                value={values[field.name] as unknown as (string | number)[]}
+                options={field.options}
+                onChange={(val) =>
+                  handleFieldChange(field.name as keyof T, val as T[keyof T])
+                }
+              />
             )}
           </div>
         ))}
@@ -125,14 +130,14 @@ export function FilterBase<T extends object>({
         <button
           type="button"
           onClick={handleReset}
-          className="text-sm font-medium px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all duration-150"
+          className="text-sm font-medium px-5 py-2.5 rounded-3 border border-gray-300 text-gray-700 bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all duration-150"
         >
           Reset
         </button>
 
         <button
           type="submit"
-          className="text-sm font-semibold px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all duration-150 shadow-sm"
+          className="text-sm font-semibold px-5 py-2.5 rounded-3 bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all duration-150 shadow-sm"
         >
           Apply Filters
         </button>

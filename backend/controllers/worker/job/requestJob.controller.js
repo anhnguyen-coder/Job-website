@@ -17,6 +17,18 @@ export const requestJob = async (req, res, next) => {
       return AppError(res, 400, "Job is not available for request");
     }
 
+    const hasRequested = await JobRequest.findOne({
+      jobId: jobId,
+      workerId: workerId,
+    });
+
+    if (hasRequested)
+      return AppError(
+        res,
+        400,
+        "You have already applied this job, please wait for customer approve!"
+      );
+
     const jobRequest = new JobRequest({
       jobId: job._id,
       workerId: workerId,

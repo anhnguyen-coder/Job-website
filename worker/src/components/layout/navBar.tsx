@@ -1,5 +1,10 @@
 import { NavItem } from "@/components/base/navItem";
-import { Package, LogOut, BarChart2, BookMarked, LayoutDashboard } from "lucide-react";
+import {
+  Package,
+  LogOut,
+  BookMarked,
+  LayoutDashboard,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import logoImg from "@/assets/logo.png";
 import { useWorkerAuth } from "@/context/context";
@@ -29,7 +34,7 @@ const navItemData: NavItemType[] = [
     id: 3,
     title: "Bookmarked",
     icon: <BookMarked size={20} />,
-    path: "",
+    path: "/bookmarked",
   },
 ];
 
@@ -42,7 +47,9 @@ export function Navbar() {
       <div className="flex items-center gap-3 mb-6 shrink-0">
         <img src={logoImg} alt="" className="w-[50px] h-[50px] rounded-full" />
         <div>
-          <p className="text-2xl font-semibold text-sky-700 m-0">Job TingTing</p>
+          <p className="text-2xl font-semibold text-sky-700 m-0">
+            Job TingTing
+          </p>
         </div>
       </div>
 

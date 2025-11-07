@@ -32,3 +32,10 @@ export interface JobRequestInterface {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface BookmarkJobInterface {
+  workerId: UserInterface;
+  jobId: JobInterface;
+  createdAt: string;
+  updatedAt: string;
+}

@@ -6,17 +6,43 @@ import {
   getStatusBadgeVariant,
   formatUSD,
 } from "@/pkg/helper/formatter";
+import { useState } from "react";
+import { ConfirmModal } from "../base/confirmModal";
 
 type Props = {
   jobData: JobInterface;
+  handleApplyJob: (jobId: string) => Promise<void>;
+  handleSaveJob: (jobId: string) => Promise<void>;
 };
 
-export default function JobDetailPage({ jobData }: Props) {
+export default function JobDetailPage({
+  jobData,
+  handleApplyJob,
+  handleSaveJob,
+}: Props) {
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("vi-VN");
 
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+
+  const handleConfirm = async () => {
+    await handleApplyJob(jobData._id);
+  };
+
+  const makeSave = async () => {
+    await handleSaveJob(jobData._id);
+  };
+
   return (
     <main className="min-h-screen bg-gray-50">
+      {openConfirmModal && (
+        <ConfirmModal
+          isOpen={openConfirmModal}
+          onConfirm={handleConfirm}
+          onClose={() => setOpenConfirmModal(false)}
+        />
+      )}
+
       {/* Header */}
       <div className="border-b border-blue-200 bg-white shadow-sm mt-5 rounded-lg">
         <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -129,13 +155,24 @@ export default function JobDetailPage({ jobData }: Props) {
                 </h2>
                 <div className="space-y-3">
                   {jobData.jobTasks.map((task, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 rounded-lg bg-gray-100 p-3"
-                    >
-                      <i className="bx bx-check-circle text-green-600 text-lg"></i>
-                      <span className="text-gray-800">{task.title}</span>
-                    </div>
+                    <>
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 rounded-lg bg-gray-100 p-3"
+                      >
+                        <span className="flex items-center gap-2">
+                          <i className="bx bx-task text-green-600 text-lg"></i>
+                          <span className="font-semibold">#{index + 1}</span>
+                        </span>
+                        {"-"}
+                        <span className="text-gray-800">{task.title}</span>
+                      </div>
+
+                      <div className="flex flex-col items-start gap-3 rounded-lg bg-gray-100 p-3">
+                        <p className="font-semibold">Description:</p>
+                        <pre>{task.description}</pre>
+                      </div>
+                    </>
                   ))}
                 </div>
               </div>
@@ -165,34 +202,18 @@ export default function JobDetailPage({ jobData }: Props) {
               </div>
             </div>
 
-            {/* Worker Status */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="mb-4 text-lg font-semibold text-gray-800">
-                Worker
-              </h2>
-              {jobData.assignedWorkerId ? (
-                <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3">
-                  <i className="bx bx-check-circle text-green-600 text-lg"></i>
-                  <span className="text-sm font-medium text-green-700">
-                    Đã phân công
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 rounded-lg bg-yellow-50 p-3">
-                  <i className="bx bx-error-circle text-yellow-600 text-lg"></i>
-                  <span className="text-sm font-medium text-yellow-700">
-                    Chưa phân công
-                  </span>
-                </div>
-              )}
-            </div>
-
             {/* Action Buttons */}
             <div className="space-y-3">
-              <button className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 font-medium">
+              <button
+                onClick={() => setOpenConfirmModal(true)}
+                className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 font-medium cursor-pointer"
+              >
                 Apply
               </button>
-              <button className="w-full rounded-lg border border-gray-300 py-2 font-medium hover:bg-gray-50">
+              <button
+                onClick={() => makeSave()}
+                className="w-full rounded-lg border border-gray-300 py-2 font-medium hover:bg-gray-50 cursor-pointer"
+              >
                 Save to bookmark
               </button>
             </div>

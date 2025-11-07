@@ -7,6 +7,7 @@ import { PageHeading } from "@/components/base/pageheading";
 import { FilterBase } from "@/components/base/filter";
 import { JobList } from "@/components/job/jobList";
 import { Pagination } from "@/components/base/pagy";
+import { LoadingOverlay } from "@/components/base/loading";
 
 const Page: React.FC = () => {
   const {
@@ -18,6 +19,7 @@ const Page: React.FC = () => {
     setQueryInput,
     handleGetJobs,
     categoriesOptions,
+    loading,
   } = useHook();
 
   const fields: FilterFieldInterface<JobsQueryInputForm>[] = [
@@ -42,6 +44,8 @@ const Page: React.FC = () => {
     };
     handleGetJobs(queryInput, pagyInput);
   }, [page]);
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <div>

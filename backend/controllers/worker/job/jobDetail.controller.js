@@ -12,7 +12,8 @@ export const jobDetails = async (req, res, next) => {
     const job = await Job.findById(jobId)
       .populate("customerId", "name email")
       .populate("categories", "name")
-      .populate("assignedWorkerId", "name email");
+      .populate("assignedWorkerId", "name email")
+      .populate("jobTasks", "title description");
 
     if (!job) {
       throw AppError(404, "Job not found.");

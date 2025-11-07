@@ -9,12 +9,12 @@ export const bookmarkJob = async (req, res, next) => {
 
     const job = await Job.findById(jobId);
     if (!job) {
-      return AppError(404, "Job not found");
+      return AppError(res, 404, "Job not found");
     }
 
     const existingBookmark = await Bookmark.findOne({ workerId, jobId });
     if (existingBookmark) {
-      return AppError(400, "Job already bookmarked");
+      return AppError(res, 400, "Job already saved to Bookmark");
     }
 
     const newBookmark = new Bookmark({ workerId, jobId });
@@ -22,6 +22,6 @@ export const bookmarkJob = async (req, res, next) => {
 
     return successRes(res, { data: newBookmark, status: 200 });
   } catch (error) {
-    next(error);
+    AppError(res, 500, error.message);
   }
 };

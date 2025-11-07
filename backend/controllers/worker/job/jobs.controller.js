@@ -33,7 +33,7 @@ export const listJobs = async (req, res) => {
     const { page, limit, skip } = getPagination(req.query);
 
     const [jobs, total] = await Promise.all([
-      Job.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }).lean(),
+      Job.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }).populate("categories", "name").lean(),
       Job.countDocuments(filter),
     ]);
 

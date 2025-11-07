@@ -1,8 +1,8 @@
 export type FilterFieldInterface<T> = {
   name: keyof T;
   label: string;
-  type: "text" | "number" | "select";
-  options?: FilterOption[]
+  type: "text" | "number" | "select" | "multiSelect" | "date";
+  options?: FilterOption[];
 };
 
 export type FilterOption = {

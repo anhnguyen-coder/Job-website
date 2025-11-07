@@ -115,6 +115,7 @@ const useHook = () => {
       ...prev,
       tasks: [...(prev.tasks || []), task],
     }));
+    setTask({ title: "", description: "" });
   };
 
   const handleOpenTask = (task: TaskInputForm, index: number) => {
