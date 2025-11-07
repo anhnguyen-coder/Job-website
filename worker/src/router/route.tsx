@@ -8,11 +8,13 @@ import DashBoardPage from "@/pages/dashboard/page";
 import AppLayout from "@/layout/app.layout";
 import JobListPage from "@/pages/jobs/page";
 import SignUpPage from "@/pages/signup/page";
+import JobIDPage from "@/pages/jobs/id/page";
+import ForgotPasswordPage from "@/pages/forgotPassword/page";
 
 const AppRouter: React.FC = () => {
-  const { isAuthenticated, initialized } = useWorkerAuth();
+  const { isAuthenticated, loading } = useWorkerAuth();
 
-  if (!initialized) return <LoadingOverlay />;
+  if (loading) return <LoadingOverlay />;
 
   return (
     <Routes>
@@ -20,6 +22,7 @@ const AppRouter: React.FC = () => {
         <Route element={<AuthLayout />}>
           <Route path="signin" element={<SignInPage />}></Route>
           <Route path="signup" element={<SignUpPage />}></Route>
+          <Route path="reset-password" element={<ForgotPasswordPage />}></Route>
         </Route>
       )}
 
@@ -27,6 +30,7 @@ const AppRouter: React.FC = () => {
         <Route element={<AppLayout />}>
           <Route path="dashboard" element={<DashBoardPage />}></Route>
           <Route path="jobs" element={<JobListPage />}></Route>
+          <Route path="jobs/:jobId" element={<JobIDPage />}></Route>
         </Route>
       )}
 

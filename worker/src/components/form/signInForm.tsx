@@ -97,7 +97,7 @@ function SignInForm({ input, setInput, handleSignIn, err }: props) {
               </label>
             </div>
             <a
-              href="/customer/reset-password"
+              href="/reset-password"
               className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
             >
               Forgot password?

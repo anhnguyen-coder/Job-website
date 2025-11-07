@@ -15,7 +15,6 @@ import { sendMessage } from "./messages/sendMessage.controller.js";
 import { updateMessage } from "./messages/updateMessage.controller.js";
 import { deleteMessage } from "./messages/deleteMessage.controller.js";
 import { viewProfileRating } from "./rating/viewProfileRating.controller.js";
-import { validateToken } from "./auth/validateToken.controller.js";
 import { profile } from "./auth/profile.controller.js";
 
 const workerController = {
@@ -25,7 +24,6 @@ const workerController = {
   signOut: signOut,
   findByEmail: findByEmail,
   resetPassword: resetPassword,
-  validateToken: validateToken,
   profile: profile,
 
   // job

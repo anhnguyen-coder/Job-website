@@ -1,6 +1,6 @@
 import { useErrorHandler } from "@/pkg/helper/errHandler";
 import type { UserInterface } from "@/pkg/interfaces/user.type";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   resetPasswordInput,
@@ -17,8 +17,9 @@ import { WorkerAuthContext } from "./context";
 export const WorkerProvider = ({ children }: { children: ReactNode }) => {
   const [worker, setWorker] = useState<UserInterface | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [initialized, setInitialized] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    !!localStorage.getItem("workerToken")
+  );
   const [err, setErr] = useState("");
   const navigate = useNavigate();
   const handleError = useErrorHandler();
@@ -28,6 +29,7 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await axiosInstance.post(POST_API.SIGN_IN, input);
       if (response.data.success) {
+        localStorage.setItem("workerToken", response.data.data);
         setIsAuthenticated(true);
         navigate("/dashboard");
       }
@@ -45,31 +47,12 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
       handleError(error as AxiosError, setErr);
     } finally {
       setIsAuthenticated(false);
+      localStorage.removeItem("workerToken");
+      localStorage.removeItem("currentWorker");
       setWorker(null);
       navigate("/signin");
     }
   };
-
-  const validateToken = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await axiosInstance.get(GET_API.VALIDATE_TOKEN);
-      if (res.data.success) {
-        setIsAuthenticated(true);
-        setWorker(res.data.admin);
-      } else {
-        setIsAuthenticated(false);
-        setWorker(null);
-      }
-    } catch (error) {
-      setIsAuthenticated(false);
-      setWorker(null);
-      handleError(error as AxiosError, setErr);
-    } finally {
-      setLoading(false);
-      setInitialized(true);
-    }
-  }, [handleError]);
 
   const signUp = async (input: WorkerSignUpInput) => {
     setLoading(true);
@@ -92,7 +75,7 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await axiosInstance.post(PUT_API.RESET_PASSWORD, input);
       if (response.data.success) {
-        toast.success("Reseted password successfully!");
+        toast.success("Password reset successfully!");
         navigate("/signin");
       }
       setLoading(false);
@@ -106,8 +89,16 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
   const profile = async () => {
     setLoading(true);
     try {
+      const storedUser = localStorage.getItem("currentWorker");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setWorker(parsedUser);
+        return;
+      }
+
       const response = await axiosInstance.get(GET_API.PROFILE);
       if (response.data.success) {
+        localStorage.setItem("currentWorker", response.data.data);
         setWorker(response.data.data);
       }
     } catch (error) {
@@ -117,23 +108,16 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  useEffect(() => {
-    if (!initialized) validateToken();
-    else setInitialized(true);
-  }, [validateToken, initialized]);
-
   const value: WorkerAuthContextType = {
     worker,
     loading,
     isAuthenticated,
-    initialized,
     err,
     setWorker,
     setLoading,
     setIsAuthenticated,
     signin,
     signOut,
-    validateToken,
     signUp,
     resetPassword,
     profile,

@@ -11,7 +11,6 @@ router.put("/reset-password", customerController.resetPassword);
 router.get("/find-by-email", customerController.findByEmail);
 router.post("/signout", customerAuth, customerController.signOut);
 router.get("/profile", customerAuth, customerController.profile);
-router.get("/validate-token", customerAuth, customerController.validateToken);
 
 // Job routes (private)
 router.use(customerAuth);

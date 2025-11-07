@@ -18,7 +18,7 @@ export const signIn = async (req, res) => {
       expiresIn: "7d",
     });
 
-    const isProd = process.env.APP_ENV === "production"
+    const isProd = process.env.APP_ENV === "production";
 
     res.cookie("customerToken", token, {
       httpOnly: true,
@@ -27,7 +27,7 @@ export const signIn = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return successRes(res);
+    return successRes(res, { data: token });
   } catch (error) {
     console.log(error);
     AppError(res, 500, error.message);

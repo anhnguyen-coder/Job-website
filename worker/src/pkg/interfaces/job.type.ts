@@ -10,7 +10,7 @@ export interface JobTaskInterface {
 
 export interface JobInterface {
   _id: string;
-  customerId: string;
+  customerId: UserInterface;
   title: string;
   description: string;
   categories: CategoryInterface[];

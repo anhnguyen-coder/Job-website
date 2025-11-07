@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import CustomerLayout from "@/layouts/customer.layout";
 // import Page from "@/pages/customer/jobs/page";
 import { useCustomerAuth } from "@/contexts/customer";
@@ -12,19 +12,13 @@ import JobsPage from "@/pages/customer/jobs/page";
 import JobIdPage from "@/pages/customer/jobs/_id/page";
 import JobCreatePage from "@/pages/customer/jobs/create/page";
 import JobRequestList from "@/pages/customer/jobs/request/page";
-
-const NotFound: React.FC = () => {
-  return <div>404 Not Found</div>;
-};
+import { LoadingOverlay } from "@/components/base/loading";
 
 const CustomerAppRouters: React.FC = () => {
   const customerContext = useCustomerAuth();
-  const { validateToken, loading, isAuthenticated } = customerContext;
+  const { loading, isAuthenticated } = customerContext;
 
-  useEffect(() => {
-    validateToken();
-  }, [validateToken]);
-
+  if (loading) return <LoadingOverlay />;
   return (
     <>
       {!loading && (
@@ -51,7 +45,15 @@ const CustomerAppRouters: React.FC = () => {
               <Route path="job-request" element={<JobRequestList />}></Route>
             </Route>
           )}
-          <Route path="*" element={<NotFound />} />
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to={isAuthenticated ? "/dashboard" : "/signin"}
+                replace
+              />
+            }
+          />
         </Routes>
       )}
     </>

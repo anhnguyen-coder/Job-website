@@ -1,4 +1,4 @@
-import type React from "react";
+import { useState } from "react";
 import { Button } from "../base/button";
 import { Input } from "../base/input";
 
@@ -14,7 +14,7 @@ interface findWithEmail {
   handleResetPassword: () => void;
 }
 
-export function FindWithEmailCustomer({
+export function FindWithEmailWorker({
   email,
   setEmail,
   handleFindByEmail,
@@ -29,6 +29,8 @@ export function FindWithEmailCustomer({
 
     isExist ? handleResetPassword() : handleFindByEmail();
   };
+
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="w-120">
@@ -63,23 +65,27 @@ export function FindWithEmailCustomer({
           {isExist && (
             <>
               {/* New Password Field */}
-              <div className="space-y-4">
-                <label
-                  htmlFor="new_pw"
-                  className="block text-sm font-medium text-slate-500 flex items-start"
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  required
+                  onChange={(e) => setPassword(e.target.value)}
+                  iconClassName="bx bx-lock-alt text-slate-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
                 >
-                  New password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="new_pw"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    iconClassName="bx bx-lock text-slate-400"
-                  />
-                </div>
+                  {showPassword ? (
+                    <i className="bx bx-show-alt w-5 h-5"></i>
+                  ) : (
+                    <i className="bx bx-hide w-5 h-5"></i>
+                  )}
+                </button>
               </div>
             </>
           )}

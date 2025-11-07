@@ -89,21 +89,8 @@ export function SignInForm({
 
           {/* Remember & Forgot */}
           <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center space-x-2">
-              {/* <Checkbox
-                id="remember"
-                checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-              /> */}
-              <label
-                htmlFor="remember"
-                className="text-sm text-slate-600 cursor-pointer"
-              >
-                Remember me
-              </label>
-            </div>
             <a
-              href="/customer/reset-password"
+              href="/reset-password"
               className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
             >
               Forgot password?
@@ -125,7 +112,7 @@ export function SignInForm({
         <p className="text-center text-slate-600 text-sm">
           Don't have an account?{" "}
           <a
-            href="/customer/signup"
+            href="/signup"
             className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             Sign Up

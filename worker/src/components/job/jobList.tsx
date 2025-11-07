@@ -1,4 +1,4 @@
-import type { JobInterface } from "@/pkg/types/interfaces/job.type";
+import type { JobInterface } from "@/pkg/interfaces/job.type";
 import JobItem from "./jobItem";
 
 interface JobListProps {

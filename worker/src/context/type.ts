@@ -5,14 +5,12 @@ export interface WorkerAuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   err: string;
-  initialized: boolean;
   setWorker: (worker: UserInterface | null) => void;
   setLoading: (loading: boolean) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 
   signin: (input: WorkerSigninInput) => Promise<void>;
   signOut: () => Promise<void>;
-  validateToken: () => Promise<void>;
   signUp: (input: WorkerSignUpInput) => Promise<void>;
   profile: () => Promise<void>;
   resetPassword: (input: resetPasswordInput) => Promise<void>;

@@ -22,7 +22,7 @@ export function BaseBadge({ variant = "default", children, className, ...props }
   return (
     <span
       className={clsx(
-        "inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full",
+        "inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full w-fit",
         variantClasses[variant],
         className
       )}

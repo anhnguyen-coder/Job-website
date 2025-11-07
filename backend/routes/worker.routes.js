@@ -22,7 +22,6 @@ router.use(workerAuth);
 // 🔐 Sign out
 router.get("/profile", workerController.profile);
 router.post("/signout", workerController.signOut);
-router.get("/validate-token", workerController.validateToken);
 // 💼 Job routes
 router.get("/jobs", workerController.jobList);
 router.get("/jobs/bookmark", workerController.bookmarJobList);

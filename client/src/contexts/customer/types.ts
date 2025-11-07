@@ -19,7 +19,6 @@ export interface CustomerAuthContextType {
   signOut: () => Promise<void>;
   signUp: (input: customerSignupInput) => Promise<void>;
   resetPassword: (input: resetPasswordInput) => Promise<void>;
-  validateToken: () => void;
 }
 
 export interface customerSigninInput {

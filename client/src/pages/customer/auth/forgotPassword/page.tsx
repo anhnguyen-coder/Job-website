@@ -2,6 +2,7 @@ import { HeaderAuth } from "@/components/base/headerAuth";
 import { FindWithEmailCustomer } from "@/components/customer/findByEmail";
 import type React from "react";
 import useHook from "./hook";
+import { LoadingOverlay } from "@/components/base/loading";
 
 const ForgotPasswordPage: React.FC = () => {
   const {
@@ -15,6 +16,8 @@ const ForgotPasswordPage: React.FC = () => {
     setPassword,
     handleResetPassword,
   } = useHook();
+
+  if (loading) return <LoadingOverlay />;
   return (
     <div>
       <HeaderAuth />
@@ -22,7 +25,6 @@ const ForgotPasswordPage: React.FC = () => {
       <FindWithEmailCustomer
         email={email}
         setEmail={setEmail}
-        loading={loading}
         err={err}
         handleFindByEmail={handleFindByEmail}
         password={password}

@@ -17,7 +17,9 @@ import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    !!localStorage.getItem("customerToken")
+  );
   const [err, setErr] = useState("");
   const handleError = useErrorHandler();
 
@@ -27,7 +29,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       const response = await axiosInstance.post(POST.SIGNIN, input);
-      if (response.status === 200) {
+      if (response.data.success) {
+        localStorage.setItem("customerToken", response.data.data);
         setIsAuthenticated(true);
         navigate("/dashboard");
       }
@@ -38,26 +41,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }
   };
-
-  const validateToken = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await axiosInstance.get(GET.VALIDATE_TOKEN);
-
-      if (res.data.success) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-        navigate("/signin");
-      }
-    } catch (error) {
-      setIsAuthenticated(false);
-      setUser(null);
-      handleError(error as AxiosError, setErr);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const profile = useCallback(async () => {
     setLoading(true);
@@ -75,8 +58,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("currenCustomer", JSON.stringify(res.data.data));
       }
     } catch (error) {
-      setIsAuthenticated(false);
-      setUser(null);
       handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);
@@ -89,6 +70,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(false);
       setUser(null);
       localStorage.removeItem("currenCustomer");
+      localStorage.removeItem("customerToken");
       navigate("/signin");
     } catch (error) {
       handleError(error as AxiosError, setErr);
@@ -104,14 +86,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       }
       setLoading(false);
     } catch (errorny) {
-      let message = "An unknown error occurred";
-
-      if (errorny && (errorny as AxiosError).isAxiosError) {
-        const axiosError = errorny as AxiosError<{ message: string }>;
-        message = axiosError.response?.data?.message || axiosError.message;
-      }
-
-      setErr(message);
+      handleError(errorny as AxiosError, setErr);
+    } finally {
       setLoading(false);
     }
   };
@@ -143,7 +119,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     signOut: signOut,
     signUp: signUp,
     resetPassword: resetPassword,
-    validateToken: validateToken,
   };
 
   return (
