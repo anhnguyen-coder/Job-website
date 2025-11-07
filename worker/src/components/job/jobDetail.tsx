@@ -1,4 +1,4 @@
-import type { JobInterface } from "@/pkg/interfaces/job.type";
+import type { JobInterface, JobTaskInterface } from "@/pkg/interfaces/job.type";
 import { Link } from "react-router-dom";
 import { BaseBadge } from "../base/badgeBase";
 import {
@@ -6,24 +6,58 @@ import {
   getStatusBadgeVariant,
   formatUSD,
 } from "@/pkg/helper/formatter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ConfirmModal } from "../base/confirmModal";
+import { useWorkerAuth } from "@/context/context";
+import { ProgressBar } from "../base/progressBar";
+import { JOB_STATUS } from "@/pkg/enums/job";
 
 type Props = {
   jobData: JobInterface;
   handleApplyJob: (jobId: string) => Promise<void>;
   handleSaveJob: (jobId: string) => Promise<void>;
+  makeTaskComplete: (taskId: string, jobId: string) => Promise<void>;
+  handleStartJob: (jobId: string) => Promise<void>;
+  handleCancelJob: (jobId: string) => Promise<void>;
+  handleRequestCheckComplete: (jobId: string) => Promise<void>;
 };
 
 export default function JobDetailPage({
   jobData,
   handleApplyJob,
   handleSaveJob,
+  makeTaskComplete,
+  handleCancelJob,
+  handleStartJob,
+  handleRequestCheckComplete,
 }: Props) {
+  const auth = useWorkerAuth();
+  const [isAssigned, setIsAssigned] = useState(false);
+  const [isInProgress, setIsInProgress] = useState(false);
+  const { worker, profile } = auth;
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  const [openModalCancel, setOpenModalCancel] = useState(false);
+
+  useEffect(() => {
+    profile();
+  }, []);
+
+  useEffect(() => {
+    if (
+      worker?._id &&
+      jobData.assignedWorkerId?._id &&
+      worker._id === jobData.assignedWorkerId._id
+    ) {
+      setIsAssigned(true);
+    }
+
+    if (jobData.status === JOB_STATUS.IN_PROGRESS) {
+      setIsInProgress(true);
+    }
+  }, [worker?._id, jobData.assignedWorkerId?._id]);
+
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("vi-VN");
-
-  const [openConfirmModal, setOpenConfirmModal] = useState(false);
 
   const handleConfirm = async () => {
     await handleApplyJob(jobData._id);
@@ -33,6 +67,16 @@ export default function JobDetailPage({
     await handleSaveJob(jobData._id);
   };
 
+  const calculateProgress = () => {
+    if (jobData.jobTasks && jobData.jobTasks.length > 0) {
+      const tasks = jobData.jobTasks as JobTaskInterface[];
+      const completed = tasks.filter((t) => t.isCompleted).length;
+      return Math.round((completed / tasks.length) * 100);
+    } else {
+      return 0;
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gray-50">
       {openConfirmModal && (
@@ -40,6 +84,14 @@ export default function JobDetailPage({
           isOpen={openConfirmModal}
           onConfirm={handleConfirm}
           onClose={() => setOpenConfirmModal(false)}
+        />
+      )}
+
+      {openModalCancel && (
+        <ConfirmModal
+          isOpen={openModalCancel}
+          onConfirm={() => handleCancelJob(jobData._id)}
+          onClose={() => setOpenModalCancel(false)}
         />
       )}
 
@@ -153,26 +205,46 @@ export default function JobDetailPage({
                 <h2 className="mb-4 text-lg font-semibold text-gray-800">
                   Tasks
                 </h2>
-                <div className="space-y-3">
+                {isAssigned &&
+                  (jobData.status === JOB_STATUS.IN_PROGRESS ||
+                    jobData.status === JOB_STATUS.CHECK_COMPLETE) && (
+                    <ProgressBar progress={calculateProgress()} />
+                  )}
+
+                <div className="space-y-3 mt-5">
                   {jobData.jobTasks.map((task, index) => (
-                    <>
-                      <div
-                        key={index}
-                        className="flex items-center gap-3 rounded-lg bg-gray-100 p-3"
-                      >
-                        <span className="flex items-center gap-2">
-                          <i className="bx bx-task text-green-600 text-lg"></i>
-                          <span className="font-semibold">#{index + 1}</span>
-                        </span>
-                        {"-"}
-                        <span className="text-gray-800">{task.title}</span>
+                    <div key={index}>
+                      <div className="flex items-center justify-between bg-gray-100 p-3">
+                        <div className="flex items-center gap-3 rounded-lg ">
+                          <span className="flex items-center gap-2">
+                            <i className="bx bx-task text-green-600 text-lg"></i>
+                            <span className="font-semibold">#{index + 1}</span>
+                          </span>
+                          {"-"}
+                          <span className="text-gray-800">{task.title}</span>
+                        </div>
+                        {isAssigned &&
+                          (jobData.status === JOB_STATUS.IN_PROGRESS ||
+                            jobData.status === JOB_STATUS.CHECK_COMPLETE) && (
+                            <input
+                              type="checkbox"
+                              checked={task.isCompleted}
+                              disabled={
+                                jobData.status === JOB_STATUS.CHECK_COMPLETE
+                              }
+                              onChange={() =>
+                                makeTaskComplete(task._id, jobData._id)
+                              }
+                              className="w-5 h-5"
+                            />
+                          )}
                       </div>
 
-                      <div className="flex flex-col items-start gap-3 rounded-lg bg-gray-100 p-3">
+                      <div className="flex flex-col items-start gap-3 rounded-lg bg-gray-100 p-3 mt-2">
                         <p className="font-semibold">Description:</p>
                         <pre>{task.description}</pre>
                       </div>
-                    </>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -203,20 +275,53 @@ export default function JobDetailPage({
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3">
-              <button
-                onClick={() => setOpenConfirmModal(true)}
-                className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 font-medium cursor-pointer"
-              >
-                Apply
-              </button>
-              <button
-                onClick={() => makeSave()}
-                className="w-full rounded-lg border border-gray-300 py-2 font-medium hover:bg-gray-50 cursor-pointer"
-              >
-                Save to bookmark
-              </button>
-            </div>
+            {!isAssigned && (
+              <div className="space-y-3">
+                <button
+                  onClick={() => setOpenConfirmModal(true)}
+                  className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 font-medium cursor-pointer"
+                >
+                  Apply
+                </button>
+                <button
+                  onClick={() => makeSave()}
+                  className="w-full rounded-lg border border-gray-300 py-2 font-medium hover:bg-gray-50 cursor-pointer"
+                >
+                  Save to bookmark
+                </button>
+              </div>
+            )}
+
+            {jobData.status === JOB_STATUS.TAKEN && (
+              <div className="space-y-3">
+                <button
+                  onClick={() => handleStartJob(jobData._id)}
+                  className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 font-medium cursor-pointer"
+                >
+                  Start Job
+                </button>
+                <button
+                  onClick={() => {
+                    setOpenModalCancel(true);
+                  }}
+                  className="w-full rounded-lg bg-red-400 text-white py-2 font-medium hover:bg-red-500 hover:text-white transition-all cursor-pointer"
+                >
+                  Cancel Job
+                </button>
+              </div>
+            )}
+
+            {jobData.status === JOB_STATUS.IN_PROGRESS &&
+              calculateProgress() === 100 && (
+                <div className="space-y-3">
+                  <button
+                    onClick={() => handleRequestCheckComplete(jobData._id)}
+                    className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 font-medium cursor-pointer"
+                  >
+                    Request to check complete
+                  </button>
+                </div>
+              )}
 
             {/* Job ID */}
             <div className="rounded-lg bg-gray-100 p-4">

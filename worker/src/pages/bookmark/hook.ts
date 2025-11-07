@@ -7,9 +7,10 @@ import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import type { JobBookmarkQueryFormInput } from "./type";
 import type { PagyInput, PagyInterface } from "@/pkg/interfaces/pagy";
-import { JOB_GET_API } from "@/api/job";
+import { JOB_DELETE_API, JOB_GET_API } from "@/api/job";
 import { buildQueryParams, parseQueryArrayToString } from "@/pkg/helper/query";
 import type { JobInterface } from "@/pkg/interfaces/job.type";
+import { toast } from "react-toastify";
 
 const useHook = () => {
   const [categoriesOptions, setCategoriesOption] = useState<Option[]>();
@@ -74,10 +75,30 @@ const useHook = () => {
     }
   };
 
+  const handleRemoveBookmarked = async (jobId: string) => {
+    setLoading(true);
+    try {
+      const res = await axiosInstance.delete(
+        `${JOB_DELETE_API.REMOVE_BOOKMARKED}/${jobId}`
+      );
+
+      if (res.data.success) {
+        toast.success("Removed job from bookmark");
+        handleGetBookmarkedList();
+      }
+    } catch (error) {
+      handleError(error as AxiosError, setErr);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    handleGetCategories();
+    if (!categoriesOptions) {
+      handleGetCategories();
+    }
     handleGetBookmarkedList();
-  }, []);
+  }, [page]);
 
   return {
     categoriesOptions,
@@ -88,6 +109,7 @@ const useHook = () => {
     setPage,
     jobs,
     page,
+    handleRemoveBookmarked,
   };
 };
 

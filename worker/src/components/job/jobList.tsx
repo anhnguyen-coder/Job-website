@@ -3,9 +3,11 @@ import JobItem from "./jobItem";
 
 interface JobListProps {
   jobs: JobInterface[];
+  onDeleteJob?: (id: string) => Promise<void>;
+  isShowDelete?: boolean;
 }
 
-export function JobList({ jobs }: JobListProps) {
+export function JobList({ jobs, onDeleteJob, isShowDelete }: JobListProps) {
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -19,7 +21,12 @@ export function JobList({ jobs }: JobListProps) {
       {jobs.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {jobs.map((job) => (
-            <JobItem key={job._id} job={job} />
+            <JobItem
+              key={job._id}
+              job={job}
+              onDelete={onDeleteJob}
+              isShowDelete={isShowDelete}
+            />
           ))}
         </div>
       ) : (

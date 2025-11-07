@@ -7,6 +7,8 @@ import type { JobCreateForm } from "./type";
 import { POST } from "@/apis/customer/job";
 import type { Option } from "@/pkg/types/interfaces/option";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const useHook = () => {
   const [categories, setCategories] = useState<CategoryInterface[]>();
@@ -23,6 +25,7 @@ const useHook = () => {
   const [categoriesOptions, setCategoriesOption] = useState<Option[]>();
 
   const handleError = useErrorHandler();
+  const navigate = useNavigate()
 
   const handleGetCategories = async () => {
     setLoading(true);
@@ -52,7 +55,8 @@ const useHook = () => {
     try {
       const res = await axiosInstance.post(POST.CREATE_JOB, formInput);
       if (res.data.success) {
-        console.log(res.data);
+        toast.success("Created job successfully!");
+        navigate("/jobs")
       }
     } catch (error) {
       handleError(error as AxiosError, setErr);

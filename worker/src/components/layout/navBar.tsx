@@ -4,6 +4,7 @@ import {
   LogOut,
   BookMarked,
   LayoutDashboard,
+  Briefcase,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import logoImg from "@/assets/logo.png";
@@ -35,6 +36,12 @@ const navItemData: NavItemType[] = [
     title: "Bookmarked",
     icon: <BookMarked size={20} />,
     path: "/bookmarked",
+  },
+  {
+    id: 4,
+    title: "Current jobs",
+    icon: <Briefcase size={20} />,
+    path: "/current-jobs",
   },
 ];
 

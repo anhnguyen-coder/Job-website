@@ -98,8 +98,9 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
 
       const response = await axiosInstance.get(GET_API.PROFILE);
       if (response.data.success) {
-        localStorage.setItem("currentWorker", response.data.data);
-        setWorker(response.data.data);
+        const userData = response.data.data;
+        localStorage.setItem("currentWorker", JSON.stringify(userData));
+        setWorker(userData);
       }
     } catch (error) {
       handleError(error as AxiosError, setErr);

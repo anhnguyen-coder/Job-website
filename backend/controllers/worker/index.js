@@ -16,6 +16,8 @@ import { updateMessage } from "./messages/updateMessage.controller.js";
 import { deleteMessage } from "./messages/deleteMessage.controller.js";
 import { viewProfileRating } from "./rating/viewProfileRating.controller.js";
 import { profile } from "./auth/profile.controller.js";
+import { bookmarkJobRemove } from "./job/bookmarkRemove.controller.js";
+import { updateJobTaskStatus } from "./job/updateJobTaskStatus.controller.js";
 
 const workerController = {
   // Auth
@@ -35,6 +37,8 @@ const workerController = {
   makeBookmarkJob: bookmarkJob,
   makeRequestJob: requestJob,
   updateJobStatus: updateJob,
+  removeJobBookmarked: bookmarkJobRemove,
+  updateJobTaskStatus: updateJobTaskStatus,
 
   // message
   fetchMessagesJob: fetchMessagesJob,

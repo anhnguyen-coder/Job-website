@@ -21,7 +21,7 @@ export const createJob = async (req, res, next) => {
     const categoriesArr = await validateCategories(categoryIds, res);
     if (!categoriesArr) return;
 
-    const isValidTasks = validateTasks(tasks);
+    const isValidTasks = validateTasks(tasks, res);
     if (!isValidTasks) return AppError(res, 400, "Invalid tasks");
 
     let job;
@@ -67,7 +67,9 @@ const validateCategories = async (categoryIds, res) => {
     return AppError(res, 400, "Invalid categories format.");
   }
 
-  
+  if (categoryIds.length === 0) {
+    return AppError(res, 400, "Please chooese at least one category for job.");
+  }
 
   for (const id of categoryIds) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -80,13 +82,17 @@ const validateCategories = async (categoryIds, res) => {
     }
   }
 
-  return categoryIds
+  return categoryIds;
 };
 
 // --- Validate tasks ---
-const validateTasks = (tasks) => {
+const validateTasks = (tasks, res) => {
   if (!Array.isArray(tasks)) {
     return false;
+  }
+
+  if (tasks.length === 0) {
+    return AppError(res, 400, "Please create at least one task for job.");
   }
 
   for (const task of tasks) {

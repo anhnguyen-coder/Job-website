@@ -26,7 +26,7 @@ export const requestJob = async (req, res, next) => {
       return AppError(
         res,
         400,
-        "You have already applied this job, please wait for customer approve!"
+        "You can only apply once for this job."
       );
 
     const jobRequest = new JobRequest({
@@ -40,6 +40,6 @@ export const requestJob = async (req, res, next) => {
 
     return successRes(res, { data: null, status: 200 });
   } catch (error) {
-    AppError(500, "Server Error");
+    AppError(res, 500, error.message);
   }
 };

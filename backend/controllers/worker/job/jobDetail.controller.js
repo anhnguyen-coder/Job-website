@@ -6,17 +6,17 @@ export const jobDetails = async (req, res, next) => {
   try {
     const jobId = req.params.jobId;
     if (!jobId) {
-      throw AppError(400, "Job ID is required.");
+      return AppError(res, 400, "Job ID is required.");
     }
 
     const job = await Job.findById(jobId)
       .populate("customerId", "name email")
       .populate("categories", "name")
       .populate("assignedWorkerId", "name email")
-      .populate("jobTasks", "title description");
+      .populate("jobTasks");
 
     if (!job) {
-      throw AppError(404, "Job not found.");
+      return AppError(res, 404, "Job not found.");
     }
 
     return successRes(res, {
@@ -24,7 +24,6 @@ export const jobDetails = async (req, res, next) => {
       data: job,
     });
   } catch (error) {
-    next(error);
     AppError(res, 500, error.message || "Server Error");
   }
 };

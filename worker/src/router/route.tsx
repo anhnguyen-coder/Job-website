@@ -11,6 +11,7 @@ import SignUpPage from "@/pages/signup/page";
 import JobIDPage from "@/pages/jobs/id/page";
 import ForgotPasswordPage from "@/pages/forgotPassword/page";
 import BookmarkPage from "@/pages/bookmark/page";
+import MyCurrentJobList from "@/pages/currentJobs/page";
 
 const AppRouter: React.FC = () => {
   const { isAuthenticated, loading } = useWorkerAuth();
@@ -33,6 +34,7 @@ const AppRouter: React.FC = () => {
           <Route path="jobs" element={<JobListPage />}></Route>
           <Route path="jobs/:jobId" element={<JobIDPage />}></Route>
           <Route path="bookmarked" element={<BookmarkPage />}></Route>
+          <Route path="current-jobs" element={<MyCurrentJobList />}></Route>
         </Route>
       )}
 

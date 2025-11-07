@@ -162,6 +162,22 @@ const useHook = () => {
       setLoading(false);
     }
   };
+
+  const handlePublishJob = async (jobId: string) => {
+    setLoading(true);
+    try {
+      const res = await axiosInstance.put(`${PUT.PUBLISH_JOB}/${jobId}`);
+      if (res.data.success) {
+        toast.success("Published job successfully!");
+        handleFetchJobId(jobId);
+      }
+    } catch (error) {
+      handleError(error as AxiosError, setErr);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     job,
     loading,
@@ -185,6 +201,7 @@ const useHook = () => {
     handleOpenTask,
     makeJobComplete,
     handleDeleteJob,
+    handlePublishJob,
   };
 };
 

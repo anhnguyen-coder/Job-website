@@ -43,10 +43,8 @@ export const updateJob = async (req, res, next) => {
         case JOB_STATUS.CHECK_COMPLETE:
           await handleCompleteJob(job, session);
           break;
-
-        default:
-          job.status = status;
-          await job.save({ session });
+        case JOB_STATUS.IN_PROGRESS:
+          await handleStartJob(job, session);
           break;
       }
       return job;
@@ -54,15 +52,13 @@ export const updateJob = async (req, res, next) => {
 
     return successRes(res, { data: updatedJob, status: 200 });
   } catch (error) {
-    next(error);
     return AppError(res, 500, error.message);
   }
 };
 
 /* -------------------- HANDLERS -------------------- */
 
-
-const handleCancelJob = async (job, session) => {
+const handleCancelJob = async (job, workerId, session) => {
   if (!STATUS_ALLOW_CANCEL.has(job.status)) {
     throw new Error("Cannot cancel job after it has started");
   }
@@ -70,19 +66,15 @@ const handleCancelJob = async (job, session) => {
   job.status = JOB_STATUS.CANCELLED;
   job.assignedWorkerId = null;
   await job.save({ session });
-
-  await JobTicket.create(
-    [
-      {
-        jobId: job._id,
-        workerId: job.assignedWorkerId,
-        customerId: job.customerId,
-        ticketType: "issue",
-        message: "Job cancelled by worker",
-      },
-    ],
-    { session }
+  await JobRequest.findOneAndUpdate(
+    { jobId: job._id, workerId: workerId },
+    {
+      status: JOB_REQUEST_STATUS.REJECTED,
+    },
+    { new: true, session: session }
   );
+
+  // TODO: create noti to customer
 };
 
 const handleCompleteJob = async (job, session) => {
@@ -93,16 +85,18 @@ const handleCompleteJob = async (job, session) => {
   job.status = JOB_STATUS.CHECK_COMPLETE;
   await job.save({ session });
 
-  await JobTicket.create(
-    [
-      {
-        jobId: job._id,
-        workerId: job.assignedWorkerId,
-        customerId: job.customerId,
-        ticketType: "feedback",
-        message: "Job completed by worker, pending customer review",
-      },
-    ],
-    { session }
-  );
+  // TODO: create noti to customer
+};
+
+const handleStartJob = async (job, session) => {
+  if (job.status === JOB_STATUS.AVAILABLE && !job.assignedWorkerId) {
+    throw new Error("You are not assigned to this job");
+  }
+
+  if (job.assignedWorkerId && job.status !== JOB_STATUS.TAKEN) {
+    throw new Error("This job has akready started!");
+  }
+
+  job.status = JOB_STATUS.IN_PROGRESS;
+  await job.save({ session });
 };

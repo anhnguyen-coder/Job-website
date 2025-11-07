@@ -30,6 +30,11 @@ router.get("/job/:jobId", workerController.jobDetail);
 router.put("/job/:jobId", workerController.updateJobStatus);
 router.post("/job/bookmark/:jobId", workerController.makeBookmarkJob);
 router.post("/job/request/:jobId", workerController.makeRequestJob);
+router.delete(
+  "/job/bookmark/remove/:jobId",
+  workerController.removeJobBookmarked
+);
+router.put("/job/task/:taskId", workerController.updateJobTaskStatus);
 
 // 💬 Message routes
 router

@@ -18,6 +18,7 @@ function Page() {
     jobs,
     page,
     handleGetBookmarkedList,
+    handleRemoveBookmarked,
   } = useHook();
   const [query, setQuery] = useState<JobBookmarkQueryFormInput>({
     title: "",
@@ -62,7 +63,13 @@ function Page() {
 
       {/* job list */}
       <div className="py-4 px-6 rounded-2xl shadow-lg bg-white mt-6">
-        {jobs && <JobList jobs={jobs} />}
+        {jobs && (
+          <JobList
+            jobs={jobs}
+            onDeleteJob={handleRemoveBookmarked}
+            isShowDelete
+          />
+        )}
       </div>
 
       <Pagination pagy={pagy ?? {}} onPageChange={setPage} />

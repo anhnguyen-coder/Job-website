@@ -37,6 +37,7 @@ const JobIdPage = () => {
     handleOpenTask,
     makeJobComplete,
     handleDeleteJob,
+    handlePublishJob,
   } = useHook();
 
   useEffect(() => {
@@ -162,6 +163,15 @@ const JobIdPage = () => {
                   className="px-4 py-2 mx-4 bg-green-500 text-white font-semibold rounded-3xl shadow hover:bg-green-600 transition-colors"
                 >
                   Mark completed
+                </button>
+              )}
+
+              {job.status === JOB_STATUS.CANCELLED && (
+                <button
+                  onClick={() => handlePublishJob(job._id)}
+                  className="px-4 py-2 mx-4 bg-green-500 text-white font-semibold rounded-3xl shadow hover:bg-green-600 transition-colors"
+                >
+                  Publish job
                 </button>
               )}
             </div>

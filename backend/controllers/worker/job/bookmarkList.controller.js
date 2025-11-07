@@ -37,7 +37,7 @@ export const bookmarkList = async (req, res, next) => {
         .populate([
           { path: "customerId", select: "name email" },
           { path: "categories", select: "name" },
-          { path: "jobTasks", select: "title description" },
+          { path: "jobTasks", select: "title description isCompleted" },
         ])
         .skip(skip)
         .limit(limit)
