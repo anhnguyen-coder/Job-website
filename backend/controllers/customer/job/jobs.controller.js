@@ -46,7 +46,8 @@ export const jobs = async (req, res, next) => {
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 })
-        .populate("jobTasks"),
+        .populate("jobTasks")
+        .populate("categories"),
       Job.countDocuments(filter),
     ]);
 

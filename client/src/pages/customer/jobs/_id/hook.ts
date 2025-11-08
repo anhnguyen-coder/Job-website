@@ -178,6 +178,17 @@ const useHook = () => {
     }
   };
 
+  const handleRemoveJobTasks = (removeIndex: number) => {
+    const updatedTasks = inputFormUpdate.tasks.filter(
+      (_, index) => index !== removeIndex
+    );
+
+    setInputUpdate({
+      ...inputFormUpdate,
+      tasks: updatedTasks,
+    });
+  };
+
   return {
     job,
     loading,
@@ -202,6 +213,7 @@ const useHook = () => {
     makeJobComplete,
     handleDeleteJob,
     handlePublishJob,
+    handleRemoveJobTasks,
   };
 };
 

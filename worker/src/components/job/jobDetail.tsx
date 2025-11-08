@@ -33,7 +33,6 @@ export default function JobDetailPage({
 }: Props) {
   const auth = useWorkerAuth();
   const [isAssigned, setIsAssigned] = useState(false);
-  const [isInProgress, setIsInProgress] = useState(false);
   const { worker, profile } = auth;
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [openModalCancel, setOpenModalCancel] = useState(false);
@@ -49,10 +48,6 @@ export default function JobDetailPage({
       worker._id === jobData.assignedWorkerId._id
     ) {
       setIsAssigned(true);
-    }
-
-    if (jobData.status === JOB_STATUS.IN_PROGRESS) {
-      setIsInProgress(true);
     }
   }, [worker?._id, jobData.assignedWorkerId?._id]);
 

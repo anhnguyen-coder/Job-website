@@ -6,7 +6,7 @@ import type {
 } from "@/pkg/types/interfaces/job.type";
 import { ProgressBar } from "@/components/base/progressBar";
 import { formatUSD } from "@/pkg/helpers/formatter";
-import { MapPin, DollarSign, User } from "lucide-react";
+import { MapPin, DollarSign, User, FolderTree } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CUSTOMER_APP_THEME } from "@/constant/constant";
 import { applyOpacity } from "@/pkg/helpers/style";
@@ -86,6 +86,21 @@ const JobItem = ({ job }: JobItemProps) => {
           <DollarSign size={16} className="text-gray-500" />
           <span className="font-medium">Budget:</span>
           <span>{formatUSD(job.budget)}</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-gray-700">
+          <FolderTree size={16} className="text-gray-500 shrink-0" />
+          <span className="font-medium">Categories:</span>
+          <div className="flex flex-wrap items-center text-wrap gap-2">
+            {job.categories.map((cate) => (
+              <div
+                key={cate._id}
+                className="bg-blue-200 rounded-xl px-2 border border-blue-500"
+              >
+                <p className="text-blue-700">{cate.name}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

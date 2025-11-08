@@ -25,10 +25,13 @@ export const updateJob = async (req, res, next) => {
       categoriesArr = await validateCategories(categoryIds);
     }
 
-    await validateTasks(tasks);
-
-    // 🔹 Cập nhật các field cơ bản
-    if (title) job.title = title;
+    const validTasks = await validateTasks(tasks);
+    if (validTasks.length === 0) {
+      return AppError(res, 400, "Create at least one task for job.");
+    }
+    if (title)
+      // 🔹 Cập nhật các field cơ bản
+      job.title = title;
     if (description) job.description = description;
     if (location) job.location = location;
     if (budget) job.budget = budget;
@@ -43,12 +46,13 @@ export const updateJob = async (req, res, next) => {
 
       // Thêm task mới
       const jobTasks = await JobTask.insertMany(
-        tasks.map((t) => ({ ...t, jobId: job._id })),
+        validTasks.map((t) => ({ ...t, jobId: job._id })),
         { session }
       );
 
       // Cập nhật job
       job.jobTasks = jobTasks.map((e) => e._id);
+
       await job.save({ session });
     });
 

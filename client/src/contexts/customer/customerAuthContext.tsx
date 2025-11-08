@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomerAuthContext } from "./context";
 import type {
@@ -104,6 +104,10 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       handleError(error as AxiosError, setErr);
     }
   };
+
+  useEffect(()=>{
+    console.log(isAuthenticated)
+  },[])
 
   const value: CustomerAuthContextType = {
     user,

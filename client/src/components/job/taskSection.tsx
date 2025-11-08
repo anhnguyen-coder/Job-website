@@ -10,6 +10,7 @@ interface TaskSectionProps {
   progress: number;
   onAdd: () => void;
   onOpenTask: (task: TaskInputForm, index: number) => void;
+  handleRemoveJobTasks: (removeIndex: number) => void;
 }
 
 export const TaskSection = ({
@@ -19,6 +20,7 @@ export const TaskSection = ({
   progress,
   onAdd,
   onOpenTask,
+  handleRemoveJobTasks,
 }: TaskSectionProps) => (
   <section>
     {/* Header */}
@@ -40,10 +42,19 @@ export const TaskSection = ({
             <li
               key={index}
               onClick={() => onOpenTask(task, index)}
-              className="flex justify-between items-center px-3 py-2 rounded-md transition-colors hover:bg-gray-50 bg-green-50 cursor-pointer"
+              className="grid grid-cols-[2fr_5fr_1fr] items-center px-3 py-2 rounded-md transition-colors hover:bg-gray-50 bg-green-50 cursor-pointer"
             >
               <span>{task.title}</span>
-              <span className="text-xs font-semibold text-green-700"></span>
+              <pre className="text-xs font-semibold text-green-700">
+                {task.description}
+              </pre>
+              <i
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemoveJobTasks(index);
+                }}
+                className="mdi mdi-delete text-red-500 text-2xl text-end"
+              ></i>
             </li>
           ))}
         </ul>
@@ -55,14 +66,21 @@ export const TaskSection = ({
       <>
         <ProgressBar progress={progress} />
         <ul className="list-disc mt-3 space-y-2 text-gray-700">
-          {jobTasks.map((task) => (
+          {jobTasks.map((task, index) => (
             <li
               key={task._id}
               className={`flex justify-between items-center px-3 py-2 rounded-md transition-colors hover:bg-gray-50 ${
                 task.isCompleted ? "bg-green-50" : "bg-yellow-50"
               }`}
             >
-              <span>{task.title}</span>
+              <p className="text-lg font-semibold">
+                <span>#{index + 1} - </span>
+                <span>{task.title}</span>
+              </p>
+              <div>
+                <p>Description</p>
+                <pre className="line-clamp-2">{task.description}</pre>
+              </div>
               <span
                 className={`text-xs font-semibold ${
                   task.isCompleted ? "text-green-700" : "text-yellow-700"

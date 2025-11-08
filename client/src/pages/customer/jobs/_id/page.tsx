@@ -38,6 +38,7 @@ const JobIdPage = () => {
     makeJobComplete,
     handleDeleteJob,
     handlePublishJob,
+    handleRemoveJobTasks,
   } = useHook();
 
   useEffect(() => {
@@ -278,6 +279,7 @@ const JobIdPage = () => {
             progress={progress}
             onAdd={() => setOpenTaskModal(true)}
             onOpenTask={handleOpenTask}
+            handleRemoveJobTasks={handleRemoveJobTasks}
           />
         </div>
       </div>
