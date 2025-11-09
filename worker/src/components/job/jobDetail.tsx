@@ -11,6 +11,11 @@ import { ConfirmModal } from "../base/confirmModal";
 import { useWorkerAuth } from "@/context/context";
 import { ProgressBar } from "../base/progressBar";
 import { JOB_STATUS } from "@/pkg/enums/job";
+import { RatingModal } from "../rating/ratingModal";
+import type { RatingInput } from "@/pages/jobs/type";
+import type { RatingInterface } from "@/pkg/interfaces/rating";
+import type { PagyInterface } from "@/pkg/interfaces/pagy";
+import { Pagination } from "../base/pagy";
 
 type Props = {
   jobData: JobInterface;
@@ -20,6 +25,11 @@ type Props = {
   handleStartJob: (jobId: string) => Promise<void>;
   handleCancelJob: (jobId: string) => Promise<void>;
   handleRequestCheckComplete: (jobId: string) => Promise<void>;
+  handleMakeRateCustomer: (input: RatingInput) => Promise<void>;
+  ratings: RatingInterface[];
+  ratingPagy: PagyInterface;
+  ratingPage: number;
+  setRatingPage: (page: number) => void;
 };
 
 export default function JobDetailPage({
@@ -30,16 +40,23 @@ export default function JobDetailPage({
   handleCancelJob,
   handleStartJob,
   handleRequestCheckComplete,
+  handleMakeRateCustomer,
+  ratings,
+  ratingPagy,
+  setRatingPage,
 }: Props) {
   const auth = useWorkerAuth();
   const [isAssigned, setIsAssigned] = useState(false);
   const { worker, profile } = auth;
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [openModalCancel, setOpenModalCancel] = useState(false);
+  const [openRatingModal, setOpenRatingModal] = useState(false);
 
   useEffect(() => {
-    profile();
-  }, []);
+    if (!worker) {
+      profile();
+    }
+  }, [worker]);
 
   useEffect(() => {
     if (
@@ -90,6 +107,16 @@ export default function JobDetailPage({
         />
       )}
 
+      {openRatingModal && (
+        <RatingModal
+          isOpen={openRatingModal}
+          onClose={() => setOpenRatingModal(false)}
+          customerId={jobData.customerId._id}
+          jobId={jobData._id}
+          onSubmit={handleMakeRateCustomer}
+        />
+      )}
+
       {/* Header */}
       <div className="border-b border-blue-200 bg-white shadow-sm mt-5 rounded-lg">
         <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -122,7 +149,7 @@ export default function JobDetailPage({
               <h2 className="mb-4 text-xl font-semibold text-gray-800">
                 Description details
               </h2>
-              <p className="text-base leading-relaxed text-gray-700">
+              <p className="text-base leading-relaxed text-gray-700 whitespace-pre-wrap">
                 {jobData.description}
               </p>
             </div>
@@ -249,22 +276,87 @@ export default function JobDetailPage({
           {/* Right Column */}
           <div className="space-y-6">
             {/* Customer Info */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="mb-4 text-lg font-semibold text-gray-800">
-                Customer info
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Name</p>
-                  <p className="mt-1 text-base font-semibold text-gray-800">
-                    {jobData.customerId.name}
-                  </p>
+            <div>
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="mb-4 text-lg font-semibold text-gray-800">
+                  Customer info
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Name</p>
+                    <p className="mt-1 text-base font-semibold text-gray-800">
+                      {jobData.customerId.name}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Email</p>
+                    <p className="mt-1 break-all text-base text-gray-800">
+                      {jobData.customerId.email}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Email</p>
-                  <p className="mt-1 break-all text-base text-gray-800">
-                    {jobData.customerId.email}
-                  </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="mb-4 text-lg font-semibold text-gray-800">
+                  Customer Ratings
+                </h2>
+                <div className="space-y-4">
+                  {ratings.length === 0 && (
+                    <p className="text-gray-500">No ratings available.</p>
+                  )}
+                  {ratings.map((rating) => (
+                    <div
+                      key={rating._id}
+                      className="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-200"
+                    >
+                      {/* Header: User + Rating */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 text-lg font-semibold">
+                            <i className="mdi mdi-account-outline"></i>
+                          </span>
+                          <div>
+                            <p className="text-gray-800 font-semibold">
+                              {rating.authorId.name}
+                            </p>
+                            <p className="text-gray-500 text-sm">
+                              {new Date(rating.createdAt).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Star rating */}
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <i
+                              key={star}
+                              className={`mdi mdi-star ${
+                                star <= rating.rating
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                            ></i>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Comment */}
+                      {rating.comment && (
+                        <p className="mt-3 text-gray-700 text-sm whitespace-pre-wrap">
+                          {rating.comment}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Pagination Controls */}
+                  <Pagination
+                    pagy={ratingPagy ?? {}}
+                    onPageChange={setRatingPage}
+                  />
                 </div>
               </div>
             </div>
@@ -317,6 +409,15 @@ export default function JobDetailPage({
                   </button>
                 </div>
               )}
+
+            {jobData.status === JOB_STATUS.COMPLETED && (
+              <button
+                onClick={() => setOpenRatingModal(true)}
+                className="w-full rounded-lg bg-orange-400 hover:bg-orange-700 text-white py-2 font-medium cursor-pointer"
+              >
+                Give a feedback
+              </button>
+            )}
 
             {/* Job ID */}
             <div className="rounded-lg bg-gray-100 p-4">

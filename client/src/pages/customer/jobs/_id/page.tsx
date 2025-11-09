@@ -234,6 +234,7 @@ const JobIdPage = () => {
                   description: e.target.value,
                 })
               }
+              className="whitespace-pre-line"
             />
           </Section>
 

@@ -18,6 +18,8 @@ import { viewProfileRating } from "./rating/viewProfileRating.controller.js";
 import { profile } from "./auth/profile.controller.js";
 import { bookmarkJobRemove } from "./job/bookmarkRemove.controller.js";
 import { updateJobTaskStatus } from "./job/updateJobTaskStatus.controller.js";
+import { makeRateCustomer } from "./rating/makeRateCustomer.controller.js";
+import { viewCustomerRating } from "./rating/viewCustomerRating.controller.js";
 
 const workerController = {
   // Auth
@@ -48,6 +50,8 @@ const workerController = {
 
   // rating
   viewProfileRating: viewProfileRating,
+  makeRateCustomer: makeRateCustomer,
+  viewCustomerRating: viewCustomerRating,
 };
 
 export default workerController;

@@ -4,28 +4,40 @@ import { JOB_STATUS } from "@/pkg/enums/job";
 import { useErrorHandler } from "@/pkg/helper/errHandler";
 import type { JobInterface } from "@/pkg/interfaces/job.type";
 import type { AxiosError } from "axios";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import type { RatingInput } from "../type";
+import { RATING_GET_API, RATING_POST_API } from "@/api/rating";
+import type { RatingInterface } from "@/pkg/interfaces/rating";
+import type { PagyInterface } from "@/pkg/interfaces/pagy";
+import { buildQueryParams } from "@/pkg/helper/query";
 
 const useHook = () => {
   const [job, setJob] = useState<JobInterface>();
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const handleError = useErrorHandler();
+  const [ratings, setRatings] = useState<RatingInterface[]>([]);
+  const [ratingPagy, setRatingPagy] = useState<PagyInterface>();
+  const [ratingPage, setRatingPage] = useState(1);
+  const didFetchCustomerRating = useRef(false);
 
-  const handleFetchJobId = async (jobId: string) => {
-    setLoading(true);
-    try {
-      const res = await axiosInstance.get(`${JOB_GET_API.JOB_DETAIL}/${jobId}`);
-      if (res.data.success) {
-        setJob(res.data.data);
+  const handleFetchJobId = useCallback(
+    async (jobId: string) => {
+      setLoading(true);
+      try {
+        const res = await axiosInstance.get(
+          `${JOB_GET_API.JOB_DETAIL}/${jobId}`
+        );
+        if (res.data.success) setJob(res.data.data);
+      } catch (error) {
+        handleError(error as AxiosError, setErr);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      handleError(error as AxiosError, setErr);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [handleError]
+  );
 
   const handleApplyJob = async (jobId: string) => {
     setLoading(true);
@@ -139,6 +151,55 @@ const useHook = () => {
     }
   };
 
+  const viewCustomerRating = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (!job) return;
+      const query = { customerId: job.customerId._id };
+      const pagyInput = { page: ratingPage, limit: 5 };
+      const queryString = buildQueryParams(query, pagyInput);
+      const res = await axiosInstance.get(
+        `${RATING_GET_API.CUSTOMER_RATINGS}/${queryString}`
+      );
+      if (res.data.success) {
+        setRatings(res.data.data);
+        setRatingPagy(res.data.pagy);
+      }
+    } catch (error) {
+      handleError(error as AxiosError, setErr);
+    } finally {
+      setLoading(false);
+    }
+  }, [handleError]);
+
+  const handleMakeRateCustomer = useCallback(
+    async (input: RatingInput) => {
+      setLoading(true);
+      try {
+        const res = await axiosInstance.post(
+          RATING_POST_API.RATE_CUSTOMER,
+          input
+        );
+        if (res.data.success) {
+          toast.success("Feedback sent successfully!");
+          viewCustomerRating();
+        }
+      } catch (error) {
+        handleError(error as AxiosError, setErr);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [handleError, viewCustomerRating]
+  );
+
+  useEffect(() => {
+    if (!job) return;
+    if (didFetchCustomerRating.current) return;
+    didFetchCustomerRating.current = true;
+    viewCustomerRating();
+  }, [ratingPage, job]);
+
   return {
     job,
     loading,
@@ -150,6 +211,12 @@ const useHook = () => {
     handleStartJob,
     handleCancelJob,
     handleRequestCheckComplete,
+    handleMakeRateCustomer,
+    viewCustomerRating,
+    ratings,
+    ratingPagy,
+    ratingPage,
+    setRatingPage,
   };
 };
 

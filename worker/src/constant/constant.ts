@@ -3,4 +3,9 @@ const ENDPOINT = {
   SHARED_ENDPOINT: "/shared",
 };
 
-export { ENDPOINT };
+const RATING_TARGETS = {
+  CUSTOMER: "customer",
+  WORKER: "worker",
+};
+
+export { ENDPOINT, RATING_TARGETS };

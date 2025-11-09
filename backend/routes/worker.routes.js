@@ -49,5 +49,7 @@ router
 
 // 🌟 Rating routes
 router.get("/ratings", workerController.viewProfileRating);
+router.post("/rating/customer", workerController.makeRateCustomer);
+router.get("/rating/customer", workerController.viewCustomerRating);
 
 export default router;

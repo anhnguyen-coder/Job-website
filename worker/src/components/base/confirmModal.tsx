@@ -21,7 +21,7 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <BaseModal isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col items-center text-center gap-4">
+      <div className="flex flex-col items-center text-center gap-4 p-6">
         <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
         <p className="text-gray-600">{message}</p>
 

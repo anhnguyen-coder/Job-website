@@ -9,7 +9,6 @@ export { default as SOSAlert } from "./sosAlert.model.js";
 export { default as WorkerLocation } from "./workerLocation.model.js";
 export { default as Category } from "./category.model.js";
 export { default as JobRequest } from "./jobRequest.model.js";
-export { default as JobTicket } from "./jobTicket.model.js";
 export { default as Rating } from "./rating.model.js";
 export { default as Payment } from "./payment.model.js";
 export { default as JobTask } from "./jobTask.model.js";

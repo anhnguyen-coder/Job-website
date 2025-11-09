@@ -1,6 +1,5 @@
 import { JOB_REQUEST_STATUS, JOB_STATUS } from "../../../enums/job.enum.js";
 import { Job, JobRequest } from "../../../models/index.js";
-import JobTicket from "../../../models/jobTicket.model.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import { withTransaction } from "../../../pkg/transaction/transaction.js";

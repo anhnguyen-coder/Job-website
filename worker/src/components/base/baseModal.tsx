@@ -24,7 +24,7 @@ export function BaseModal({ isOpen, onClose, children }: BaseModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl p-6 relative"
+        className="bg-white rounded-2xl shadow-xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         {children}

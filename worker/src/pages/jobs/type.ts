@@ -9,3 +9,11 @@ export interface JobsQueryInputForm {
 export interface JobRequestQueryInput {
   status?: string;
 }
+
+export type RatingInput = {
+  targetType: string;
+  targetId: string;
+  jobId: string;
+  rating: number;
+  comment: string;
+};

@@ -42,10 +42,10 @@ export const TaskSection = ({
             <li
               key={index}
               onClick={() => onOpenTask(task, index)}
-              className="grid grid-cols-[2fr_5fr_1fr] items-center px-3 py-2 rounded-md transition-colors hover:bg-gray-50 bg-green-50 cursor-pointer"
+              className="grid grid-cols-[2fr_5fr_1fr] px-3 py-2 rounded-md transition-colors hover:bg-gray-50 bg-green-50 cursor-pointer"
             >
-              <span>{task.title}</span>
-              <pre className="text-xs font-semibold text-green-700">
+              <span className="w-full">{task.title}</span>
+              <pre className="w-full text-xs font-semibold text-green-700">
                 {task.description}
               </pre>
               <i
@@ -69,7 +69,7 @@ export const TaskSection = ({
           {jobTasks.map((task, index) => (
             <li
               key={task._id}
-              className={`flex justify-between items-center px-3 py-2 rounded-md transition-colors hover:bg-gray-50 ${
+              className={`grid grid-cols-[2fr_5fr_1fr] px-3 py-2 rounded-md transition-colors hover:bg-gray-50 ${
                 task.isCompleted ? "bg-green-50" : "bg-yellow-50"
               }`}
             >

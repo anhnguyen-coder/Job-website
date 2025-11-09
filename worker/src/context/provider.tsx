@@ -87,7 +87,6 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const profile = async () => {
-    setLoading(true);
     try {
       const storedUser = localStorage.getItem("currentWorker");
       if (storedUser) {
@@ -104,8 +103,6 @@ export const WorkerProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       handleError(error as AxiosError, setErr);
-    } finally {
-      setLoading(false);
     }
   };
 

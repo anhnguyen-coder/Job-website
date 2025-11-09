@@ -17,6 +17,11 @@ function Page() {
     handleCancelJob,
     handleStartJob,
     handleRequestCheckComplete,
+    handleMakeRateCustomer,
+    ratings,
+    ratingPagy,
+    ratingPage,
+    setRatingPage,
   } = useHook();
 
   useEffect(() => {
@@ -39,6 +44,11 @@ function Page() {
             handleCancelJob={handleCancelJob}
             handleStartJob={handleStartJob}
             handleRequestCheckComplete={handleRequestCheckComplete}
+            handleMakeRateCustomer={handleMakeRateCustomer}
+            ratings={ratings}
+            ratingPage={ratingPage}
+            setRatingPage={setRatingPage}
+            ratingPagy={ratingPagy ?? {}}
           />
         )}
       </div>
