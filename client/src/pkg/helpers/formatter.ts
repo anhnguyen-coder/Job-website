@@ -17,7 +17,6 @@ export const formatUSD = (value: number): string => {
   }).format(value);
 };
 
-
 export function formatDate(
   date: string | Date,
   locale: string = "vi-VN",
@@ -38,7 +37,6 @@ export function formatDate(
     return "Lỗi định dạng ngày";
   }
 }
-
 
 // src/helpers/getStatusBadgeVariant.ts
 export function getStatusBadgeVariant(
@@ -100,8 +98,17 @@ export function getStatusLabel(status?: string): string {
     default:
       // fallback — format nicely (e.g. "in_progress" → "In Progress")
       return (
-        status.charAt(0).toUpperCase() +
-        status.slice(1).replace(/_/g, " ")
+        status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ")
       );
   }
+}
+
+export function formatDateDDMMYYYY(date: string | Date): string {
+  if (!date) return "Không có dữ liệu";
+
+  const _date = new Date(date);
+  const day = String(_date.getDate()).padStart(2, "0");
+  const month = String(_date.getMonth() + 1).padStart(2, "0");
+  const year = _date.getFullYear();
+  return `${day}-${month}-${year}`;
 }

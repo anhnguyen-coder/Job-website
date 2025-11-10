@@ -39,7 +39,7 @@ const navItemData: navItem[] = [
     id: 4,
     title: "Reviews",
     icon: "mdi mdi-star-outline",
-    path: "/reviews",
+    path: "/rating",
   },
   {
     id: 5,

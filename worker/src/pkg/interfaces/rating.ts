@@ -1,3 +1,4 @@
+import type { JobInterface } from "./job.type";
 import type { UserInterface } from "./user.type";
 
 export interface RatingInterface {
@@ -6,7 +7,7 @@ export interface RatingInterface {
   authorType: string;
   targetType: string;
   targetId: UserInterface;
-  jobId: string;
+  jobId: JobInterface;
   rating: number;
   comment: string;
   createdAt: string;

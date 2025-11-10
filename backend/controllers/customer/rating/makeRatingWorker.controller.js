@@ -1,3 +1,4 @@
+import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
 import { Job, Rating, User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
@@ -8,7 +9,22 @@ export const makeRatingWorker = async (req, res) => {
   try {
     await validateRatingInput(res, workerId, jobId, rating, comment);
 
-    const rate = Rating.create({
+    const isExist = await Rating.findOne({
+      authorId: customerId,
+      authorType: "customer",
+      targetId: workerId,
+      targetType: "worker",
+      jobId: jobId,
+    });
+
+    if (isExist) {
+      isExist.rating = rating;
+      isExist.comment = comment;
+      await isExist.save();
+      return successRes(res);
+    }
+
+    await Rating.create({
       authorId: customerId,
       authorType: "customer",
       targetId: workerId,
@@ -17,8 +33,6 @@ export const makeRatingWorker = async (req, res) => {
       rating: rating,
       comment: comment,
     });
-
-    await rate.save();
 
     return successRes(res);
   } catch (error) {

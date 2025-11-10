@@ -10,6 +10,7 @@ import type { CategoryInterface } from "@/pkg/types/interfaces/category";
 import type { JobCreateForm, TaskInputForm } from "../create/type";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { REVIEW_POST_API } from "@/apis/customer/review";
 
 const useHook = () => {
   const [job, setJob] = useState<JobInterface>();
@@ -189,6 +190,34 @@ const useHook = () => {
     });
   };
 
+  const handleMakeRateWorker = async (
+    workerId: string,
+    rating: number,
+    comment?: string
+  ) => {
+    setLoading(true);
+    try {
+      const input = {
+        workerId: workerId,
+        jobId: job?._id,
+        rating: rating,
+        comment: comment,
+      };
+      const res = await axiosInstance.post(
+        REVIEW_POST_API.SUBMIT_WORKER_RATING,
+        input
+      );
+
+      if (res.data.success) {
+        toast.success("Submitted review successfully!");
+      }
+    } catch (error) {
+      handleError(error as AxiosError, setErr);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     job,
     loading,
@@ -214,6 +243,7 @@ const useHook = () => {
     handleDeleteJob,
     handlePublishJob,
     handleRemoveJobTasks,
+    handleMakeRateWorker,
   };
 };
 

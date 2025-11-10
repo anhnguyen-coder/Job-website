@@ -16,7 +16,7 @@ function CurrentJobList({ jobs }: props) {
   const navigate = useNavigate();
 
   const calculateProgress = (job: JobInterface) => {
-    if (job.jobTasks && job.jobTasks.length > 0) {
+    if (job && job.jobTasks && job.jobTasks.length > 0) {
       const tasks = job.jobTasks as JobTaskInterface[];
       const completed = tasks.filter((t) => t.isCompleted).length;
       return Math.round((completed / tasks.length) * 100);

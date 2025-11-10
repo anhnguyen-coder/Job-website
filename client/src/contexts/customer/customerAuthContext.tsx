@@ -11,7 +11,7 @@ import type {
 
 import type { AxiosError } from "axios";
 import axiosInstance from "@/pkg/axios/axiosInstance";
-import { GET, POST, PUT } from "@/apis/customer/auth/apis";
+import { GET, POST, PUT } from "@/apis/customer/auth";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {

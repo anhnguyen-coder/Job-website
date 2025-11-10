@@ -1,30 +1,34 @@
+import mongoose from "mongoose";
 import { Rating } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import { getPagination, getPagingData } from "../../../pkg/helper/pagy.js";
 import successRes from "../../../pkg/helper/successRes.js";
 
-export const viewProfileRating = async (req, res) => {
-  const workerId = req.user.id;
+export const viewSelfRatingsController = async (req, res) => {
   try {
     const { page, limit, skip } = getPagination(req.query);
 
-    const [ratings, total] = await Promise.all([
+    const customerId = req.user.id;
+    const id = mongoose.Types.ObjectId.createFromHexString(customerId);
+
+    const [ratings, tota] = await Promise.all([
       Rating.find({
-        targetId: workerId,
-        targetType: "worker",
+        targetType: "customer",
+        targetId: id,
       })
-        .skip(skip)
         .limit(limit)
+        .skip(skip)
         .sort({ createdAt: -1 })
+        .populate("targetId", "name email")
         .populate("authorId", "name email")
         .populate("jobId", "title"),
       Rating.countDocuments({
-        targetId: workerId,
-        targetType: "worker",
+        targetType: "customer",
+        targetId: id,
       }),
     ]);
 
-    const pagy = getPagingData(total, page, limit);
+    const pagy = getPagingData(tota, page, limit);
 
     return successRes(res, { data: ratings, pagy: pagy });
   } catch (error) {

@@ -3,7 +3,6 @@ export { default as Job } from "./job.model.js";
 export { default as Application } from "./application.model.js";
 export { default as Message } from "./message.model.js";
 export { default as Notification } from "./notification.model.js";
-export { default as Review } from "./review.model.js";
 export { default as Bookmark } from "./bookmark.model.js";
 export { default as SOSAlert } from "./sosAlert.model.js";
 export { default as WorkerLocation } from "./workerLocation.model.js";

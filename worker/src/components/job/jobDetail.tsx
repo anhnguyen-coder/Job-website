@@ -297,7 +297,7 @@ export default function JobDetailPage({
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-lg shadow-md">
+              <div className="bg-white p-6 rounded-lg shadow-md mt-5">
                 <h2 className="mb-4 text-lg font-semibold text-gray-800">
                   Customer Ratings
                 </h2>
@@ -343,11 +343,33 @@ export default function JobDetailPage({
                         </div>
                       </div>
 
+                      {/* job title */}
+                      {rating.jobId && rating.jobId.title && (
+                        <div className="flex items-center gap-2 mt-3">
+                          <p className="text-sm text-gray-500 font-semibold">
+                            <span>
+                              <i className="mdi mdi-briefcase-outline mr-1"></i>
+                            </span>
+                            Job:
+                          </p>
+                          <p className="text-sm text-gray-500 font-semibold">
+                            {rating.jobId.title}
+                          </p>
+                        </div>
+                      )}
                       {/* Comment */}
                       {rating.comment && (
-                        <p className="mt-3 text-gray-700 text-sm whitespace-pre-wrap">
-                          {rating.comment}
-                        </p>
+                        <div className="flex flex-col items-start gap-2 mt-3">
+                          <p className="text-sm text-gray-500 font-semibold">
+                            <span>
+                              <i className="mdi mdi-message-outline mr-1"></i>
+                            </span>
+                            Comment:
+                          </p>
+                          <p className="text-gray-700 text-sm whitespace-pre-wrap">
+                            {rating.comment}
+                          </p>
+                        </div>
                       )}
                     </div>
                   ))}

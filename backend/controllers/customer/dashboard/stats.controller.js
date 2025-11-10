@@ -1,5 +1,5 @@
 import { JOB_STATUS } from "../../../enums/job.enum.js";
-import { Job, Payment, Review } from "../../../models/index.js";
+import { Job, Payment, Rating } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import mongoose from "mongoose";
@@ -39,7 +39,7 @@ export const dashboardStats = async (req, res) => {
           status: JOB_STATUS.COMPLETED,
         }),
 
-        Review.aggregate([
+        Rating.aggregate([
           { $match: { targetType: "customer", targetId: customerId } },
           { $group: { _id: null, avgRating: { $avg: "$rating" } } },
         ]),
@@ -63,7 +63,7 @@ export const dashboardStats = async (req, res) => {
       },
       {
         id: 4,
-        label: "Reviews",
+        label: "Ratings",
         value: reviewStats?.[0]?.avgRating
           ? Math.round(reviewStats[0].avgRating)
           : 0,

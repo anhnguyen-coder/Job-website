@@ -20,6 +20,7 @@ import { bookmarkJobRemove } from "./job/bookmarkRemove.controller.js";
 import { updateJobTaskStatus } from "./job/updateJobTaskStatus.controller.js";
 import { makeRateCustomer } from "./rating/makeRateCustomer.controller.js";
 import { viewCustomerRating } from "./rating/viewCustomerRating.controller.js";
+import { ratingStatsController } from "./rating/ratingStats.controller.js";
 
 const workerController = {
   // Auth
@@ -52,6 +53,7 @@ const workerController = {
   viewProfileRating: viewProfileRating,
   makeRateCustomer: makeRateCustomer,
   viewCustomerRating: viewCustomerRating,
+  ratingStats: ratingStatsController,
 };
 
 export default workerController;

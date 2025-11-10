@@ -28,6 +28,7 @@ export const viewCustomerRating = async (req, res) => {
         .sort({ createdAt: -1 })
         .populate("authorId", "name email")
         .populate("targetId", "name email")
+        .populate("jobId", "title")
         .lean(),
       Rating.countDocuments({
         targetId: customerId,

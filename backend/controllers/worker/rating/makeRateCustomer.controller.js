@@ -15,14 +15,14 @@ export const makeRateCustomer = async (req, res) => {
       authorId: authorId,
       targetType: targetType,
       targetId: targetId,
+      jobId: jobId,
     });
 
     if (isExist) {
-      return AppError(
-        res,
-        400,
-        "You have already rated this customer before"
-      );
+      isExist.rating = rating;
+      isExist.comment = comment;
+      await isExist.save();
+      return successRes(res);
     }
 
     await Rating.create({

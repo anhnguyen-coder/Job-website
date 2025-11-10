@@ -12,6 +12,7 @@ import { LoadingOverlay } from "@/components/base/loading";
 import { JobTaskModal } from "@/components/customer/job/ jobTaskModal";
 import { TaskSection } from "@/components/job/taskSection";
 import MarkCompleteModalDetail from "@/components/job/markCompleteModal";
+import Header from "@/components/job/id/header";
 
 const JobIdPage = () => {
   const { jobId } = useParams();
@@ -39,6 +40,7 @@ const JobIdPage = () => {
     handleDeleteJob,
     handlePublishJob,
     handleRemoveJobTasks,
+    handleMakeRateWorker,
   } = useHook();
 
   useEffect(() => {
@@ -112,71 +114,17 @@ const JobIdPage = () => {
       <div className="w-full mt-8">
         <div className="mx-auto bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-xl p-8 transition-transform hover:shadow-2xl">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
-            <h2 className="text-3xl font-extrabold text-gray-900">
-              {job.title}
-            </h2>
-            <div className="flex items-center">
-              {/* Delete button — only when AVAILABLE */}
-              {job.status === JOB_STATUS.AVAILABLE && (
-                <button
-                  onClick={() => onDelete()}
-                  className="px-4 py-2 mx-4 bg-red-500 text-white font-semibold rounded-3xl shadow hover:bg-red-600 transition-colors"
-                >
-                  Delete
-                </button>
-              )}
-
-              {/* Update / Save / Cancel — when AVAILABLE or TAKEN */}
-              {(job.status === JOB_STATUS.AVAILABLE ||
-                job.status === JOB_STATUS.TAKEN) && (
-                <div>
-                  {disable ? (
-                    <button
-                      onClick={handleEdit}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-3xl shadow hover:bg-blue-700 transition-colors"
-                    >
-                      Update
-                    </button>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => setDisable(true)}
-                        className="px-4 py-2 mx-4 bg-gray-600 text-white rounded-3xl shadow hover:bg-gray-700 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={onSubmit}
-                        className="px-4 py-2 bg-green-600 text-white rounded-3xl shadow hover:bg-green-700 transition-colors"
-                      >
-                        Save
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Mark completed — only when CHECK_COMPLETE */}
-              {job.status === JOB_STATUS.CHECK_COMPLETE && (
-                <button
-                  onClick={() => setShowMarkCompleteModal(true)}
-                  className="px-4 py-2 mx-4 bg-green-500 text-white font-semibold rounded-3xl shadow hover:bg-green-600 transition-colors"
-                >
-                  Mark completed
-                </button>
-              )}
-
-              {job.status === JOB_STATUS.CANCELLED && (
-                <button
-                  onClick={() => handlePublishJob(job._id)}
-                  className="px-4 py-2 mx-4 bg-green-500 text-white font-semibold rounded-3xl shadow hover:bg-green-600 transition-colors"
-                >
-                  Publish job
-                </button>
-              )}
-            </div>
-          </div>
+          <Header
+            job={job}
+            disable={disable}
+            setDisable={setDisable}
+            onDelete={onDelete}
+            handleEdit={handleEdit}
+            onSubmit={onSubmit}
+            setShowMarkCompleteModal={setShowMarkCompleteModal}
+            handlePublishJob={handlePublishJob}
+            makeRateWorker={handleMakeRateWorker}
+          />
 
           {/* Info Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

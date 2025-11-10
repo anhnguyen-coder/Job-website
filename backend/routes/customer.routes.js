@@ -34,6 +34,8 @@ router.delete("/message/:messageId", customerController.deleteMessage);
 
 // rating routes
 router.post("/rating", customerController.makeRatingWorker);
+router.get("/rating/stats", customerController.ratingStats);
+router.get("/rating/self", customerController.viewSelfRatingsController);
 router.put("/rating/:ratingId", customerController.updateRatingWorker);
 router.get("/rating/:workerId", customerController.viewWorkerRatings);
 

@@ -1,4 +1,4 @@
-import { GET } from "@/apis/customer/dashboard/apis";
+import { GET } from "@/apis/customer/dashboard";
 import { GET as GET_JOB } from "@/apis/customer/job";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";

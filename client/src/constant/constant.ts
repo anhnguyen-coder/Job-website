@@ -15,11 +15,16 @@ const CUSTOMER_APP_THEME = {
 const USER_ENDPOINT = {
   CUSTOMER_ENDPOINT: "/customer",
   WORKER_ENPOINT: "/worker",
-  SHARED_ENDPOINT: "/shared"
+  SHARED_ENDPOINT: "/shared",
 };
 
 const ROLE = {
   CUSTOMER: "customer",
   WORKER: "worker",
 };
-export { APP, CUSTOMER_APP_THEME, USER_ENDPOINT, ROLE };
+
+const RATING_TARGETS = {
+  WORKER: "worker",
+  CUSTOMER: "customer",
+};
+export { APP, CUSTOMER_APP_THEME, USER_ENDPOINT, ROLE, RATING_TARGETS };

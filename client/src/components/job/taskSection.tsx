@@ -1,4 +1,4 @@
-import type { TaskInputForm } from "@/pages/customer/jobs/create/type";
+import type { TaskInputForm } from "@/pages/jobs/create/type";
 import type { JobTaskInterface } from "@/pkg/types/interfaces/job.type";
 import { Button } from "../base/button";
 import { ProgressBar } from "../base/progressBar";

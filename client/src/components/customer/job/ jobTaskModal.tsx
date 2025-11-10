@@ -1,5 +1,5 @@
 import { BaseModal } from "@/components/base/baseModal";
-import type { TaskInputForm } from "@/pages/customer/jobs/create/type";
+import type { TaskInputForm } from "@/pages/jobs/create/type";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -46,7 +46,7 @@ export function JobTaskModal({
 
   return (
     <BaseModal isOpen={isOpen} onClose={() => setOpen(false)}>
-      <div className="bg-white rounded-2xl w-[400px] max-w-md p-4 relative animate-fade-in">
+      <div className="bg-white rounded-2xl w-[400px] max-w-md p-10 relative animate-fade-in">
         {/* Heading */}
         <h2 className="text-2xl font-semibold text-gray-800 mb-5">
           Create Sub Task

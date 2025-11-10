@@ -19,7 +19,9 @@ import { fetchMessageJob } from "./messages/fetchMessageJob.controller.js";
 import { sendMessage } from "./messages/sendMessage.controller.js";
 import { updateMessage } from "./messages/updateMessage.controller.js";
 import { makeRatingWorker } from "./rating/makeRatingWorker.controller.js";
+import { ratingStatsController } from "./rating/ratingStats.controller.js";
 import { updateRatingWorker } from "./rating/updateRatingWorker.controller.js";
+import { viewSelfRatingsController } from "./rating/viewSelfRatings.controller.js";
 import { viewWorkerRates } from "./rating/viewWorkerRates.controller.js";
 
 const customerController = {
@@ -52,6 +54,8 @@ const customerController = {
   makeRatingWorker: makeRatingWorker,
   updateRatingWorker: updateRatingWorker,
   viewWorkerRatings: viewWorkerRates,
+  ratingStats: ratingStatsController,
+  viewSelfRatingsController: viewSelfRatingsController,
 
   // dashboard
   customerStats: dashboardStats,

@@ -40,7 +40,7 @@ function MarkCompleteModalDetail({
 
   return (
     <BaseModal isOpen={isOpen} onClose={() => onOpenChange(false)}>
-      <div className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="max-w-2xl max-h-[90vh] overflow-y-auto p-6">
         {/* Header */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold">Job Request Details</h2>

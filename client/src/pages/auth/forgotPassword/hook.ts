@@ -1,4 +1,4 @@
-import { GET, PUT } from "@/apis/customer/auth/apis";
+import { GET, PUT } from "@/apis/customer/auth";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 

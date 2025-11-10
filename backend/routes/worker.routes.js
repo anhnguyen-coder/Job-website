@@ -51,5 +51,6 @@ router
 router.get("/ratings", workerController.viewProfileRating);
 router.post("/rating/customer", workerController.makeRateCustomer);
 router.get("/rating/customer", workerController.viewCustomerRating);
+router.get("/rating/stats", workerController.ratingStats);
 
 export default router;
