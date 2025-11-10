@@ -35,6 +35,20 @@ function Page() {
       },
     },
     {
+      key: "authorId",
+      label: "Email",
+      render: (item) => {
+        return (
+          <span>
+            <span>
+              <i className="mdi mdi-email mr-2"></i>
+            </span>
+            {item.authorId?.email}
+          </span>
+        );
+      },
+    },
+    {
       key: "rating",
       label: "Rating",
       render: (item) => {

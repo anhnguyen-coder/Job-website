@@ -52,7 +52,7 @@ export const ratingStatsController = async (req, res) => {
       {
         $match: {
           targetType: "customer",
-          targetId: new mongoose.Types.ObjectId(customerId),
+          targetId: mongoose.Types.ObjectId.createFromHexString(customerId),
         },
       },
       {
