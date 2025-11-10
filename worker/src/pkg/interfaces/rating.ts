@@ -13,3 +13,24 @@ export interface RatingInterface {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface RatingStatsInterface {
+  avgRating: number;
+  totalRatings: number;
+  fiveStars: number;
+  positiveSentiment: number;
+}
+
+export interface RatingDistributionInterface {
+  1: number;
+  2: number;
+  3: number;
+  4: number;
+  5: number;
+}
+
+export interface RatingSentimentInterface {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
