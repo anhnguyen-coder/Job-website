@@ -5,6 +5,8 @@ import type {
 } from "@/pkg/interfaces/conversation";
 import type { PagyInterface } from "@/pkg/interfaces/pagy";
 import type { UserInterface } from "@/pkg/interfaces/user.type";
+import { useSocketMessages } from "@/pkg/socket/handler/message.handler";
+import { getSocket } from "@/pkg/socket/socket";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -47,6 +49,7 @@ function MessageSideBar({
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const socket = getSocket();
 
   // Load conversation + messages
   useEffect(() => {
@@ -56,11 +59,17 @@ function MessageSideBar({
       try {
         setLoading(true);
         const conv = await handleGetConversation(userId);
-        setConversation(conv);
+        if (conv) {
+          setConversation(conv);
+          const [msgs, pg] = await handleGetMessages(conv._id, 1);
+          setMessages(msgs || []);
+          setPagy(pg || {});
 
-        const [msgs, pg] = await handleGetMessages(conv._id, 1);
-        setMessages(msgs || []);
-        setPagy(pg || {});
+          if (socket && socket.connected) {
+            socket.emit("join_conversation", conv._id);
+            console.log("emit join_conversation immediately");
+          }
+        }
       } finally {
         setLoading(false);
       }
@@ -109,12 +118,23 @@ function MessageSideBar({
       userId,
       selectedFiles
     );
-    if (res) setMessages((prev) => [res, ...prev]);
+    if (res) {
+      if (!socket || (socket && !socket.connected)) {
+        setMessages((prev) => [res, ...(prev || [])]);
+      }
+    }
     setMessage("");
     setSelectedFiles([]);
     setRows(1);
     textareaRef.current?.focus();
   }, [conversation, message, selectedFiles, userId]);
+
+  useSocketMessages(conversation?._id || "", (newMessage) => {
+    // if(socket && socket.connected)
+    if (socket && socket.connected) {
+      setMessages((prev) => [newMessage, ...(prev || [])]);
+    }
+  });
 
   const targetUserName = useMemo(() => {
     if (!conversation || !currentUser) return "Unknown";
