@@ -9,13 +9,18 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  type Dispatch,
+  type SetStateAction,
 } from "react";
 import { LoadingCustom } from "../base/loading";
+import { getSocket } from "@/pkg/socket/socket";
+import { useSocketMessages } from "@/pkg/socket/handler/message.handler";
 
 type Props = {
   loading: boolean;
   currentUser: UserInterface;
   messages: MessageInterface[];
+  setMessages: Dispatch<SetStateAction<MessageInterface[]>>;
   handleGetMessages: (conversationId: string, page: number) => void;
   page: number;
   setPage: (page: number) => void;
@@ -26,7 +31,7 @@ type Props = {
     message: string,
     userId: string,
     files?: File[]
-  ) => Promise<void>;
+  ) => Promise<MessageInterface>;
 };
 
 const Message: React.FC<Props> = ({
@@ -36,6 +41,7 @@ const Message: React.FC<Props> = ({
   handleGetMessages,
   page,
   userId,
+  setMessages,
   handleSendMessage,
   handleGetConversation,
 }) => {
@@ -47,12 +53,17 @@ const Message: React.FC<Props> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const maxRows = 5;
+  const socket = getSocket();
 
   // 🧠 Fetch conversation khi userId thay đổi
   useEffect(() => {
     if (!userId) return;
     handleGetConversation(userId).then((conv) => {
       if (conv) {
+        if (socket && socket.connected) {
+          socket.emit("join_conversation", conv._id);
+          console.log("emit join_conversation immediately");
+        }
         setConversation(conv);
         handleGetMessages(conv._id, 1);
       }
@@ -82,12 +93,18 @@ const Message: React.FC<Props> = ({
     if (!message.trim() && selectedFiles.length === 0) return;
     if (!conversation || !userId) return;
 
-    await handleSendMessage(
+    const res = await handleSendMessage(
       conversation._id,
       message.trim(),
       userId,
       selectedFiles
     );
+
+    if (res) {
+      if (!socket || (socket && !socket.connected)) {
+        setMessages((prev) => [res, ...(prev || [])]);
+      }
+    }
 
     setMessage("");
     setSelectedFiles([]);
@@ -116,6 +133,13 @@ const Message: React.FC<Props> = ({
       : conversation.user1.name;
   }, [conversation, currentUser]);
 
+  // receive message realtime
+  useSocketMessages(conversation?._id || "", (newMessage) => {
+    // if(socket && socket.connected)
+    if (socket && socket.connected) {
+      setMessages((prev) => [newMessage, ...(prev || [])]);
+    }
+  });
   return (
     <div className="bg-white rounded-lg flex flex-col h-full">
       {conversation ? (

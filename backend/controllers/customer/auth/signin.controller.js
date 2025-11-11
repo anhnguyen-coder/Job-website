@@ -3,6 +3,7 @@ import { User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import jwt from "jsonwebtoken";
+import { USER_ROLE_ENUM } from "../../../enums/userRole.enum.js";
 
 export const signIn = async (req, res) => {
   const { email, password } = req.body;
@@ -14,9 +15,13 @@ export const signIn = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw AppError(res, 401, "Invalid password");
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: user._id, role: USER_ROLE_ENUM.CUSTOMER },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     const isProd = process.env.APP_ENV === "production";
 

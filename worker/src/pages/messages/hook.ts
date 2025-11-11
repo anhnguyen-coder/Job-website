@@ -125,8 +125,8 @@ const useHook = () => {
       message: string,
       userId: string,
       files?: File[]
-    ) => {
-      if (sending) return;
+    ): Promise<MessageInterface> => {
+      if (sending) return {} as MessageInterface;
       setSending(true);
 
       try {
@@ -147,11 +147,12 @@ const useHook = () => {
 
         const res = await axiosInstance.post(MESSAGE_POST_API.SEND, formData);
         if (res.data.success) {
-          // append message thay vì refetch toàn bộ
-          setMessages((prev) => [res.data.data, ...(prev || [])]);
+          return res.data.data as MessageInterface;
         }
+        return {} as MessageInterface;
       } catch (error) {
         handleError(error as AxiosError, setErr);
+        return {} as MessageInterface;
       } finally {
         setSending(false);
       }
@@ -177,6 +178,7 @@ const useHook = () => {
     setMessPage,
     messages,
     loadingMessages,
+    setMessages,
 
     // user context
     userId,

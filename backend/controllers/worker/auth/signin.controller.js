@@ -26,9 +26,13 @@ export const signIn = async (req, res) => {
       return AppError(res, 400, "Invalid credentials");
     }
 
-    const token = jwt.sign({ id: worker._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: worker._id, role: USER_ROLE_ENUM.WORKER },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.cookie("workerToken", token, {
       httpOnly: true,

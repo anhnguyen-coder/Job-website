@@ -20,6 +20,7 @@ function Page() {
     handleGetConversation,
     handleSendMessage,
     loadingMessages,
+    setMessages,
   } = useHook();
 
   const { user, profile } = useCustomerAuth();
@@ -55,6 +56,7 @@ function Page() {
             userId={userId}
             handleGetConversation={handleGetConversation}
             handleSendMessage={handleSendMessage}
+            setMessages={setMessages}
           />
         </div>
       </div>

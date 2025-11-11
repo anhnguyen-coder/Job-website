@@ -4,6 +4,7 @@ import { withTransaction } from "../../../pkg/transaction/transaction.js";
 import { MESSAGE_TYPE_ENUMS } from "../../../enums/message.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import mongoose from "mongoose";
+import { getIO } from "../../../socket/index.js";
 
 export const sendMessage = async (req, res) => {
   try {
@@ -37,6 +38,11 @@ export const sendMessage = async (req, res) => {
       conversation.lastMessage = messageDoc._id;
       conversation.updatedAt = new Date();
       await conversation.save({ session });
+
+      const io = getIO();
+      if (io) {
+        io.to(conversationId).emit("receive_message", messageDoc);
+      }
 
       return successRes(res, { data: messageDoc });
     });
