@@ -14,15 +14,19 @@ import { jobs } from "./job/jobs.controller.js";
 import { makeJobComplete } from "./job/makeJobComplete.controller.js";
 import { publishJob } from "./job/publishJob.controller.js";
 import { updateJob } from "./job/updateJob.controller.js";
-import { deleteMessage } from "./messages/deleteMessage.controller.js";
-import { fetchMessageJob } from "./messages/fetchMessageJob.controller.js";
+import { deleteMessageController } from "./messages/deleteMessage.controller.js";
+import { getConversation } from "./messages/getConversation.controller.js";
+import { getConversationMessages } from "./messages/getConversationMessages.controller.js";
+import { getConversations } from "./messages/getConversations.controller.js";
 import { sendMessage } from "./messages/sendMessage.controller.js";
-import { updateMessage } from "./messages/updateMessage.controller.js";
+import { updateMessageController } from "./messages/updateMessage.controller.js";
+
 import { makeRatingWorker } from "./rating/makeRatingWorker.controller.js";
 import { ratingStatsController } from "./rating/ratingStats.controller.js";
 import { updateRatingWorker } from "./rating/updateRatingWorker.controller.js";
 import { viewSelfRatingsController } from "./rating/viewSelfRatings.controller.js";
 import { viewWorkerRates } from "./rating/viewWorkerRates.controller.js";
+import { getWorkerByName } from "./worker/getWorkerByName.controller.js";
 
 const customerController = {
   // auth
@@ -45,10 +49,12 @@ const customerController = {
   publishJob: publishJob,
 
   // message controllers
-  fetchMessagesWithWorkerByJob: fetchMessageJob,
+  listConversations: getConversations,
+  conversationMessages: getConversationMessages,
   sendMessage: sendMessage,
-  updateMessage: updateMessage,
-  deleteMessage: deleteMessage,
+  updateMessage: updateMessageController,
+  deleteMessage: deleteMessageController,
+  getConverByUserId: getConversation,
 
   // rating
   makeRatingWorker: makeRatingWorker,
@@ -59,6 +65,9 @@ const customerController = {
 
   // dashboard
   customerStats: dashboardStats,
+
+  // worker
+  findWorkerByName: getWorkerByName,
 };
 
 export default customerController;

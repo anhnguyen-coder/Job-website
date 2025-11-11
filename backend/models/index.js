@@ -1,7 +1,5 @@
 export { default as User } from "./userModel.js";
 export { default as Job } from "./job.model.js";
-export { default as Application } from "./application.model.js";
-export { default as Message } from "./message.model.js";
 export { default as Notification } from "./notification.model.js";
 export { default as Bookmark } from "./bookmark.model.js";
 export { default as SOSAlert } from "./sosAlert.model.js";
@@ -11,3 +9,6 @@ export { default as JobRequest } from "./jobRequest.model.js";
 export { default as Rating } from "./rating.model.js";
 export { default as Payment } from "./payment.model.js";
 export { default as JobTask } from "./jobTask.model.js";
+export { default as Conversation } from "./converstation.model.js";
+export { default as Message } from "./message.model.js";
+export { default as Attachment } from "./attachment.model.js";

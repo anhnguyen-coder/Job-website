@@ -1,36 +1,21 @@
+import { Message } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
-import { Message } from "../../../models/index.js";
 
-export const deleteMessage = async (req, res) => {
+export const deleteMessageController = async (req, res) => {
   try {
-    const { messageId } = req.params;
-    const workerId = req.user?.id;
+    const messageId = req.params.messageId;
 
-    validation(messageId, res);
+    const message = await Message.findOne({
+      _id: messageId,
+      senderId: req.user.id,
+    });
 
-    const messageToDelete = await Message.findById(messageId);
-    if (!messageToDelete) {
-      return AppError(res, 404, "Message not found");
-    }
-    if (messageToDelete.senderId.toString() !== workerId) {
-      return AppError(
-        res,
-        403,
-        "You are not authorized to delete this message"
-      );
-    }
+    if (!message) return AppError(res, 404, "Message not found");
 
-    await messageToDelete.deleteOne();
-
-    return successRes(res);
+    await message.deleteOne();
+    successRes(res);
   } catch (error) {
     AppError(res, 500, error.message);
-  }
-};
-
-const validation = (messageId, res) => {
-  if (!messageId) {
-    return AppError(res, 400, "Message ID is required");
   }
 };

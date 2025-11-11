@@ -38,6 +38,20 @@ export function formatDate(
   }
 }
 
+export function formatTime(dateString: string): string {
+  const date = new Date(dateString);
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 => 12
+
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+  return `${hours}:${formattedMinutes} ${ampm}`;
+}
 // src/helpers/getStatusBadgeVariant.ts
 export function getStatusBadgeVariant(
   status?: string
@@ -102,7 +116,6 @@ export function getStatusLabel(status?: string): string {
       );
   }
 }
-
 
 export function formatDateDDMMYYYY(date: string | Date): string {
   if (!date) return "Không có dữ liệu";

@@ -13,6 +13,7 @@ import ForgotPasswordPage from "@/pages/forgotPassword/page";
 import BookmarkPage from "@/pages/bookmark/page";
 import MyCurrentJobList from "@/pages/currentJobs/page";
 import ReviewPage from "@/pages/reviews/page";
+import MessagePage from "@/pages/messages//page";
 
 const AppRouter: React.FC = () => {
   const { isAuthenticated, loading } = useWorkerAuth();
@@ -37,6 +38,7 @@ const AppRouter: React.FC = () => {
           <Route path="bookmarked" element={<BookmarkPage />}></Route>
           <Route path="current-jobs" element={<MyCurrentJobList />}></Route>
           <Route path="reviews" element={<ReviewPage />}></Route>
+          <Route path="messages" element={<MessagePage />}></Route>
         </Route>
       )}
 

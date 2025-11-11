@@ -16,7 +16,7 @@ export function ProgressBar({ progress }: ProgressBarProps) {
   return (
     <div className="w-full bg-gray-200 rounded-full h-2 relative">
       <div
-        className={`h-full ${getColor()} transition-all duration-500 ease-in-out`}
+        className={`h-full ${getColor()} transition-all rounded-full duration-500 ease-in-out`}
         style={{ width: `${clampedProgress}%` }}
       ></div>
       <span className="absolute right-2 top-[-22px] text-sm font-medium text-gray-700">

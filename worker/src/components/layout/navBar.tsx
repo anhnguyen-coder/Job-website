@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Briefcase,
   Star,
+  MessageCircle,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import logoImg from "@/assets/logo.png";
@@ -49,6 +50,12 @@ const navItemData: NavItemType[] = [
     title: "Reviews",
     icon: <Star size={20} />,
     path: "/reviews",
+  },
+  {
+    id: 6,
+    title: "Messages",
+    icon: <MessageCircle size={20} />,
+    path: "/messages",
   },
 ];
 

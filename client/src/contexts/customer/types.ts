@@ -1,16 +1,12 @@
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-}
+import type { UserInterface } from "@/pkg/types/interfaces/user.type";
 
 export interface CustomerAuthContextType {
-  user: User | null;
+  user: UserInterface | null;
   loading: boolean;
   isAuthenticated: boolean;
   err: string;
 
-  setUser: (user: User | null) => void;
+  setUser: (user: UserInterface | null) => void;
   setLoading: (loading: boolean) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 

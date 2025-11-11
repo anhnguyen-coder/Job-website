@@ -1,6 +1,7 @@
 import express from "express";
 import customerAuth from "../middleware/customer.auth.js";
 import customerController from "../controllers/customer/index.js";
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -27,10 +28,19 @@ router.delete("/job/:jobId", customerController.jobDelete);
 router.put("/job/publish/:jobId", customerController.publishJob);
 
 // message routes
-router.get("/message/:jobId", customerController.fetchMessagesWithWorkerByJob);
-router.post("/message", customerController.sendMessage);
-router.put("/message/:messageId", customerController.updateMessage);
-router.delete("/message/:messageId", customerController.deleteMessage);
+router.get("/message/list", customerController.listConversations);
+router.get(
+  "/message/conversation/messages",
+  customerController.conversationMessages
+);
+router.post(
+  "/message/send",
+  upload.array("files", 5),
+  customerController.sendMessage
+);
+router.put("/message/update", customerController.updateMessage);
+router.get("/message/conversation", customerController.getConverByUserId);
+router.delete("/message/delete/:messageId", customerController.deleteMessage);
 
 // rating routes
 router.post("/rating", customerController.makeRatingWorker);
@@ -41,4 +51,7 @@ router.get("/rating/:workerId", customerController.viewWorkerRatings);
 
 // customer dashboard
 router.get("/dashboard/stats", customerController.customerStats);
+
+// worker
+router.get("/worker", customerController.findWorkerByName);
 export default router;

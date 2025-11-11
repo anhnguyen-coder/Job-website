@@ -3,7 +3,7 @@ import { GET as GET_SHARED } from "@/apis/shared/category";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import type { JobInterface } from "@/pkg/types/interfaces/job.type";
 import type { AxiosError } from "axios";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 import type { Option } from "@/pkg/types/interfaces/option";
 import type { CategoryInterface } from "@/pkg/types/interfaces/category";
@@ -11,6 +11,13 @@ import type { JobCreateForm, TaskInputForm } from "../create/type";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { REVIEW_POST_API } from "@/apis/customer/review";
+import type {
+  ConversationInterface,
+  MessageInterface,
+} from "@/pkg/types/interfaces/conversation";
+import { MESSAGE_GET_API, MESSAGE_POST_API } from "@/apis/customer/message";
+import { buildQueryParams } from "@/pkg/helpers/query";
+import type { PagyInterface } from "@/pkg/types/interfaces/pagy";
 
 const useHook = () => {
   const [job, setJob] = useState<JobInterface>();
@@ -32,6 +39,8 @@ const useHook = () => {
     budget: 0,
     tasks: [],
   });
+
+  const controllerRef = useRef<AbortController | null>(null);
 
   const navigate = useNavigate();
 
@@ -218,6 +227,95 @@ const useHook = () => {
     }
   };
 
+  const handleGetConversation = useCallback(
+    async (userId: string): Promise<ConversationInterface> => {
+      try {
+        const res = await axiosInstance.get(
+          `${MESSAGE_GET_API.CONVERSATION}?userId=${userId}`
+        );
+        return res.data.success ? res.data.data : ({} as ConversationInterface);
+      } catch (error) {
+        handleError(error as AxiosError, setErr);
+        return {} as ConversationInterface;
+      }
+    },
+    []
+  );
+
+  const handleGetConversationMessage = useCallback(
+    async (
+      conversationId: string,
+      page = 1,
+    ): Promise<[MessageInterface[], PagyInterface]> => {
+      try {
+        controllerRef.current?.abort();
+        controllerRef.current = new AbortController();
+
+        const query = { conversationId };
+        const pagyInput = { page: page, limit: 20 };
+        const queryStr = buildQueryParams(query, pagyInput);
+
+        const res = await axiosInstance.get(
+          `${MESSAGE_GET_API.MESSAGES}${queryStr}`,
+          {
+            signal: controllerRef.current.signal,
+          }
+        );
+
+        if (res.data.success) {
+          const messages: MessageInterface[] = res.data.data ?? [];
+          const pagy: PagyInterface = res.data.pagy ?? {};
+          return [messages, pagy];
+        }
+        return [[], {}];
+      } catch (error) {
+        if ((error as any).name !== "CanceledError") {
+          handleError(error as AxiosError, setErr);
+        }
+
+        return [[], {}];
+      }
+    },
+    []
+  );
+
+  const handleSendMessage = useCallback(
+    async (
+      conversationId: string,
+      message: string,
+      userId: string,
+      files?: File[]
+    ): Promise<MessageInterface> => {
+      try {
+        const formData = new FormData();
+        formData.append("conversationId", conversationId);
+        formData.append("message", message);
+        formData.append("userId", userId);
+
+        if (files?.length) {
+          files.forEach((file) => {
+            if (file instanceof File) {
+              formData.append("files", file);
+            } else {
+              console.warn("Invalid file skipped:", file);
+            }
+          });
+        }
+
+        const res = await axiosInstance.post(MESSAGE_POST_API.SEND, formData);
+        if (res.data.success) {
+          return res.data.data as MessageInterface;
+        }
+
+        return {} as MessageInterface;
+      } catch (error) {
+        handleError(error as AxiosError, setErr);
+        return {} as MessageInterface;
+      }
+    },
+    []
+  );
+
   return {
     job,
     loading,
@@ -244,6 +342,9 @@ const useHook = () => {
     handlePublishJob,
     handleRemoveJobTasks,
     handleMakeRateWorker,
+    handleGetConversation,
+    handleGetConversationMessage,
+    handleSendMessage,
   };
 };
 

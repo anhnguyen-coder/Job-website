@@ -22,6 +22,9 @@ function Page() {
     ratingPagy,
     ratingPage,
     setRatingPage,
+    handleGetConversation,
+    handleGetConversationMessage,
+    handleSendMessage,
   } = useHook();
 
   useEffect(() => {
@@ -49,6 +52,9 @@ function Page() {
             ratingPage={ratingPage}
             setRatingPage={setRatingPage}
             ratingPagy={ratingPagy ?? {}}
+            handleGetConversation={handleGetConversation}
+            handleGetMessages={handleGetConversationMessage}
+            handleSendMessage={handleSendMessage}
           />
         )}
       </div>

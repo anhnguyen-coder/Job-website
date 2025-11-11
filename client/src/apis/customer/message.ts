@@ -1,0 +1,21 @@
+import { USER_ENDPOINT } from "@/constant/constant";
+
+const MESSAGE_GET_API = {
+  CONVERSATIONS: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/message/list`,
+  CONVERSATION: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/message/conversation`,
+  MESSAGES: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/message/conversation/messages`,
+};
+
+const MESSAGE_POST_API = {
+  SEND: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/message/send`,
+};
+
+const MESSAGE_PUT_API = {
+  UPDATE: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/message/update`,
+};
+
+const MESSAGE_DEL_API = {
+  DELETE: `${USER_ENDPOINT.CUSTOMER_ENDPOINT}/message/delete`,
+};
+
+export { MESSAGE_DEL_API, MESSAGE_GET_API, MESSAGE_POST_API, MESSAGE_PUT_API };

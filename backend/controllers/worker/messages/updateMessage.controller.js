@@ -1,41 +1,25 @@
-import successRes from "../../../pkg/helper/successRes.js";
 import { Message } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
+import successRes from "../../../pkg/helper/successRes.js";
 
-export const updateMessage = async (req, res) => {
+export const updateMessageController = async (req, res) => {
   try {
-    const { messageId } = req.params;
-    const { message } = req.body;
-    const workerId = req.user?.id;
+    const { messageId, content } = req.body;
 
-    validation(messageId, message, res);
+    if (!messageId || !content)
+      return AppError(res, 400, "Missing required fields");
 
-    const messageToUpdate = await Message.findById(messageId);
-    if (!messageToUpdate) {
-      return AppError(res, 404, "Message not found");
-    }
-    if (messageToUpdate.senderId.toString() !== workerId) {
-      return AppError(
-        res,
-        403,
-        "You are not authorized to update this message"
-      );
-    }
+    const userId = req.user.id;
 
-    messageToUpdate.message = message;
-    await messageToUpdate.save();
+    const message = await Message.findOne({ senderId: userId, _id: messageId });
 
-    return successRes(res);
+    if (!message) return AppError(res, 404, "Error: message not found");
+
+    message.content = content;
+    await message.save({ session: session });
+
+    successRes(res);
   } catch (error) {
     AppError(res, 500, error.message);
-  }
-};
-
-const validation = (messageId, message, res) => {
-  if (!messageId) {
-    return AppError(res, 400, "Message ID is required");
-  }
-  if (!message) {
-    return AppError(res, 400, "Message is required");
   }
 };

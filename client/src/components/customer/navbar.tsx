@@ -47,6 +47,12 @@ const navItemData: navItem[] = [
     icon: "mdi mdi-chart-bar",
     path: "/history",
   },
+  {
+    id: 7,
+    title: "Messages",
+    icon: "mdi mdi-message-outline",
+    path: "/messages",
+  },
 ];
 export function Navbar() {
   const customerAuth = useCustomerAuth();

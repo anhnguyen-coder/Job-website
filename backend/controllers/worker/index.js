@@ -10,10 +10,7 @@ import { myCurrentJobs } from "./job/myCurrentJobs.controller.js";
 import { listJobs } from "./job/jobs.controller.js";
 import { requestJob } from "./job/requestJob.controller.js";
 import { updateJob } from "./job/updateJob.controller.js";
-import { fetchMessagesJob } from "./messages/fetchMessageJob.controller.js";
-import { sendMessage } from "./messages/sendMessage.controller.js";
-import { updateMessage } from "./messages/updateMessage.controller.js";
-import { deleteMessage } from "./messages/deleteMessage.controller.js";
+
 import { viewProfileRating } from "./rating/viewProfileRating.controller.js";
 import { profile } from "./auth/profile.controller.js";
 import { bookmarkJobRemove } from "./job/bookmarkRemove.controller.js";
@@ -21,6 +18,12 @@ import { updateJobTaskStatus } from "./job/updateJobTaskStatus.controller.js";
 import { makeRateCustomer } from "./rating/makeRateCustomer.controller.js";
 import { viewCustomerRating } from "./rating/viewCustomerRating.controller.js";
 import { ratingStatsController } from "./rating/ratingStats.controller.js";
+import { getConversations } from "./messages/getConversations.controller.js";
+import { getConversationMessages } from "./messages/getConversationMessages.controller.js";
+import { sendMessage } from "./messages/sendMessage.controller.js";
+import { updateMessageController } from "./messages/updateMessage.controller.js";
+import { deleteMessageController } from "./messages/deleteMessage.controller.js";
+import { getConversation } from "./messages/getConversation.controller.js";
 
 const workerController = {
   // Auth
@@ -44,10 +47,12 @@ const workerController = {
   updateJobTaskStatus: updateJobTaskStatus,
 
   // message
-  fetchMessagesJob: fetchMessagesJob,
+  listConversations: getConversations,
+  conversationMessages: getConversationMessages,
   sendMessage: sendMessage,
-  updateMessage: updateMessage,
-  deleteMessage: deleteMessage,
+  updateMessage: updateMessageController,
+  deleteMessage: deleteMessageController,
+  getConverByUserId: getConversation,
 
   // rating
   viewProfileRating: viewProfileRating,

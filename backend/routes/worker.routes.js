@@ -1,6 +1,7 @@
 import express from "express";
 import workerAuth from "../middleware/worker.auth.js";
 import workerController from "../controllers/worker/index.js";
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -37,15 +38,19 @@ router.delete(
 router.put("/job/task/:taskId", workerController.updateJobTaskStatus);
 
 // 💬 Message routes
-router
-  .route("/messages/:jobId")
-  .get(workerController.fetchMessagesJob)
-  .post(workerController.sendMessage);
-
-router
-  .route("/messages/:messageId")
-  .put(workerController.updateMessage)
-  .delete(workerController.deleteMessage);
+router.get("/message/list", workerController.listConversations);
+router.get(
+  "/message/conversation/messages",
+  workerController.conversationMessages
+);
+router.post(
+  "/message/send",
+  upload.array("files", 5),
+  workerController.sendMessage
+);
+router.put("/message/update", workerController.updateMessage);
+router.get("/message/conversation", workerController.getConverByUserId);
+router.delete("/message/delete/:messageId", workerController.deleteMessage);
 
 // 🌟 Rating routes
 router.get("/ratings", workerController.viewProfileRating);

@@ -6,16 +6,16 @@ import type {
   customerSigninInput,
   customerSignupInput,
   resetPasswordInput,
-  User,
 } from "./types";
 
 import type { AxiosError } from "axios";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { GET, POST, PUT } from "@/apis/customer/auth";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";
+import type { UserInterface } from "@/pkg/types/interfaces/user.type";
 
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserInterface | null>(null);
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     !!localStorage.getItem("customerToken")
@@ -43,7 +43,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   };
 
   const profile = useCallback(async () => {
-    setLoading(true);
     try {
       const storedUser = localStorage.getItem("currenCustomer");
       if (storedUser) {
@@ -59,8 +58,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       handleError(error as AxiosError, setErr);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -104,10 +101,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       handleError(error as AxiosError, setErr);
     }
   };
-
-  useEffect(()=>{
-    console.log(isAuthenticated)
-  },[])
 
   const value: CustomerAuthContextType = {
     user,

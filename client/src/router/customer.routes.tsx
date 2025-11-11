@@ -14,6 +14,7 @@ import JobCreatePage from "@/pages/jobs/create/page";
 import JobRequestList from "@/pages/jobs/request/page";
 import { LoadingOverlay } from "@/components/base/loading";
 import RatingPageView from "@/pages/rating/page";
+import MessagePage from "@/pages/messages/page";
 
 const CustomerAppRouters: React.FC = () => {
   const customerContext = useCustomerAuth();
@@ -45,6 +46,7 @@ const CustomerAppRouters: React.FC = () => {
               <Route path="create-job" element={<JobCreatePage />}></Route>
               <Route path="job-request" element={<JobRequestList />}></Route>
               <Route path="rating" element={<RatingPageView />}></Route>
+              <Route path="messages" element={<MessagePage />}></Route>
             </Route>
           )}
           <Route

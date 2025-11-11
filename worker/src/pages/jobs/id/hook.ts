@@ -11,6 +11,11 @@ import { RATING_GET_API, RATING_POST_API } from "@/api/rating";
 import type { RatingInterface } from "@/pkg/interfaces/rating";
 import type { PagyInterface } from "@/pkg/interfaces/pagy";
 import { buildQueryParams } from "@/pkg/helper/query";
+import { MESSAGE_GET_API, MESSAGE_POST_API } from "@/api/message";
+import type {
+  ConversationInterface,
+  MessageInterface,
+} from "@/pkg/interfaces/conversation";
 
 const useHook = () => {
   const [job, setJob] = useState<JobInterface>();
@@ -21,6 +26,7 @@ const useHook = () => {
   const [ratingPagy, setRatingPagy] = useState<PagyInterface>();
   const [ratingPage, setRatingPage] = useState(1);
   const didFetchCustomerRating = useRef(false);
+  const controllerRef = useRef<AbortController | null>(null);
 
   const handleFetchJobId = useCallback(
     async (jobId: string) => {
@@ -193,6 +199,95 @@ const useHook = () => {
     [handleError, viewCustomerRating]
   );
 
+  const handleGetConversation = useCallback(
+    async (userId: string): Promise<ConversationInterface> => {
+      try {
+        const res = await axiosInstance.get(
+          `${MESSAGE_GET_API.CONVERSATION}?userId=${userId}`
+        );
+        return res.data.success ? res.data.data : ({} as ConversationInterface);
+      } catch (error) {
+        handleError(error as AxiosError, setErr);
+        return {} as ConversationInterface;
+      }
+    },
+    []
+  );
+
+  const handleGetConversationMessage = useCallback(
+    async (
+      conversationId: string,
+      page = 1
+    ): Promise<[MessageInterface[], PagyInterface]> => {
+      try {
+        controllerRef.current?.abort();
+        controllerRef.current = new AbortController();
+
+        const query = { conversationId };
+        const pagyInput = { page: page, limit: 20 };
+        const queryStr = buildQueryParams(query, pagyInput);
+
+        const res = await axiosInstance.get(
+          `${MESSAGE_GET_API.MESSAGES}${queryStr}`,
+          {
+            signal: controllerRef.current.signal,
+          }
+        );
+
+        if (res.data.success) {
+          const messages: MessageInterface[] = res.data.data ?? [];
+          const pagy: PagyInterface = res.data.pagy ?? {};
+          return [messages, pagy];
+        }
+        return [[], {}];
+      } catch (error) {
+        if ((error as any).name !== "CanceledError") {
+          handleError(error as AxiosError, setErr);
+        }
+
+        return [[], {}];
+      }
+    },
+    []
+  );
+
+  const handleSendMessage = useCallback(
+    async (
+      conversationId: string,
+      message: string,
+      userId: string,
+      files?: File[]
+    ): Promise<MessageInterface> => {
+      try {
+        const formData = new FormData();
+        formData.append("conversationId", conversationId);
+        formData.append("message", message);
+        formData.append("userId", userId);
+
+        if (files?.length) {
+          files.forEach((file) => {
+            if (file instanceof File) {
+              formData.append("files", file);
+            } else {
+              console.warn("Invalid file skipped:", file);
+            }
+          });
+        }
+
+        const res = await axiosInstance.post(MESSAGE_POST_API.SEND, formData);
+        if (res.data.success) {
+          return res.data.data as MessageInterface;
+        }
+
+        return {} as MessageInterface;
+      } catch (error) {
+        handleError(error as AxiosError, setErr);
+        return {} as MessageInterface;
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     if (!job) return;
     if (didFetchCustomerRating.current) return;
@@ -217,6 +312,9 @@ const useHook = () => {
     ratingPagy,
     ratingPage,
     setRatingPage,
+    handleGetConversation,
+    handleGetConversationMessage,
+    handleSendMessage,
   };
 };
 

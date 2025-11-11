@@ -16,6 +16,12 @@ import type { RatingInput } from "@/pages/jobs/type";
 import type { RatingInterface } from "@/pkg/interfaces/rating";
 import type { PagyInterface } from "@/pkg/interfaces/pagy";
 import { Pagination } from "../base/pagy";
+import type {
+  ConversationInterface,
+  MessageInterface,
+} from "@/pkg/interfaces/conversation";
+import MessageSideBar from "../message/messageSideBar";
+import type { UserInterface } from "@/pkg/interfaces/user.type";
 
 type Props = {
   jobData: JobInterface;
@@ -30,6 +36,17 @@ type Props = {
   ratingPagy: PagyInterface;
   ratingPage: number;
   setRatingPage: (page: number) => void;
+  handleGetConversation: (userId: string) => Promise<ConversationInterface>;
+  handleGetMessages: (
+    conversationId: string,
+    page: number
+  ) => Promise<[MessageInterface[], PagyInterface]>;
+  handleSendMessage: (
+    conversationId: string,
+    message: string,
+    userId: string,
+    files?: File[]
+  ) => Promise<MessageInterface>;
 };
 
 export default function JobDetailPage({
@@ -44,6 +61,9 @@ export default function JobDetailPage({
   ratings,
   ratingPagy,
   setRatingPage,
+  handleGetConversation,
+  handleGetMessages,
+  handleSendMessage,
 }: Props) {
   const auth = useWorkerAuth();
   const [isAssigned, setIsAssigned] = useState(false);
@@ -51,6 +71,7 @@ export default function JobDetailPage({
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [openModalCancel, setOpenModalCancel] = useState(false);
   const [openRatingModal, setOpenRatingModal] = useState(false);
+  const [openMessageSideBar, setOpenMessageSideBar] = useState(false);
 
   useEffect(() => {
     if (!worker) {
@@ -114,6 +135,18 @@ export default function JobDetailPage({
           customerId={jobData.customerId._id}
           jobId={jobData._id}
           onSubmit={handleMakeRateCustomer}
+        />
+      )}
+
+      {openMessageSideBar && (
+        <MessageSideBar
+          isOpen={openMessageSideBar}
+          setIsOpen={setOpenMessageSideBar}
+          currentUser={worker || ({} as UserInterface)}
+          userId={jobData.customerId?._id || ""}
+          handleGetConversation={handleGetConversation}
+          handleGetMessages={handleGetMessages}
+          handleSendMessage={handleSendMessage}
         />
       )}
 
@@ -384,6 +417,16 @@ export default function JobDetailPage({
             </div>
 
             {/* Action Buttons */}
+
+            {jobData.assignedWorkerId?._id === worker?._id && (
+              <button
+                onClick={() => setOpenMessageSideBar(true)}
+                className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white py-2 font-medium cursor-pointer"
+              >
+                Send message
+              </button>
+            )}
+
             {!isAssigned && (
               <div className="space-y-3">
                 <button

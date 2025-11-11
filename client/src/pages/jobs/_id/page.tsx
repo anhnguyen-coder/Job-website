@@ -13,6 +13,9 @@ import { JobTaskModal } from "@/components/customer/job/ jobTaskModal";
 import { TaskSection } from "@/components/job/taskSection";
 import MarkCompleteModalDetail from "@/components/job/markCompleteModal";
 import Header from "@/components/job/id/header";
+import MessageSideBar from "@/components/job/id/messageSideBar";
+import { useCustomerAuth } from "@/contexts/customer";
+import type { UserInterface } from "@/pkg/types/interfaces/user.type";
 
 const JobIdPage = () => {
   const { jobId } = useParams();
@@ -41,13 +44,25 @@ const JobIdPage = () => {
     handlePublishJob,
     handleRemoveJobTasks,
     handleMakeRateWorker,
+    handleGetConversation,
+    handleGetConversationMessage,
+    handleSendMessage,
   } = useHook();
 
   useEffect(() => {
     if (jobId) handleFetchJobId(jobId.toString());
   }, [jobId]);
 
+  const { user: currentUser, profile } = useCustomerAuth();
+
+  useEffect(() => {
+    if (!currentUser) {
+      profile();
+    }
+  }, [currentUser]);
+
   const [showMarkCompleteModal, setShowMarkCompleteModal] = useState(false);
+  const [openMessageSideBar, setOpenMessageSideBar] = useState(false);
 
   // Progress for tasks
   const progress =
@@ -115,6 +130,13 @@ const JobIdPage = () => {
         <div className="mx-auto bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-xl p-8 transition-transform hover:shadow-2xl">
           {/* Header */}
           <Header
+            title={inputFormUpdate.title}
+            setTitle={(val) =>
+              setInputUpdate((pre) => ({
+                ...pre,
+                title: val,
+              }))
+            }
             job={job}
             disable={disable}
             setDisable={setDisable}
@@ -186,6 +208,42 @@ const JobIdPage = () => {
             />
           </Section>
 
+          {/* worker */}
+          {job.assignedWorkerId && (
+            <Section title="Worker">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <p className="w-14 h-14 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold">
+                    {job.assignedWorkerId.name.charAt(0).toUpperCase()}
+                  </p>
+                  <div className="flex items-center gap-8">
+                    <div>
+                      <label className="text-gray-500 font-semibold">
+                        User Name:
+                      </label>
+                      <p className="m-0 text-lg">{job.assignedWorkerId.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-gray-500 font-semibold">
+                        Email:
+                      </label>
+                      <p className="m-0 text-lg">
+                        {job.assignedWorkerId.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setOpenMessageSideBar(true)}
+                  className="p-4 rounded-full flex items-center justify-center text-xl bg-blue-500 cursor-pointer hover:bg-blue-800"
+                >
+                  <i className="mdi mdi-message-text-outline text-2xl w-6 h-6 flex items-center justify-center text-white"></i>
+                </div>
+              </div>
+            </Section>
+          )}
+
           {/* Categories */}
           <Section title="Categories">
             {disable ? (
@@ -252,6 +310,18 @@ const JobIdPage = () => {
           makeJobComplete={makeJobComplete}
         />
       )}
+
+      {openMessageSideBar && (
+        <MessageSideBar
+          isOpen={openMessageSideBar}
+          setIsOpen={setOpenMessageSideBar}
+          currentUser={currentUser || ({} as UserInterface)}
+          userId={job.assignedWorkerId?._id || ""}
+          handleGetConversation={handleGetConversation}
+          handleGetMessages={handleGetConversationMessage}
+          handleSendMessage={handleSendMessage}
+        />
+      )}
     </div>
   );
 };
@@ -277,9 +347,11 @@ const Section = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <div className="mb-8">
+  <div className="mb-8 shadow-md border border-gray-200 px-6 py-6 rounded-lg">
     {title && (
-      <h3 className="text-lg font-semibold text-gray-800 mb-3">{title}</h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b border-gray-200 w-fit">
+        {title}:
+      </h3>
     )}
     {children}
   </div>

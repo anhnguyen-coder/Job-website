@@ -1,3 +1,4 @@
+import { Input } from "@/components/base/input";
 import { RatingModal } from "@/components/rating/ratingModal";
 import { JOB_STATUS } from "@/pkg/types/enums/job";
 import type { JobInterface } from "@/pkg/types/interfaces/job.type";
@@ -13,6 +14,8 @@ interface HeaderProps {
   setShowMarkCompleteModal: React.Dispatch<React.SetStateAction<boolean>>;
   handlePublishJob: (jobId: string) => void;
   makeRateWorker: (workerId: string, rating: number, comment?: string) => void;
+  setTitle: (val: string) => void;
+  title: string;
 }
 
 function Header({
@@ -25,6 +28,8 @@ function Header({
   setShowMarkCompleteModal,
   handlePublishJob,
   makeRateWorker,
+  title,
+  setTitle,
 }: HeaderProps) {
   const [openModalRating, setOpenModalRating] = useState(false);
 
@@ -40,7 +45,11 @@ function Header({
       )}
 
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
-        <h2 className="text-3xl font-extrabold text-gray-900">{job.title}</h2>
+        {!disable ? (
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+        ) : (
+          <h2 className="text-3xl font-extrabold text-gray-900">{job.title}</h2>
+        )}
         <div className="flex items-center">
           {/* Delete button — only when AVAILABLE */}
           {job.status === JOB_STATUS.AVAILABLE && (

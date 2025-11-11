@@ -5,3 +5,13 @@
     font-family: "Times New Roman", Times, serif;
   }
 }
+
+.scroll-hidden {
+  overflow-y: scroll; /* vẫn scroll được */
+  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
