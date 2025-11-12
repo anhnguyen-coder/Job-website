@@ -2,6 +2,7 @@ import { MESSAGE_GET_API, MESSAGE_POST_API } from "@/apis/customer/message";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";
 import { buildQueryParams } from "@/pkg/helpers/query";
+import { refreshListConv } from "@/pkg/socket/handler/message.handler";
 import type {
   ConversationInterface,
   MessageInterface,
@@ -57,7 +58,6 @@ const useHook = () => {
   /** ----- FETCH MESSAGES IN A CONVERSATION ----- */
   const handleGetConversationMessage = useCallback(
     async (conversationId: string, page = 1, isLoadMore = false) => {
-      if (loadingMessages) return;
       setLoadingMessages(true);
 
       try {
@@ -114,7 +114,6 @@ const useHook = () => {
       userId: string,
       files?: File[]
     ): Promise<MessageInterface> => {
-      if (sending) return {} as MessageInterface;
       setSending(true);
 
       try {
@@ -154,6 +153,10 @@ const useHook = () => {
   useEffect(() => {
     handleGetConversations(conPage, conPage > 1);
   }, [conPage]);
+
+  refreshListConv(() => {
+    handleGetConversations();
+  });
 
   /** ----- RETURN API ----- */
   return {

@@ -2,19 +2,22 @@ import type {
   ConversationInterface,
   MessageInterface,
 } from "@/pkg/interfaces/conversation";
+import type { PagyInterface } from "@/pkg/interfaces/pagy";
 import type { UserInterface } from "@/pkg/interfaces/user.type";
+import { useSocketMessages } from "@/pkg/socket/handler/message.handler";
+import { getSocket } from "@/pkg/socket/socket";
 import React, {
   useEffect,
   useRef,
   useState,
   useCallback,
   useMemo,
+  useLayoutEffect,
   type Dispatch,
   type SetStateAction,
 } from "react";
 import { LoadingCustom } from "../base/loading";
-import { getSocket } from "@/pkg/socket/socket";
-import { useSocketMessages } from "@/pkg/socket/handler/message.handler";
+import { formatTime } from "@/pkg/helper/formatter";
 import MessageAttachments from "./attachments";
 
 type Props = {
@@ -22,7 +25,11 @@ type Props = {
   currentUser: UserInterface;
   messages: MessageInterface[];
   setMessages: Dispatch<SetStateAction<MessageInterface[]>>;
-  handleGetMessages: (conversationId: string, page: number) => void;
+  handleGetMessages: (
+    conversationId: string,
+    page: number,
+    isLoadMore: boolean
+  ) => void;
   page: number;
   setPage: (page: number) => void;
   userId: string;
@@ -33,7 +40,13 @@ type Props = {
     userId: string,
     files?: File[]
   ) => Promise<MessageInterface>;
+  sending: boolean;
+  pagy: PagyInterface;
+  firstTimeLoad: boolean;
+  setFirstTimeLoad: (val: boolean) => void;
 };
+
+const SCROLL_BOTTOM_THRESHOLD = 100; // px
 
 const Message: React.FC<Props> = ({
   loading,
@@ -42,9 +55,13 @@ const Message: React.FC<Props> = ({
   handleGetMessages,
   page,
   userId,
+  sending,
   setMessages,
   handleSendMessage,
   handleGetConversation,
+  firstTimeLoad,
+  setFirstTimeLoad,
+  pagy,
 }) => {
   const [conversation, setConversation] = useState<ConversationInterface>();
   const [message, setMessage] = useState("");
@@ -53,8 +70,13 @@ const Message: React.FC<Props> = ({
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const maxRows = 5;
+  const messageRef = useRef<HTMLDivElement>(null);
+  const prevScrollHeight = useRef(0);
+  const [isLoadMore, setIsLoadMore] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+
   const socket = getSocket();
+  const maxRows = 5;
 
   // 🧠 Fetch conversation khi userId thay đổi
   useEffect(() => {
@@ -62,28 +84,74 @@ const Message: React.FC<Props> = ({
     handleGetConversation(userId).then((conv) => {
       if (conv) {
         if (socket) {
-          if (socket.connected) {
-            socket.emit("join_conversation", conv._id);
-            console.log("emit join_conversation immediately");
-          } else {
-            socket.once("connect", () => {
-              socket.emit("join_conversation", conv._id);
-              console.log("emit join_conversation after connect");
-            });
-          }
+          const join = () => socket.emit("join_conversation", conv._id);
+          if (socket.connected) join();
+          else socket.once("connect", join);
         }
         setConversation(conv);
-        handleGetMessages(conv._id, 1);
+        handleGetMessages(conv._id, 1, false);
       }
     });
   }, [userId]);
 
-  // 🌀 Auto scroll xuống cuối khi có message mới
+  // 🌀 Auto scroll xuống cuối khi lần đầu load
+  useLayoutEffect(() => {
+    if (firstTimeLoad && messages.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+      setFirstTimeLoad(false);
+    }
+  }, [messages, firstTimeLoad]);
+
+  // 🔁 Khi có tin nhắn mới (realtime)
+  useSocketMessages(conversation?._id || "", (newMessage) => {
+    if (newMessage.conversationId === conversation?._id) {
+      setMessages((prev) => [...prev, newMessage]);
+    }
+  });
+
+  // 👇 Auto scroll nếu user đang ở gần cuối
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isNearBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages.length]);
+
+  // 🧭 Kiểm tra vị trí scroll
+  const handleScroll = () => {
+    const el = messageRef.current;
+    if (!el) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = el;
+
+    // Bỏ qua lần đầu load (để tránh load more tự động)
+    if (firstTimeLoad) return;
+
+    // Load thêm khi scroll lên đầu
+    if (scrollTop <= 10 && pagy?.nextPage && conversation && !isLoadMore) {
+      prevScrollHeight.current = scrollHeight;
+      setIsLoadMore(true);
+      handleGetMessages(conversation._id, pagy.nextPage, true);
+    }
+
+    // Xác định user có đang ở gần đáy không
+    const atBottom =
+      scrollHeight - scrollTop - clientHeight < SCROLL_BOTTOM_THRESHOLD;
+    setIsNearBottom(atBottom);
+  };
+
+  // 📜 Giữ nguyên vị trí khi load thêm message
+  useLayoutEffect(() => {
+    const el = messageRef.current;
+    if (!el) return;
+    if (prevScrollHeight.current > 0) {
+      const newHeight = el.scrollHeight;
+      el.scrollTop = newHeight - prevScrollHeight.current;
+      prevScrollHeight.current = 0;
+      setIsLoadMore(false);
+    }
   }, [messages]);
 
-  // 📎 Chọn file
+  // 📎 File input
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const filesArray = Array.from(e.target.files);
@@ -91,7 +159,6 @@ const Message: React.FC<Props> = ({
     setSelectedFiles(newFiles);
   };
 
-  // 🗑 Gỡ file đính kèm
   const handleRemoveFile = (index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
@@ -108,10 +175,8 @@ const Message: React.FC<Props> = ({
       selectedFiles
     );
 
-    if (res) {
-      if (!socket || (socket && !socket.connected)) {
-        setMessages((prev) => [res, ...(prev || [])]);
-      }
+    if (res && (!socket || !socket.connected)) {
+      setMessages((prev) => [...prev, res]);
     }
 
     setMessage("");
@@ -120,7 +185,7 @@ const Message: React.FC<Props> = ({
     textareaRef.current?.focus();
   }, [conversation, message, selectedFiles, userId]);
 
-  // 🔤 Tự động điều chỉnh chiều cao textarea
+  // 🧩 Tự động thay đổi chiều cao textarea
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const lineHeight = 24;
     e.target.rows = 1;
@@ -133,7 +198,7 @@ const Message: React.FC<Props> = ({
     setMessage(e.target.value);
   };
 
-  // 👤 Lấy tên người đối thoại
+  // 👤 Xác định tên người chat
   const targetUserName = useMemo(() => {
     if (!conversation || !currentUser) return "Unknown";
     return currentUser._id === conversation.user1._id
@@ -141,49 +206,48 @@ const Message: React.FC<Props> = ({
       : conversation.user1.name;
   }, [conversation, currentUser]);
 
-  // receive message realtime
-  useSocketMessages(conversation?._id || "", (newMessage) => {
-    console.log(newMessage);
-    if (socket && socket.connected) {
-      setMessages((prev) => [newMessage, ...(prev || [])]);
-    }
-  });
   return (
     <div className="bg-white rounded-lg flex flex-col h-full">
       {conversation ? (
         <div className="flex flex-col h-full">
-          {/* 🧭 Header */}
+          {/* Header */}
           <div className="shadow-md px-6 py-4 text-2xl font-semibold border-b border-gray-200">
             <p>{targetUserName}</p>
           </div>
 
-          {/* 💬 Nội dung tin nhắn */}
+          {/* Message list */}
           {loading ? (
             <div className="flex-1 flex justify-center items-center">
               <LoadingCustom />
             </div>
           ) : (
-            <div className="flex-1 flex flex-col px-6 py-4 overflow-y-auto max-h-[70vh]">
+            <div
+              ref={messageRef}
+              onScroll={handleScroll}
+              className="flex-1 flex flex-col px-6 py-4 overflow-y-auto max-h-[70vh]"
+            >
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center flex-1">
                   <i className="mdi mdi-message-outline text-gray-400 text-4xl"></i>
                   <p className="text-gray-400 text-xl">No message yet!</p>
                 </div>
               ) : (
-                <div className="flex flex-col-reverse gap-2 scroll-hidden">
-                  <div ref={bottomRef} />
+                <div className="flex flex-col gap-2">
                   {messages.map((msg) => {
                     const isMine = msg.senderId._id === currentUser._id;
-
                     return (
-                      <>
-                        <div
-                          key={msg._id}
-                          className={`flex ${
-                            isMine ? "justify-end" : "justify-start"
-                          } mb-2`}
-                        >
-                          {msg.content && (
+                      <div key={msg._id} className="px-8">
+                        {msg.content && (
+                          <div
+                            className={`flex items-center gap-3 ${
+                              isMine ? "justify-end" : "justify-start"
+                            } mb-2`}
+                          >
+                            {isMine && (
+                              <p className="text-xs text-gray-400">
+                                {formatTime(msg.createdAt)}
+                              </p>
+                            )}
                             <div
                               className={`flex flex-col px-4 py-2 rounded-lg max-w-[70%] break-words ${
                                 isMine
@@ -191,36 +255,52 @@ const Message: React.FC<Props> = ({
                                   : "bg-gray-200 text-gray-800 rounded-bl-none"
                               }`}
                             >
-                              {/* Message text */}
-                              <p className="whitespace-pre-wrap mb-2">
+                              <p className="whitespace-pre-wrap">
                                 {msg.content}
                               </p>
                             </div>
-                          )}
-                        </div>
-
-                        {/* Attachments */}
-                        <div
-                          className={`flex ${
-                            isMine ? "justify-end" : "justify-start"
-                          }`}
-                        >
-                          <div className="max-w-[60%]">
-                            <MessageAttachments
-                              attachments={msg.attachments}
-                              isMine={isMine}
-                            />
+                            {!isMine && (
+                              <p className="text-xs text-gray-400">
+                                {formatTime(msg.createdAt)}
+                              </p>
+                            )}
                           </div>
-                        </div>
-                      </>
+                        )}
+
+                        {msg.attachments?.length > 0 && (
+                          <div
+                            className={`flex mb-3 ${
+                              isMine ? "justify-end" : "justify-start"
+                            }`}
+                          >
+                            <div className="max-w-[60%] flex items-center gap-4">
+                              {isMine && (
+                                <p className="text-xs text-gray-400">
+                                  {formatTime(msg.createdAt)}
+                                </p>
+                              )}
+                              <MessageAttachments
+                                attachments={msg.attachments}
+                                isMine={isMine}
+                              />
+                              {!isMine && (
+                                <p className="text-xs text-gray-400">
+                                  {formatTime(msg.createdAt)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
+                  <div ref={bottomRef} />
                 </div>
               )}
             </div>
           )}
 
-          {/* 📎 File đính kèm */}
+          {/* File preview */}
           {selectedFiles.length > 0 && (
             <div className="px-6 mb-2 flex flex-wrap gap-2">
               {selectedFiles.map((file, idx) => (
@@ -241,7 +321,7 @@ const Message: React.FC<Props> = ({
             </div>
           )}
 
-          {/* 📝 Input gửi tin */}
+          {/* Input */}
           <div className="px-6 pb-4 flex items-end gap-2">
             <label
               htmlFor="fileInput"
@@ -276,7 +356,6 @@ const Message: React.FC<Props> = ({
           </div>
         </div>
       ) : (
-        // 🕊 Trạng thái chưa chọn hội thoại
         <div className="flex flex-col items-center justify-center h-full text-gray-500">
           <i className="mdi mdi-message-outline text-4xl"></i>
           <p className="text-2xl font-semibold">Please select a conversation</p>

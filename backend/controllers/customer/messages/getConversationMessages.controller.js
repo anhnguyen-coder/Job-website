@@ -20,7 +20,7 @@ export const getConversationMessages = async (req, res) => {
 
     const [messages, total] = await Promise.all([
       Message.find({ conversationId: convId })
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1 }) // mới nhất trước
         .skip(skip)
         .limit(limit)
         .populate("senderId", "name")
@@ -29,6 +29,8 @@ export const getConversationMessages = async (req, res) => {
         .lean(),
       Message.countDocuments({ conversationId: convId }),
     ]);
+
+    const messagesForUI = messages.reverse();
 
     const pagy = getPagingData(total, page, limit);
 
@@ -49,7 +51,7 @@ export const getConversationMessages = async (req, res) => {
     }
 
     successRes(res, {
-      data: messages,
+      data: messagesForUI,
       pagy: pagy,
     });
   } catch (error) {

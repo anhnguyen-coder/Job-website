@@ -11,6 +11,7 @@ type Props = {
   onPageChange: (page: number) => void;
   setUserId: (id: string) => void;
   userId: string;
+  setFirstTimeLoad: (val: boolean) => void;
 };
 
 function MessageList({
@@ -20,9 +21,11 @@ function MessageList({
   onPageChange,
   setUserId,
   userId,
+  setFirstTimeLoad,
 }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
 
+  // ✅ Auto-select conversation đầu tiên khi conversations thay đổi
   useEffect(() => {
     if (conversations && conversations.length > 0 && !userId) {
       const firstConv = conversations[0];
@@ -34,6 +37,7 @@ function MessageList({
     }
   }, [conversations, currentUser, userId, setUserId]);
 
+  // ✅ Xử lý scroll để load thêm
   const handleScroll = () => {
     const el = listRef.current;
     if (!el) return;
@@ -45,9 +49,11 @@ function MessageList({
     }
   };
 
+  // ✅ Hàm lấy tên người còn lại
   const getOtherUserName = (conv: ConversationInterface) =>
     conv.user1._id === currentUser._id ? conv.user2?.name : conv.user1?.name;
 
+  // ✅ Avatar chữ cái đầu
   const getOtherUserAvt = (conv: ConversationInterface) =>
     conv.user1._id === currentUser._id
       ? conv.user2?.name?.charAt(0)
@@ -57,6 +63,7 @@ function MessageList({
     const otherUserId =
       conv.user1._id === currentUser._id ? conv.user2._id : conv.user1._id;
     setUserId(otherUserId);
+    setFirstTimeLoad(true);
   };
 
   return (

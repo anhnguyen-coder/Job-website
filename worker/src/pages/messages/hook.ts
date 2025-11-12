@@ -7,6 +7,7 @@ import type {
   MessageInterface,
 } from "@/pkg/interfaces/conversation";
 import type { PagyInterface } from "@/pkg/interfaces/pagy";
+import { refreshListConv } from "@/pkg/socket/handler/message.handler";
 import type { AxiosError } from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -17,8 +18,6 @@ const useHook = () => {
   const [conversations, setConversations] = useState<ConversationInterface[]>(
     []
   );
-  const [selectedConversationId, setSelectedConversationId] =
-    useState<string>("");
 
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [messPagy, setMessPagy] = useState<PagyInterface>();
@@ -48,28 +47,17 @@ const useHook = () => {
             isLoadMore ? [...(prev || []), ...newData] : newData
           );
           setConPagy(res.data.pagy);
-
-          if (!selectedConversationId && newData.length > 0) {
-            const firstConversation = newData[0];
-            const otherUser =
-              firstConversation.user1._id === userId
-                ? firstConversation.user2._id
-                : firstConversation.user1._id;
-            setUserId(otherUser);
-            setSelectedConversationId(firstConversation._id);
-          }
         }
       } catch (error) {
         handleError(error as AxiosError, setErr);
       }
     },
-    [selectedConversationId, userId]
+    [userId]
   );
 
   /** ----- FETCH MESSAGES IN A CONVERSATION ----- */
   const handleGetConversationMessage = useCallback(
     async (conversationId: string, page = 1, isLoadMore = false) => {
-      if (loadingMessages) return;
       setLoadingMessages(true);
 
       try {
@@ -126,7 +114,6 @@ const useHook = () => {
       userId: string,
       files?: File[]
     ): Promise<MessageInterface> => {
-      if (sending) return {} as MessageInterface;
       setSending(true);
 
       try {
@@ -167,6 +154,11 @@ const useHook = () => {
     handleGetConversations(conPage, conPage > 1);
   }, [conPage]);
 
+  refreshListConv(() => {
+    handleGetConversations();
+  });
+
+  /** ----- RETURN API ----- */
   return {
     // conversation states
     conPagy,

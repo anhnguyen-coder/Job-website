@@ -1,4 +1,4 @@
-import { formatDate, formatTime } from "@/pkg/helpers/formatter";
+import { formatTime } from "@/pkg/helpers/formatter";
 import type { ConversationInterface } from "@/pkg/types/interfaces/conversation";
 import type { PagyInterface } from "@/pkg/types/interfaces/pagy";
 import type { UserInterface } from "@/pkg/types/interfaces/user.type";
@@ -11,6 +11,7 @@ type Props = {
   onPageChange: (page: number) => void;
   setUserId: (id: string) => void;
   userId: string;
+  setFirstTimeLoad: (val: boolean) => void;
 };
 
 function MessageList({
@@ -20,6 +21,7 @@ function MessageList({
   onPageChange,
   setUserId,
   userId,
+  setFirstTimeLoad,
 }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +63,7 @@ function MessageList({
     const otherUserId =
       conv.user1._id === currentUser._id ? conv.user2._id : conv.user1._id;
     setUserId(otherUserId);
+    setFirstTimeLoad(true);
   };
 
   return (

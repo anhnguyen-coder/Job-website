@@ -8,7 +8,6 @@ cloudinary.config({
 
 export default cloudinary;
 
-
 export const uploadToCloudinary = async (buffer, filename) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -18,4 +17,16 @@ export const uploadToCloudinary = async (buffer, filename) => {
 
     stream.end(buffer);
   });
+};
+
+export const deleteFromCloudinary = async (url) => {
+  const parts = url.split("/");
+  const publicIdWithExt = parts.slice(-2).join("/");
+  const publicId = publicIdWithExt.replace(/\.[^/.]+$/, "");
+
+  try {
+    await cloudinary.uploader.destroy(publicId, { resource_type: "auto" });
+  } catch (err) {
+    console.error("Error deleting from Cloudinary:", err);
+  }
 };

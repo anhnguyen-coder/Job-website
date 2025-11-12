@@ -1,60 +1,87 @@
 import type { AttachmentInterface } from "@/pkg/interfaces/conversation";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface Props {
-  attachment: AttachmentInterface | null;
+  attachments: AttachmentInterface[];
+  currentIndex: number;
   isOpen: boolean;
   onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
 }
 
 const AttachmentPreviewModal: React.FC<Props> = ({
-  attachment,
+  attachments,
+  currentIndex,
   isOpen,
   onClose,
+  onNext,
+  onPrev,
 }) => {
-  if (!isOpen || !attachment) return null;
+  const att = attachments[currentIndex];
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") onNext();
+      if (e.key === "ArrowLeft") onPrev();
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onNext, onPrev, onClose]);
+
+  if (!isOpen || !att) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-      onClick={onClose}
-    >
-      <div
-        className="relative max-w-[90%] max-h-[90%]"
-        onClick={(e) => e.stopPropagation()}
+    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+      <button
+        onClick={onClose}
+        className="absolute top-5 right-5 text-white text-2xl hover:text-gray-300"
       >
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-white text-2xl font-bold z-10"
-        >
-          &times;
-        </button>
-        {attachment.fileType === "image" && (
+        <i className="mdi mdi-close"></i>
+      </button>
+
+      <button
+        onClick={onPrev}
+        className="absolute left-5 text-white text-3xl hover:text-gray-300"
+      >
+        <i className="mdi mdi-chevron-left"></i>
+      </button>
+
+      <div className="max-w-4xl max-h-[90vh] flex justify-center items-center">
+        {att.fileType === "image" && (
           <img
-            src={attachment.url}
-            alt={attachment.fileName}
-            className="w-full h-auto max-h-[90vh] object-contain rounded-md"
+            src={att.url}
+            alt={att.fileName}
+            className="max-w-full max-h-[90vh] rounded-lg object-contain"
           />
         )}
-        {attachment.fileType === "video" && (
+        {att.fileType === "video" && (
           <video
-            src={attachment.url}
+            src={att.url}
             controls
             autoPlay
-            className="w-full max-h-[90vh] rounded-md"
+            className="max-w-full max-h-[90vh] rounded-lg object-contain"
           />
         )}
-        {attachment.fileType !== "image" && attachment.fileType !== "video" && (
+        {att.fileType !== "image" && att.fileType !== "video" && (
           <a
-            href={attachment.url}
+            href={att.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white underline"
+            className="text-white underline text-lg"
           >
-            {attachment.fileName}
+            {att.fileName}
           </a>
         )}
       </div>
+
+      <button
+        onClick={onNext}
+        className="absolute right-5 text-white text-3xl hover:text-gray-300"
+      >
+        <i className="mdi mdi-chevron-right"></i>
+      </button>
     </div>
   );
 };

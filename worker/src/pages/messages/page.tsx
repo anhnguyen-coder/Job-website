@@ -1,10 +1,11 @@
+import { useWorkerAuth } from "@/context/context";
+import useHook from "./hook";
+import { useEffect, useState } from "react";
 import { PageHeading } from "@/components/base/pageheading";
 import MessageList from "@/components/message/listConversation";
-import MessageBox from "@/components/message/messageBox";
-import useHook from "./hook";
-import { useWorkerAuth } from "@/context/context";
-import { useEffect } from "react";
 import type { UserInterface } from "@/pkg/interfaces/user.type";
+import MessageBox from "@/components/message/messageBox";
+import { refreshListConv } from "@/pkg/socket/handler/message.handler";
 
 function Page() {
   const {
@@ -21,18 +22,28 @@ function Page() {
     handleSendMessage,
     loadingMessages,
     setMessages,
+    sending,
+    messPagy,
+    handleGetConversations,
   } = useHook();
 
   const { worker, profile } = useWorkerAuth();
+
   useEffect(() => {
     if (!worker) profile();
   }, []);
+
+  refreshListConv(() => {
+    console.log("Socket triggered refresh!");
+    handleGetConversations();
+  });
+
+  const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   return (
     <div className="flex flex-col gap-5 h-[calc(100vh-4rem)]">
       <PageHeading title="Messages" />
 
       <div className="flex flex-1 gap-4 min-h-0">
-        {/* Left column */}
         <div className="w-1/4 min-h-0 overflow-y-auto">
           <MessageList
             conversations={conversations || []}
@@ -41,12 +52,13 @@ function Page() {
             onPageChange={setConPage}
             setUserId={setUserId}
             userId={userId}
+            setFirstTimeLoad={setFirstTimeLoad}
           />
         </div>
-
         {/* Right column */}
         <div className="flex-1 min-h-0 flex flex-col">
           <MessageBox
+            sending={sending}
             loading={loadingMessages}
             currentUser={worker || ({} as UserInterface)}
             messages={messages}
@@ -57,6 +69,9 @@ function Page() {
             handleGetConversation={handleGetConversation}
             handleSendMessage={handleSendMessage}
             setMessages={setMessages}
+            pagy={messPagy ?? {}}
+            firstTimeLoad={firstTimeLoad}
+            setFirstTimeLoad={setFirstTimeLoad}
           />
         </div>
       </div>
