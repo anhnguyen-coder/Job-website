@@ -5,46 +5,56 @@ import { MESSAGE_TYPE_ENUMS } from "../../../enums/message.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import mongoose from "mongoose";
 import { getIO } from "../../../socket/index.js";
+import multer from "multer";
+import { uploadToCloudinary } from "../../../config/cloudinary.js";
 
 export const sendMessage = async (req, res) => {
   try {
-    const senderId = req.user.id;
-    const { message: content, conversationId, userId } = req.body;
-
-    if (!content && (!req.files || req.files.length === 0)) {
-      return AppError(res, 400, "Cannot send empty message");
-    }
-
-    if (!conversationId)
-      return AppError(res, 400, "conversationId is required");
-
-    await withTransaction(async (session) => {
-      const conversation = await createOrGetConversation(
-        userId,
-        senderId,
-        conversationId,
-        session
-      );
-
-      const messageDoc = await createMessageWithAttachments(
-        conversation._id,
-        senderId,
-        content,
-        req.files,
-        session
-      );
-
-      await messageDoc.populate("senderId", "name");
-      conversation.lastMessage = messageDoc._id;
-      conversation.updatedAt = new Date();
-      await conversation.save({ session });
-
-      const io = getIO();
-      if (io) {
-        io.to(conversationId).emit("receive_message", messageDoc);
+    upload.any()(req, res, async (err) => {
+      if (err) {
+        return AppError(res, 500, err.message);
       }
 
-      return successRes(res, { data: messageDoc });
+      const senderId = req.user.id;
+      const { message: content, conversationId, userId } = req.body;
+
+      if (!content && (!req.files || req.files.length === 0)) {
+        return AppError(res, 400, "Cannot send empty message");
+      }
+
+      if (!conversationId)
+        return AppError(res, 400, "conversationId is required");
+
+      await withTransaction(async (session) => {
+        const conversation = await createOrGetConversation(
+          userId,
+          senderId,
+          conversationId,
+          session
+        );
+
+        const messageDoc = await createMessageWithAttachments(
+          conversation._id,
+          senderId,
+          content,
+          req.files,
+          session
+        );
+
+        await messageDoc.populate("senderId", "name");
+        await messageDoc.populate("attachments");
+
+        conversation.lastMessage = messageDoc._id;
+        conversation.updatedAt = new Date();
+        await conversation.save({ session });
+
+        const io = getIO();
+        if (io) {
+          io.to(conversationId).emit("receive_message", messageDoc);
+        }
+
+        return successRes(res, { data: messageDoc });
+      });
     });
   } catch (error) {
     AppError(res, 500, error.message);
@@ -88,31 +98,44 @@ const createOrGetConversation = async (
   return conversation;
 };
 
-const createAttachments = async (files, messageId, uploaderId, session) => {
+export const createAttachments = async (
+  files,
+  messageId,
+  uploaderId,
+  session
+) => {
   if (!files || files.length === 0) return [];
 
-  const attachmentIds = await Promise.all(
-    files.map(async (file) => {
-      const attachment = await Attachment.create(
-        [
-          {
-            messageId,
-            uploaderId,
-            fileType: file.mimetype.split("/")[0], // image/video/audio/file
-            fileName: file.originalname,
-            fileSize: file.size,
-            mimeType: file.mimetype,
-            url: file.path,
-            thumbnailUrl: file.path,
-          },
-        ],
-        { session }
-      );
-      return attachment[0]._id;
-    })
-  );
+  try {
+    // 1️⃣ Upload tất cả files song song lên Cloudinary
+    const uploadResults = await Promise.all(
+      files.map(async (file) => {
+        const result = await uploadToCloudinary(file.buffer, file.originalname);
+        return {
+          fileType: file.mimetype.split("/")[0],
+          fileName: file.originalname,
+          fileSize: file.size,
+          mimeType: file.mimetype,
+          url: result.secure_url,
+          thumbnailUrl: result.secure_url,
+        };
+      })
+    );
 
-  return attachmentIds;
+    const attachments = await Attachment.create(
+      uploadResults.map((fileData) => ({
+        messageId,
+        uploaderId,
+        ...fileData,
+      })),
+      { session }
+    );
+
+    return attachments.map((a) => a._id);
+  } catch (error) {
+    console.error("❌ Error creating attachments:", error);
+    throw new Error(error.message);
+  }
 };
 
 const createMessageWithAttachments = async (
@@ -159,3 +182,7 @@ const createMessageWithAttachments = async (
 
   return messageDoc;
 };
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});

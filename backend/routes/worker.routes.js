@@ -43,11 +43,7 @@ router.get(
   "/message/conversation/messages",
   workerController.conversationMessages
 );
-router.post(
-  "/message/send",
-  upload.array("files", 5),
-  workerController.sendMessage
-);
+router.post("/message/send", workerController.sendMessage);
 router.put("/message/update", workerController.updateMessage);
 router.get("/message/conversation", workerController.getConverByUserId);
 router.delete("/message/delete/:messageId", workerController.deleteMessage);

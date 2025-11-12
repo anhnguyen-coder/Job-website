@@ -15,6 +15,7 @@ import React, {
 import { LoadingCustom } from "../base/loading";
 import { getSocket } from "@/pkg/socket/socket";
 import { useSocketMessages } from "@/pkg/socket/handler/message.handler";
+import MessageAttachments from "./attachments";
 
 type Props = {
   loading: boolean;
@@ -60,9 +61,16 @@ const Message: React.FC<Props> = ({
     if (!userId) return;
     handleGetConversation(userId).then((conv) => {
       if (conv) {
-        if (socket && socket.connected) {
-          socket.emit("join_conversation", conv._id);
-          console.log("emit join_conversation immediately");
+        if (socket) {
+          if (socket.connected) {
+            socket.emit("join_conversation", conv._id);
+            console.log("emit join_conversation immediately");
+          } else {
+            socket.once("connect", () => {
+              socket.emit("join_conversation", conv._id);
+              console.log("emit join_conversation after connect");
+            });
+          }
         }
         setConversation(conv);
         handleGetMessages(conv._id, 1);
@@ -135,7 +143,7 @@ const Message: React.FC<Props> = ({
 
   // receive message realtime
   useSocketMessages(conversation?._id || "", (newMessage) => {
-    // if(socket && socket.connected)
+    console.log(newMessage);
     if (socket && socket.connected) {
       setMessages((prev) => [newMessage, ...(prev || [])]);
     }
@@ -166,23 +174,45 @@ const Message: React.FC<Props> = ({
                   <div ref={bottomRef} />
                   {messages.map((msg) => {
                     const isMine = msg.senderId._id === currentUser._id;
+
                     return (
-                      <div
-                        key={msg._id}
-                        className={`flex ${
-                          isMine ? "justify-end" : "justify-start"
-                        }`}
-                      >
+                      <>
                         <div
-                          className={`px-4 py-2 rounded-lg max-w-[70%] whitespace-pre-wrap break-words ${
-                            isMine
-                              ? "bg-indigo-500 text-white rounded-br-none"
-                              : "bg-gray-200 text-gray-800 rounded-bl-none"
+                          key={msg._id}
+                          className={`flex ${
+                            isMine ? "justify-end" : "justify-start"
+                          } mb-2`}
+                        >
+                          {msg.content && (
+                            <div
+                              className={`flex flex-col px-4 py-2 rounded-lg max-w-[70%] break-words ${
+                                isMine
+                                  ? "bg-indigo-500 text-white rounded-br-none"
+                                  : "bg-gray-200 text-gray-800 rounded-bl-none"
+                              }`}
+                            >
+                              {/* Message text */}
+                              <p className="whitespace-pre-wrap mb-2">
+                                {msg.content}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Attachments */}
+                        <div
+                          className={`flex ${
+                            isMine ? "justify-end" : "justify-start"
                           }`}
                         >
-                          {msg.content}
+                          <div className="max-w-[60%]">
+                            <MessageAttachments
+                              attachments={msg.attachments}
+                              isMine={isMine}
+                            />
+                          </div>
                         </div>
-                      </div>
+                      </>
                     );
                   })}
                 </div>

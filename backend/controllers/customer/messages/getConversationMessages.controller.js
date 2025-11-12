@@ -24,6 +24,8 @@ export const getConversationMessages = async (req, res) => {
         .skip(skip)
         .limit(limit)
         .populate("senderId", "name")
+        .populate("repliedToMsg", "content")
+        .populate("attachments")
         .lean(),
       Message.countDocuments({ conversationId: convId }),
     ]);

@@ -7,3 +7,15 @@ cloudinary.config({
 });
 
 export default cloudinary;
+
+
+export const uploadToCloudinary = async (buffer, filename) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto", folder: "messages" },
+      (error, result) => (error ? reject(error) : resolve(result))
+    );
+
+    stream.end(buffer);
+  });
+};

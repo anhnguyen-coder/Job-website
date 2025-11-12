@@ -30,6 +30,8 @@ const useHook = () => {
         setStats(res.data.data);
       }
     } catch (error) {
+      console.log(error);
+
       handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);

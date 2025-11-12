@@ -1,7 +1,6 @@
 import express from "express";
 import customerAuth from "../middleware/customer.auth.js";
 import customerController from "../controllers/customer/index.js";
-import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -33,11 +32,7 @@ router.get(
   "/message/conversation/messages",
   customerController.conversationMessages
 );
-router.post(
-  "/message/send",
-  upload.array("files", 5),
-  customerController.sendMessage
-);
+router.post("/message/send", customerController.sendMessage);
 router.put("/message/update", customerController.updateMessage);
 router.get("/message/conversation", customerController.getConverByUserId);
 router.delete("/message/delete/:messageId", customerController.deleteMessage);
