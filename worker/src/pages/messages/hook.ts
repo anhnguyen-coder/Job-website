@@ -154,9 +154,7 @@ const useHook = () => {
     handleGetConversations(conPage, conPage > 1);
   }, [conPage]);
 
-  refreshListConv(() => {
-    handleGetConversations();
-  });
+
 
   /** ----- RETURN API ----- */
   return {
