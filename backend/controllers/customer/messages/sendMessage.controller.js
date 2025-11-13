@@ -1,6 +1,11 @@
 // controllers/messageController.js
 import { AppError } from "../../../pkg/helper/errorHandler.js";
-import { Attachment, Conversation, Message } from "../../../models/index.js";
+import {
+  Attachment,
+  Conversation,
+  Message,
+  Notification,
+} from "../../../models/index.js";
 import { withTransaction } from "../../../pkg/transaction/transaction.js";
 import { MESSAGE_TYPE_ENUMS } from "../../../enums/message.js";
 import successRes from "../../../pkg/helper/successRes.js";
@@ -33,8 +38,8 @@ export const sendMessage = async (req, res) => {
           session
         );
 
-        await conversation.populate("user1");
-        await conversation.populate("user2");
+        await conversation.populate("user1", "name email");
+        await conversation.populate("user2", "name email");
 
         const messageDoc = await createMessageWithAttachments(
           conversation._id,
@@ -51,6 +56,27 @@ export const sendMessage = async (req, res) => {
         conversation.updatedAt = new Date();
         await conversation.save({ session });
 
+        const receiver =
+          conversation.user1._id.toString() === senderId
+            ? conversation.user2
+            : conversation.user1;
+
+        const sender =
+          conversation.user1._id.toString() === senderId
+            ? conversation.user1
+            : conversation.user2;
+
+        const noti = await Notification.create(
+          [
+            {
+              userId: receiver._id,
+              type: "info",
+              title: "New Message",
+              content: `You have received a new message from user: ${sender.name}`,
+            },
+          ],
+          { session }
+        );
         // 🔔 Emit message + refresh
         const io = getIO();
         if (io) {
@@ -59,6 +85,7 @@ export const sendMessage = async (req, res) => {
           // gửi refresh chỉ cho user tham gia conversation
           sendRefreshToUser(conversation.user1._id, io);
           sendRefreshToUser(conversation.user2._id, io);
+          sendReceiveNotificationToUser(receiver._id, io, noti[0]);
         }
 
         return successRes(res, { data: messageDoc });
@@ -183,5 +210,22 @@ const sendRefreshToUser = (userId, io) => {
     });
   } else {
     console.log(`⚠️ User ${uid} not online, cannot send refresh_list_conv`);
+  }
+};
+
+const sendReceiveNotificationToUser = (userId, io, noti) => {
+  const onlineUsers = getOnlineUsers();
+  const uid = userId.toString();
+  const sockets = onlineUsers.get(uid);
+
+  if (sockets && sockets.length > 0) {
+    sockets.forEach((socketId) => {
+      io.to(socketId).emit("receive_notification", noti);
+      console.log(
+        `📨 Sent receive_notification to user ${uid}, socketId: ${socketId}`
+      );
+    });
+  } else {
+    console.log(`⚠️ User ${uid} not online, cannot send receive_notification`);
   }
 };

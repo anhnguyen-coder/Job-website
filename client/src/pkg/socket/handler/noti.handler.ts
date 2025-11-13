@@ -2,8 +2,11 @@ import { useEffect } from "react";
 import { getSocket } from "../socket";
 import type { NotificationInterface } from "@/pkg/types/interfaces/notification";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 export const useSocketNoti = () => {
+  const location = useLocation(); // Lấy đường dẫn hiện tại
+
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
@@ -15,7 +18,9 @@ export const useSocketNoti = () => {
     }
 
     const handleRefresh = (noti: NotificationInterface) => {
-      console.log(noti);
+      // Bỏ qua nếu đang ở /messages
+      if (location.pathname.startsWith("/messages")) return;
+
       if (noti) {
         switch (noti.type) {
           case "info":
@@ -39,5 +44,5 @@ export const useSocketNoti = () => {
     return () => {
       socket.off("receive_notification", handleRefresh);
     };
-  }, []);
+  }, [location.pathname]); // watch location changes
 };

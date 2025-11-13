@@ -1,5 +1,6 @@
 import type { AttachmentInterface } from "@/pkg/interfaces/conversation";
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface Props {
   attachments: AttachmentInterface[];
@@ -19,6 +20,7 @@ const AttachmentPreviewModal: React.FC<Props> = ({
   onPrev,
 }) => {
   const att = attachments[currentIndex];
+  if (!isOpen || !att) return null;
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -30,9 +32,7 @@ const AttachmentPreviewModal: React.FC<Props> = ({
     return () => window.removeEventListener("keydown", handleKey);
   }, [onNext, onPrev, onClose]);
 
-  if (!isOpen || !att) return null;
-
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
       <button
         onClick={onClose}
@@ -82,7 +82,8 @@ const AttachmentPreviewModal: React.FC<Props> = ({
       >
         <i className="mdi mdi-chevron-right"></i>
       </button>
-    </div>
+    </div>,
+    document.body
   );
 };
 
