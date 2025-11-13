@@ -1,8 +1,9 @@
 import { JOB_REQUEST_STATUS, JOB_STATUS } from "../../../enums/job.enum.js";
-import { Job, JobRequest } from "../../../models/index.js";
+import { Job, JobRequest, Notification } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import { withTransaction } from "../../../pkg/transaction/transaction.js";
+import { getIO, getOnlineUsers } from "../../../socket/index.js";
 
 export const jobApproval = async (req, res) => {
   try {
@@ -51,12 +52,49 @@ export const jobApproval = async (req, res) => {
         // reject all other pending job requests for the same job
         await bulkRejectJobRequests(jobRequest.jobId, workerId, session);
         // TODO: handle notification to worker about job acceptance
+
+        const notification = await Notification.create(
+          [
+            {
+              userId: workerId,
+              type: "success",
+              title: "Job Request Approval",
+              content: `Your job application request for job: ${job.title} has been accepted by customer.`,
+            },
+          ],
+          {
+            session: session,
+          }
+        );
+
+        const io = getIO();
+        if (io) {
+          sendReceiveNotificationToUser(workerId, io, notification[0]);
+        }
       }
       if (status === JOB_REQUEST_STATUS.REJECTED) {
         jobRequest.status = JOB_REQUEST_STATUS.REJECTED;
         job.status = JOB_STATUS.AVAILABLE;
 
         // TODO: handle notification to worker about job rejection
+        const notification = await Notification.create(
+          [
+            {
+              userId: workerId,
+              type: "success",
+              title: "Job Request Rejected",
+              content: `Your job application request for job: ${job.title} has been rejected by customer.`,
+            },
+          ],
+          {
+            session: session,
+          }
+        );
+
+        const io = getIO();
+        if (io) {
+          sendReceiveNotificationToUser(workerId, io, notification[0]);
+        }
       }
 
       await jobRequest.save();
@@ -80,4 +118,21 @@ const bulkRejectJobRequests = async (jobId, workerId, session) => {
     },
     { $set: { status: JOB_REQUEST_STATUS.REJECTED } }
   ).session(session);
+};
+
+const sendReceiveNotificationToUser = (userId, io, noti) => {
+  const onlineUsers = getOnlineUsers();
+  const uid = userId.toString();
+  const sockets = onlineUsers.get(uid);
+
+  if (sockets && sockets.length > 0) {
+    sockets.forEach((socketId) => {
+      io.to(socketId).emit("receive_notification", noti);
+      console.log(
+        `📨 Sent receive_notification to user ${uid}, socketId: ${socketId}`
+      );
+    });
+  } else {
+    console.log(`⚠️ User ${uid} not online, cannot send receive_notification`);
+  }
 };

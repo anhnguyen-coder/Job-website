@@ -24,6 +24,11 @@ import { sendMessage } from "./messages/sendMessage.controller.js";
 import { updateMessageController } from "./messages/updateMessage.controller.js";
 import { deleteMessageController } from "./messages/deleteMessage.controller.js";
 import { getConversation } from "./messages/getConversation.controller.js";
+import { getNotiListController } from "./noti/getNotiList.controller.js";
+import { makeReadNotiController } from "./noti/makeReadNoti.controller.js";
+import { deleteNotiController } from "./noti/deleteNoti..controller.js";
+import { paymentList } from "./payment/getPaymentList.controller.js";
+import { dashboardStats } from "./dashboard/stats.controller.js";
 
 const workerController = {
   // Auth
@@ -59,6 +64,17 @@ const workerController = {
   makeRateCustomer: makeRateCustomer,
   viewCustomerRating: viewCustomerRating,
   ratingStats: ratingStatsController,
+
+  // noti
+  getListNoti: getNotiListController,
+  makeReadNoti: makeReadNotiController,
+  deleteNoti: deleteNotiController,
+
+  // payment
+  listPayments: paymentList,
+
+  // dashboard
+  dashboard: dashboardStats
 };
 
 export default workerController;

@@ -5,19 +5,42 @@ import { useEffect } from "react";
 import { StatItem } from "@/components/customer/statItem";
 import { JobList } from "@/components/customer/dashboard/jobList";
 import { Notification } from "@/components/customer/dashboard/notification";
-import type { NotificationInterface } from "@/pkg/types/interfaces/notification";
-import { NOTI_TYPE } from "@/pkg/types/enums/noti";
+
 import { CUSTOMER_APP_THEME } from "@/constant/constant";
 import { LoadingOverlay } from "@/components/base/loading";
-import { formatUSD } from "@/pkg/helpers/formatter";
+import { formatDate, formatUSD } from "@/pkg/helpers/formatter";
+import useNotiHooks from "@/hooks/useNoti";
+import { BaseTable, type Column } from "@/components/base/baseTable";
+import type { PaymentInterface } from "@/pkg/types/interfaces/payment";
+import { Pagination } from "@/components/base/pagy";
 
 const Page: React.FC = () => {
-  const { stats, loading, jobs, handleGetStats, handleGetJobList } = useHook();
+  const {
+    stats,
+    loading,
+    jobs,
+    handleGetStats,
+    handleGetJobList,
+
+    // payment
+    paymentLoad,
+    payments,
+    paymentPage,
+    setPaymentPage,
+    paymentPagy,
+    handleGetPaymentHistory,
+  } = useHook();
+  const { notifications, handleGetNotiList } = useNotiHooks();
 
   useEffect(() => {
     handleGetStats();
     handleGetJobList();
+    handleGetNotiList(1, false, 5);
   }, []);
+
+  useEffect(() => {
+    handleGetPaymentHistory(paymentPage);
+  }, [paymentPage]);
 
   const getIconBasedOnStat = (stat: stat) => {
     switch (stat.id) {
@@ -49,6 +72,80 @@ const Page: React.FC = () => {
 
   if (loading) return <LoadingOverlay />;
 
+  const columns: Column<PaymentInterface>[] = [
+    {
+      key: "jobId",
+      label: "Job Title",
+      render: (item) => {
+        return <div>{item.jobId.title}</div>;
+      },
+    },
+    {
+      key: "workerId",
+      label: "Worker",
+      render: (item) => {
+        return (
+          <div>
+            <p className="m-0">
+              <span>
+                <i className="mdi mdi-account-outline text-md"></i>
+              </span>
+              {item.workerId.name}
+            </p>
+            <p className="m-0">
+              <span>
+                <i className="mdi mdi-email-outline text-md"></i>
+              </span>
+              {item.workerId.email}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      key: "amount",
+      label: "Amount",
+      render: (item) => {
+        return <span>{formatUSD(item.amount)}</span>;
+      },
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (item) => {
+        return <span>{item.status}</span>;
+      },
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (item) => {
+        return <span>{item.status}</span>;
+      },
+    },
+    {
+      key: "paymentMethod",
+      label: "Payment method",
+      render: (item) => {
+        return <span>{item.paymentMethod.replace("_", " ").toLocaleUpperCase()}</span>;
+      },
+    },
+    {
+      key: "transactionId",
+      label: "TransactionId",
+      render: (item) => {
+        return <span>{item.transactionId}</span>;
+      },
+    },
+    {
+      key: "paidAt",
+      label: "Paid at",
+      render: (item) => {
+        return <span>{formatDate(item.paidAt)}</span>;
+      },
+    },
+  ];
+
   return (
     <div className="p-4">
       <PageHeading title="Dashboard" />
@@ -76,100 +173,24 @@ const Page: React.FC = () => {
 
         {/* Notifications */}
         <div className="bg-white px-6 py-4 rounded-xl border border-gray-200 shadow-sm h-fit">
-          <Notification notifications={mockNotifications} />
+          <Notification notifications={notifications} />
         </div>
+      </div>
+
+      {/* payments history */}
+      <div className="mt-6">
+        <BaseTable
+          columns={columns}
+          data={payments || []}
+          loading={paymentLoad}
+          title="Payment history"
+          emptyText="No data"
+        />
+
+        <Pagination pagy={paymentPagy ?? {}} onPageChange={setPaymentPage} />
       </div>
     </div>
   );
 };
 
 export default Page;
-
-export const mockNotifications: NotificationInterface[] = [
-  {
-    _id: "1",
-    userId: { _id: "u1", name: "Alice Nguyen", email: "alice@example.com" },
-    type: NOTI_TYPE.INFO,
-    title: "New Job Application",
-    content:
-      "Your job posting 'Fix plumbing issue' has received a new applicant. Your job posting 'Fix plumbing issue' has received a new applicant. Your job posting 'Fix plumbing issue' has received a new applicant.",
-    isRead: false,
-  },
-  {
-    _id: "2",
-    userId: { _id: "u2", name: "Bao Tran", email: "bao@example.com" },
-    type: NOTI_TYPE.SUCCESS,
-    title: "Payment Completed",
-    content:
-      "Payment of $120 for 'Website Design' has been successfully processed.",
-    isRead: true,
-  },
-  {
-    _id: "3",
-    userId: { _id: "u3", name: "Linh Pham", email: "linh@example.com" },
-    type: NOTI_TYPE.WARNING,
-    title: "Job Deadline Approaching",
-    content: "The job 'Home Cleaning Service' is due in 2 hours.",
-    isRead: false,
-  },
-  {
-    _id: "4",
-    userId: { _id: "u4", name: "David Le", email: "david@example.com" },
-    type: NOTI_TYPE.ERROR,
-    title: "Payment Failed",
-    content:
-      "We couldn’t process your payment for 'Car Repair Service'. Please try again.",
-    isRead: true,
-  },
-  {
-    _id: "5",
-    userId: { _id: "u5", name: "Emma Vo", email: "emma@example.com" },
-    type: NOTI_TYPE.INFO,
-    title: "Job Cancelled",
-    content: "The customer has cancelled the job 'Carpentry Repair'.",
-    isRead: false,
-  },
-  {
-    _id: "6",
-    userId: { _id: "u6", name: "Huy Dang", email: "huy@example.com" },
-    type: NOTI_TYPE.WARNING,
-    title: "System Maintenance Notice",
-    content:
-      "Scheduled maintenance will occur tonight at 10 PM. Some features may be unavailable.",
-    isRead: true,
-  },
-  {
-    _id: "7",
-    userId: { _id: "u7", name: "Mai Tran", email: "mai@example.com" },
-    type: NOTI_TYPE.SUCCESS,
-    title: "Job Completed",
-    content:
-      "The job 'Air Conditioner Installation' has been successfully marked as completed.",
-    isRead: false,
-  },
-  {
-    _id: "8",
-    userId: { _id: "u8", name: "Nam Vo", email: "nam@example.com" },
-    type: NOTI_TYPE.INFO,
-    title: "New Review Received",
-    content:
-      "You received a new 5-star review from Alice Nguyen for 'Interior Painting'.",
-    isRead: true,
-  },
-  {
-    _id: "9",
-    userId: { _id: "u9", name: "Quynh Le", email: "quynh@example.com" },
-    type: NOTI_TYPE.SUCCESS,
-    title: "Special Promotion",
-    content: "Get 20% off your next service booking this week. Don’t miss out!",
-    isRead: false,
-  },
-  {
-    _id: "10",
-    userId: { _id: "u10", name: "Son Pham", email: "son@example.com" },
-    type: NOTI_TYPE.INFO,
-    title: "Job Reminder",
-    content: "Reminder: Your job 'Electrical Wiring' starts in 2 hours.",
-    isRead: false,
-  },
-];

@@ -54,4 +54,16 @@ router.post("/rating/customer", workerController.makeRateCustomer);
 router.get("/rating/customer", workerController.viewCustomerRating);
 router.get("/rating/stats", workerController.ratingStats);
 
+// noti
+router.get("/noti/list", workerController.getListNoti);
+router.post("/noti/make-read", workerController.makeReadNoti);
+router.delete("/noti/delete/:notiId", workerController.deleteNoti);
+
+// payment
+router.get("/payment/history", workerController.listPayments);
+
+// dashboard
+router.get("/dashboard/stats", workerController.dashboard);
+
+
 export default router;

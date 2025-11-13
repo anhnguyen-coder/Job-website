@@ -112,7 +112,7 @@ const JobItem = ({ job, isShowDelete, onDelete }: JobItemProps) => {
               <FolderTree size={16} className="text-gray-500 shrink-0" />
               <span className="font-medium">Categories:</span>
               <div className="flex flex-wrap items-center text-wrap gap-2">
-                {job.categories.map((cate) => (
+                {job.categories?.map((cate) => (
                   <div
                     key={cate._id}
                     className="bg-blue-200 rounded-xl px-2 border border-blue-500"

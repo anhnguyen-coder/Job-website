@@ -49,4 +49,12 @@ router.get("/dashboard/stats", customerController.customerStats);
 
 // worker
 router.get("/worker", customerController.findWorkerByName);
+
+// notifications
+router.get("/noti/list", customerController.getListNoti);
+router.post("/noti/make-read", customerController.makeReadNoti);
+router.delete("/noti/delete/:notiId", customerController.deleteNoti);
+
+// payment
+router.get("/payment/history", customerController.listPayments);
 export default router;

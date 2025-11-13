@@ -20,6 +20,10 @@ import { getConversationMessages } from "./messages/getConversationMessages.cont
 import { getConversations } from "./messages/getConversations.controller.js";
 import { sendMessage } from "./messages/sendMessage.controller.js";
 import { updateMessageController } from "./messages/updateMessage.controller.js";
+import { deleteNotiController } from "./noti/deleteNoti..controller.js";
+import { getNotiListController } from "./noti/getNotiList.controller.js";
+import { makeReadNotiController } from "./noti/makeReadNoti.controller.js";
+import { paymentList } from "./payment/getPaymentList.controller.js";
 
 import { makeRatingWorker } from "./rating/makeRatingWorker.controller.js";
 import { ratingStatsController } from "./rating/ratingStats.controller.js";
@@ -68,6 +72,14 @@ const customerController = {
 
   // worker
   findWorkerByName: getWorkerByName,
+
+  // noti
+  getListNoti: getNotiListController,
+  makeReadNoti: makeReadNotiController,
+  deleteNoti: deleteNotiController,
+
+  // payment
+  listPayments: paymentList,
 };
 
 export default customerController;

@@ -1,8 +1,9 @@
 import { JOB_STATUS } from "../../../enums/job.enum.js";
-import { Job, Payment, User } from "../../../models/index.js";
+import { Job, Notification, Payment, User } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import { withTransaction } from "../../../pkg/transaction/transaction.js";
+import { getIO, getOnlineUsers } from "../../../socket/index.js";
 
 export const makeJobComplete = async (req, res) => {
   try {
@@ -47,6 +48,23 @@ export const makeJobComplete = async (req, res) => {
       );
 
       await updateWorkerEarnings(workerId, job.budget || 0, session);
+
+      const noti = await Notification.create(
+        [
+          {
+            userId: workerId,
+            type: "success",
+            title: "Job completed",
+            content: `Your job ${job.title} has been marked complete, and the amount has been paid via method - ${paymentMethod}.\nPlease check your balance report again and compare the amount received from the customer`,
+          },
+        ],
+        { session: session }
+      );
+
+      const io = getIO();
+      if (io) {
+        sendReceiveNotificationToUser(workerId, io, noti[0]);
+      }
     });
 
     successRes(res);
@@ -63,4 +81,21 @@ const updateWorkerEarnings = async (workerId, amount, session) => {
   await worker.save({ session });
 
   //TODO: Send notification to worker about earnings update
+};
+
+const sendReceiveNotificationToUser = (userId, io, noti) => {
+  const onlineUsers = getOnlineUsers();
+  const uid = userId.toString();
+  const sockets = onlineUsers.get(uid);
+
+  if (sockets && sockets.length > 0) {
+    sockets.forEach((socketId) => {
+      io.to(socketId).emit("receive_notification", noti);
+      console.log(
+        `📨 Sent receive_notification to user ${uid}, socketId: ${socketId}`
+      );
+    });
+  } else {
+    console.log(`⚠️ User ${uid} not online, cannot send receive_notification`);
+  }
 };

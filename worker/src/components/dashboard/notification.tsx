@@ -1,6 +1,6 @@
 import { NotiItem } from "@/components/base/notiItem";
 import { NotiSidebar } from "@/components/base/notiSideBar";
-import type { NotificationInterface } from "@/pkg/types/interfaces/notification";
+import type { NotificationInterface } from "@/pkg/interfaces/notification";
 import { useState } from "react";
 
 interface props {

@@ -1,33 +1,30 @@
-import { JOB_STATUS } from "../../../enums/job.enum.js";
-import { Job, Payment, Rating } from "../../../models/index.js";
+import { JOB_REQUEST_STATUS, JOB_STATUS } from "../../../enums/job.enum.js";
+import { Job, JobRequest, Payment, Rating } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import mongoose from "mongoose";
 
 const STATUS_JOB = [
-  JOB_STATUS.TAKEN,
-  JOB_STATUS.IN_PROGRESS,
-  JOB_STATUS.CHECK_COMPLETE,
-  JOB_STATUS.COMPLETED,
-  JOB_STATUS.CANCELLED,
+  JOB_REQUEST_STATUS.ACCEPTED,
+  JOB_REQUEST_STATUS.REJECTED,
+  JOB_REQUEST_STATUS.PENDING,
 ];
 
 export const dashboardStats = async (req, res) => {
   try {
-    const customerId = req.user.id;
+    const userId = req.user.id;
 
     const [jobActivitiesCount, totalSpending, jobCompletedCount, reviewStats] =
       await Promise.all([
-        Job.countDocuments({
-          customerId,
+        JobRequest.countDocuments({
+          workerId: userId,
           status: { $in: STATUS_JOB },
         }),
 
         Payment.aggregate([
           {
             $match: {
-              customerId:
-                mongoose.Types.ObjectId.createFromHexString(customerId),
+              workerId: mongoose.Types.ObjectId.createFromHexString(userId),
               status: "paid",
             },
           },
@@ -35,15 +32,15 @@ export const dashboardStats = async (req, res) => {
         ]),
 
         Job.countDocuments({
-          customerId,
+          assignedWorkerId: userId,
           status: JOB_STATUS.COMPLETED,
         }),
 
         Rating.aggregate([
           {
             $match: {
-              targetType: "customer",
-              targetId: mongoose.Types.ObjectId.createFromHexString(customerId),
+              targetType: "worker",
+              targetId: mongoose.Types.ObjectId.createFromHexString(userId),
             },
           },
           { $group: { _id: null, avgRating: { $avg: "$rating" } } },
@@ -58,7 +55,7 @@ export const dashboardStats = async (req, res) => {
       },
       {
         id: 2,
-        label: "Total spending",
+        label: "Total earnings",
         value: totalSpending?.[0]?.total || 0,
       },
       {

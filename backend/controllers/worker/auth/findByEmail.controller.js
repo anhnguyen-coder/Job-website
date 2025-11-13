@@ -7,7 +7,7 @@ export const findByEmail = async (req, res) => {
   try {
     const { email } = req.query;
 
-    const user = await User.find({
+    const user = await User.findOne({
       email: email,
       role: USER_ROLE_ENUM.WORKER,
     }).select("-password");

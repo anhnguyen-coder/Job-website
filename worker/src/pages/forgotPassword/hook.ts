@@ -27,7 +27,6 @@ const useHook = () => {
         setIsExist(true);
       }
     } catch (error) {
-      console.log(error);
       handleError(error as AxiosError, setErr);
     } finally {
       setLoading(false);

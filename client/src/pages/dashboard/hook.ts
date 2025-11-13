@@ -2,9 +2,11 @@ import { GET } from "@/apis/customer/dashboard";
 import { GET as GET_JOB } from "@/apis/customer/job";
 import axiosInstance from "@/pkg/axios/axiosInstance";
 import { useErrorHandler } from "@/pkg/helpers/errorHandler";
-import { parseQueryArrayToString } from "@/pkg/helpers/query";
+import { buildQueryParams, parseQueryArrayToString } from "@/pkg/helpers/query";
 import { JOB_STATUS } from "@/pkg/types/enums/job";
 import type { JobInterface } from "@/pkg/types/interfaces/job.type";
+import type { PagyInterface } from "@/pkg/types/interfaces/pagy";
+import type { PaymentInterface } from "@/pkg/types/interfaces/payment";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 
@@ -20,6 +22,10 @@ const useHook = () => {
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState<JobInterface[]>();
   const handleError = useErrorHandler();
+  const [paymentLoad, setPaymentLoad] = useState(false);
+  const [payments, setPayments] = useState<PaymentInterface[]>();
+  const [paymentPage, setPaymentPage] = useState(1);
+  const [paymentPagy, setPaymentPagy] = useState<PagyInterface>();
 
   const handleGetStats = async () => {
     setLoading(true);
@@ -60,6 +66,26 @@ const useHook = () => {
     }
   };
 
+  const handleGetPaymentHistory = async (page = 1) => {
+    setPaymentLoad(true);
+    try {
+      const pagyInput = {
+        page: page,
+        limit: 10,
+      };
+      const queryStr = buildQueryParams({}, pagyInput);
+      const res = await axiosInstance.get(`${GET.PAYMENT_HISTORY}${queryStr}`);
+      if (res.data.data) {
+        setPayments(res.data.data);
+        setPaymentPagy(res.data.pagy);
+      }
+    } catch (error) {
+      handleError(error as AxiosError, setErr);
+    } finally {
+      setPaymentLoad(false);
+    }
+  };
+
   return {
     stats,
     err,
@@ -67,6 +93,14 @@ const useHook = () => {
     jobs,
     handleGetStats,
     handleGetJobList,
+
+    // payment
+    paymentLoad,
+    payments,
+    paymentPage,
+    setPaymentPage,
+    paymentPagy,
+    handleGetPaymentHistory,
   };
 };
 

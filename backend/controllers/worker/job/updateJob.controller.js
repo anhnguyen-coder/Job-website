@@ -1,8 +1,9 @@
 import { JOB_REQUEST_STATUS, JOB_STATUS } from "../../../enums/job.enum.js";
-import { Job, JobRequest } from "../../../models/index.js";
+import { Job, JobRequest, Notification } from "../../../models/index.js";
 import { AppError } from "../../../pkg/helper/errorHandler.js";
 import successRes from "../../../pkg/helper/successRes.js";
 import { withTransaction } from "../../../pkg/transaction/transaction.js";
+import { getIO, getOnlineUsers } from "../../../socket/index.js";
 
 const STATUS_ALLOW_CANCEL = new Set([JOB_STATUS.AVAILABLE, JOB_STATUS.TAKEN]);
 
@@ -73,7 +74,22 @@ const handleCancelJob = async (job, workerId, session) => {
     { new: true, session: session }
   );
 
-  // TODO: create noti to customer
+  const notification = await Notification.create(
+    [
+      {
+        userId: job.customerId,
+        type: "error",
+        title: "Job canceled",
+        content: `Your job: ${job.title} has been cancelled by worker.`,
+      },
+    ],
+    { session: session }
+  );
+
+  const io = getIO();
+  if (io) {
+    sendReceiveNotificationToUser(job.customerId, io, notification[0]);
+  }
 };
 
 const handleCompleteJob = async (job, session) => {
@@ -84,7 +100,22 @@ const handleCompleteJob = async (job, session) => {
   job.status = JOB_STATUS.CHECK_COMPLETE;
   await job.save({ session });
 
-  // TODO: create noti to customer
+  const notification = await Notification.create(
+    [
+      {
+        userId: job.customerId,
+        type: "info",
+        title: "Job check complete",
+        content: `All tasks in your job: ${job.title} is completed and now worker is requesting for checking complete`,
+      },
+    ],
+    { session: session }
+  );
+
+  const io = getIO();
+  if (io) {
+    sendReceiveNotificationToUser(job.customerId, io, notification[0]);
+  }
 };
 
 const handleStartJob = async (job, session) => {
@@ -98,4 +129,38 @@ const handleStartJob = async (job, session) => {
 
   job.status = JOB_STATUS.IN_PROGRESS;
   await job.save({ session });
+
+  const notification = await Notification.create(
+    [
+      {
+        userId: job.customerId,
+        type: "info",
+        title: "Job Started",
+        content: `Your job: ${job.title} now is started by worker.`,
+      },
+    ],
+    { session: session }
+  );
+
+  const io = getIO();
+  if (io) {
+    sendReceiveNotificationToUser(job.customerId, io, notification[0]);
+  }
+};
+
+const sendReceiveNotificationToUser = (userId, io, noti) => {
+  const onlineUsers = getOnlineUsers();
+  const uid = userId.toString();
+  const sockets = onlineUsers.get(uid);
+
+  if (sockets && sockets.length > 0) {
+    sockets.forEach((socketId) => {
+      io.to(socketId).emit("receive_notification", noti);
+      console.log(
+        `📨 Sent receive_notification to user ${uid}, socketId: ${socketId}`
+      );
+    });
+  } else {
+    console.log(`⚠️ User ${uid} not online, cannot send receive_notification`);
+  }
 };
