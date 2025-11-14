@@ -21,75 +21,77 @@ export const sendMessage = async (req, res) => {
     upload.any()(req, res, async (err) => {
       if (err) return AppError(res, 500, err.message);
 
-      const senderId = req.user.id;
-      const { message: content, conversationId, userId } = req.body;
+      try {
+        const senderId = req.user.id;
+        const { message: content, conversationId, userId } = req.body;
 
-      if (!content && (!req.files || req.files.length === 0))
-        return AppError(res, 400, "Cannot send empty message");
+        if (!content && (!req.files || req.files.length === 0))
+          return AppError(res, 400, "Cannot send empty message");
 
-      if (!conversationId)
-        return AppError(res, 400, "conversationId is required");
+        if (!conversationId)
+          return AppError(res, 400, "conversationId is required");
 
-      await withTransaction(async (session) => {
-        const conversation = await createOrGetConversation(
-          userId,
-          senderId,
-          conversationId,
-          session
-        );
+        await withTransaction(async (session) => {
+          const conversation = await createOrGetConversation(
+            userId,
+            senderId,
+            conversationId,
+            session
+          );
 
-        await conversation.populate("user1", "name email");
-        await conversation.populate("user2", "name email");
+          await conversation.populate("user1", "name email");
+          await conversation.populate("user2", "name email");
 
-        const messageDoc = await createMessageWithAttachments(
-          conversation._id,
-          senderId,
-          content,
-          req.files,
-          session
-        );
+          const messageDoc = await createMessageWithAttachments(
+            conversation._id,
+            senderId,
+            content,
+            req.files,
+            session
+          );
 
-        await messageDoc.populate("senderId", "name");
-        await messageDoc.populate("attachments");
+          await messageDoc.populate("senderId", "name");
+          await messageDoc.populate("attachments");
 
-        conversation.lastMessage = messageDoc._id;
-        conversation.updatedAt = new Date();
-        await conversation.save({ session });
+          conversation.lastMessage = messageDoc._id;
+          conversation.updatedAt = new Date();
+          await conversation.save({ session });
 
-        const receiver =
-          conversation.user1._id.toString() === senderId
-            ? conversation.user2
-            : conversation.user1;
+          const receiver =
+            conversation.user1._id.toString() === senderId
+              ? conversation.user2
+              : conversation.user1;
 
-        const sender =
-          conversation.user1._id.toString() === senderId
-            ? conversation.user1
-            : conversation.user2;
+          const sender =
+            conversation.user1._id.toString() === senderId
+              ? conversation.user1
+              : conversation.user2;
 
-        const noti = await Notification.create(
-          [
-            {
-              userId: receiver._id,
-              type: "info",
-              title: "New Message",
-              content: `You have received a new message from user: ${sender.name}`,
-            },
-          ],
-          { session }
-        );
-        // 🔔 Emit message + refresh
-        const io = getIO();
-        if (io) {
-          io.to(conversationId).emit("receive_message", messageDoc);
+          const noti = await Notification.create(
+            [
+              {
+                userId: receiver._id,
+                type: "info",
+                title: "New Message",
+                content: `You have received a new message from user: ${sender.name}`,
+              },
+            ],
+            { session }
+          );
 
-          // gửi refresh chỉ cho user tham gia conversation
-          sendRefreshToUser(conversation.user1._id, io);
-          sendRefreshToUser(conversation.user2._id, io);
-          sendReceiveNotificationToUser(receiver._id, io, noti[0]);
-        }
+          const io = getIO();
+          if (io) {
+            io.to(conversationId).emit("receive_message", messageDoc);
+            sendRefreshToUser(conversation.user1._id, io);
+            sendRefreshToUser(conversation.user2._id, io);
+            sendReceiveNotificationToUser(receiver._id, io, noti[0]);
+          }
 
-        return successRes(res, { data: messageDoc });
-      });
+          return successRes(res, { data: messageDoc });
+        });
+      } catch (error) {
+        AppError(res, 500, error.message);
+      }
     });
   } catch (error) {
     AppError(res, 500, error.message);

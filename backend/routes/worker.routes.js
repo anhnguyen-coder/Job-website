@@ -1,7 +1,7 @@
 import express from "express";
 import workerAuth from "../middleware/worker.auth.js";
 import workerController from "../controllers/worker/index.js";
-import { upload } from "../middleware/upload.js";
+// import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
