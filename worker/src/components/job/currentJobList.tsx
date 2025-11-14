@@ -40,7 +40,7 @@ function CurrentJobList({ jobs }: props) {
           >
             {/* title */}
             <div className="text-xl font-semibold flex items-center justify-between">
-              <p className="max-w-[80%] line-clamp-1">{job.jobId.title}</p>
+              <p className="max-w-[80%] line-clamp-1">{job.jobId?.title}</p>
               <span>#{index + 1}</span>
             </div>
 

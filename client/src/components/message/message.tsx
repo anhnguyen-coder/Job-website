@@ -235,7 +235,7 @@ const Message: React.FC<Props> = ({
               ) : (
                 <div className="flex flex-col gap-2">
                   {messages.map((msg) => {
-                    const isMine = msg.senderId._id === currentUser._id;
+                    const isMine = msg.senderId._id === currentUser?._id;
                     return (
                       <div key={msg._id} className="px-8">
                         {msg.content && (
