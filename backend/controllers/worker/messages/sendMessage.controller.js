@@ -90,10 +90,12 @@ export const sendMessage = async (req, res) => {
           return successRes(res, { data: messageDoc });
         });
       } catch (error) {
+        console.log(error)
         AppError(res, 500, error.message);
       }
     });
   } catch (error) {
+    console.log(error)
     AppError(res, 500, error.message);
   }
 };

@@ -17,6 +17,7 @@ import React, {
   type SetStateAction,
 } from "react";
 import { LoadingCustom } from "../base/loading";
+import SendingMessage from "./sending";
 import { formatTime } from "@/pkg/helper/formatter";
 import MessageAttachments from "./attachments";
 
@@ -294,6 +295,14 @@ const Message: React.FC<Props> = ({
                       </div>
                     );
                   })}
+
+                  {sending && (
+                    <SendingMessage
+                      text="Sending..."
+                      attachments={selectedFiles}
+                    />
+                  )}
+
                   <div ref={bottomRef} />
                 </div>
               )}

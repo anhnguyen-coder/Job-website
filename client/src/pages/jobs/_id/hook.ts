@@ -302,7 +302,9 @@ const useHook = () => {
           });
         }
 
-        const res = await axiosInstance.post(MESSAGE_POST_API.SEND, formData);
+        const res = await axiosInstance.post(MESSAGE_POST_API.SEND, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         if (res.data.success) {
           return res.data.data as MessageInterface;
         }

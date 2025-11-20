@@ -240,9 +240,8 @@ const Message: React.FC<Props> = ({
                       <div key={msg._id} className="px-8">
                         {msg.content && (
                           <div
-                            className={`flex items-center gap-3 ${
-                              isMine ? "justify-end" : "justify-start"
-                            } mb-2`}
+                            className={`flex items-center gap-3 ${isMine ? "justify-end" : "justify-start"
+                              } mb-2`}
                           >
                             {isMine && (
                               <p className="text-xs text-gray-400">
@@ -250,11 +249,10 @@ const Message: React.FC<Props> = ({
                               </p>
                             )}
                             <div
-                              className={`flex flex-col px-4 py-2 rounded-lg max-w-[70%] break-words ${
-                                isMine
-                                  ? "bg-indigo-500 text-white rounded-br-none"
-                                  : "bg-gray-200 text-gray-800 rounded-bl-none"
-                              }`}
+                              className={`flex flex-col px-4 py-2 rounded-lg max-w-[70%] break-words ${isMine
+                                ? "bg-indigo-500 text-white rounded-br-none"
+                                : "bg-gray-200 text-gray-800 rounded-bl-none"
+                                }`}
                             >
                               <p className="whitespace-pre-wrap">
                                 {msg.content}
@@ -270,9 +268,8 @@ const Message: React.FC<Props> = ({
 
                         {msg.attachments?.length > 0 && (
                           <div
-                            className={`flex mb-3 ${
-                              isMine ? "justify-end" : "justify-start"
-                            }`}
+                            className={`flex mb-3 ${isMine ? "justify-end" : "justify-start"
+                              }`}
                           >
                             <div className="max-w-[60%] flex items-center gap-4">
                               {isMine && (
@@ -295,6 +292,13 @@ const Message: React.FC<Props> = ({
                       </div>
                     );
                   })}
+
+                  {sending && (
+                    <SendingMessage
+                      text="Sending..."
+                      attachments={selectedFiles}
+                    />
+                  )}
                   <div ref={bottomRef} />
                 </div>
               )}

@@ -13,7 +13,7 @@ const attachmentSchema = new mongoose.Schema(
     },
     fileType: {
       type: String,
-      enum: ["image", "video", "file", "audio"],
+      enum: ["image", "video", "file", "audio", "text", "application"],
       required: true,
     },
     fileName: String,
