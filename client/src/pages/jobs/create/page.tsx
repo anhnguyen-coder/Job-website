@@ -33,7 +33,8 @@ const Page = () => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormInput((prev) => ({ ...prev, [name]: value }));
+    const v = name === "title" ? value.replace(/[0-9]/g, "") : value;
+    setFormInput((prev) => ({ ...prev, [name]: v }));
   };
 
   const handleAddTask = (task: TaskInputForm) => {
