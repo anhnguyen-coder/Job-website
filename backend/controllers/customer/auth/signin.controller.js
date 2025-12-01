@@ -9,7 +9,7 @@ export const signIn = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, role: USER_ROLE_ENUM.CUSTOMER });
     if (!user) throw AppError(res, 404, "User not found");
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
