@@ -42,13 +42,14 @@ const JobItem = ({ job }: JobItemProps) => {
     <div className="p-5 border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center">
-          <h4 className="text-lg font-semibold mr-3 text-gray-800 truncate">
+        <div className="flex items-center gap-2 min-w-0">
+          <h4 className="flex-1 min-w-0 text-lg font-semibold mr-3 text-gray-800 truncate">
             {job.title}
           </h4>
+
           <div
             onClick={() => handleViewJobDetails(job._id)}
-            className={`border px-2 rounded-lg text-sm text-green-500 hover:cursor-pointer hover:text-green-700`}
+            className={`border px-2 rounded-lg text-sm text-green-500 hover:cursor-pointer hover:text-green-700 shrink-0`}
             style={{
               borderColor: CUSTOMER_APP_THEME.COLOR.SECONDARY,
               backgroundColor: applyOpacity(
