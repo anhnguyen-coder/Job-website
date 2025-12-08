@@ -37,6 +37,11 @@ export function JobTaskModal({
     setOpen(false);
   };
 
+  const removeSpecialChars = (value: string) => {
+    return value.replace(/[^a-zA-Z0-9\sÀ-Ỹà-ỹ]/g, "");
+  };
+
+
   useEffect(() => {
     if (task && index !== undefined && index !== null) {
       setTitle(task.title);
@@ -58,7 +63,7 @@ export function JobTaskModal({
             <label className="text-sm text-gray-600 mb-1 block">Title</label>
             <input
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => setTitle(removeSpecialChars(e.target.value))}
               type="text"
               placeholder="Enter task title"
               className="w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg p-2.5 transition"
@@ -71,7 +76,7 @@ export function JobTaskModal({
             </label>
             <textarea
               value={desc}
-              onChange={(e) => setDesc(e.target.value)}
+              onChange={(e) => setDesc(removeSpecialChars(e.target.value))}
               placeholder="Enter task description"
               rows={4}
               className="w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg p-2.5 resize-none transition"
