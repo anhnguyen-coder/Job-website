@@ -33,8 +33,17 @@ const Page = () => {
     >
   ) => {
     const { name, value } = e.target;
-    const v = name === "title" ? value.replace(/[0-9]/g, "") : value;
-    setFormInput((prev) => ({ ...prev, [name]: v }));
+    // Regex allows letter, number, space, ".", "," and "-"
+    const cleaned = value.replace(/[^a-zA-Z0-9\s.,-]/g, "");
+
+    const finalValue =
+      name === "title"
+        ? value.replace(/[^a-zA-ZÀ-ỹ\s]/g, "")      // title: cannot input number
+        : name === "description" || name === "location"
+        ? cleaned                           // description + location: not allowed special characters
+        : value;
+
+      setFormInput((prev) => ({ ...prev, [name]: finalValue }));
   };
 
   const handleAddTask = (task: TaskInputForm) => {

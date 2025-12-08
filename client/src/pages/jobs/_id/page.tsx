@@ -134,7 +134,7 @@ const JobIdPage = () => {
             setTitle={(val) =>
               setInputUpdate((pre) => ({
                 ...pre,
-                title: val.replace(/[0-9]/g, ""),
+                title: val,
               }))
             }
             job={job}
