@@ -12,7 +12,7 @@ router.get("/find-by-email", customerController.findByEmail);
 router.post("/signout", customerAuth, customerController.signOut);
 router.get("/profile", customerAuth, customerController.profile);
 
-// Job routes (private)
+// Job routes (private) 
 router.use(customerAuth);
 
 // Job routes

@@ -24,6 +24,19 @@ export const createJob = async (req, res, next) => {
     const isValidTasks = validateTasks(tasks, res);
     if (!isValidTasks) return AppError(res, 400, "Invalid tasks");
 
+    // Check duplicate job
+    const existedJob = await Job.findOne({
+      customerId,
+      title: { $regex: new RegExp(`^${title}$`, "i") },
+      location,
+      categories: { $all: categoryIds },
+    });
+
+
+    if (existedJob) {
+      return AppError(res, 400, "You already created the same job.");
+    }
+
     let job;
 
     await withTransaction(async (session) => {

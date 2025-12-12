@@ -34,7 +34,7 @@ const Page = () => {
   ) => {
     const { name, value } = e.target;
     // Regex allows letter, number, space, ".", "," and "-"
-    const cleaned = value.replace(/[^a-zA-Z0-9\s.,-]/g, "");
+    const cleaned = value.replace(/[^a-zA-ZÀ-ỹ0-9\s.,-]/g, "");
 
     const finalValue =
       name === "title"
